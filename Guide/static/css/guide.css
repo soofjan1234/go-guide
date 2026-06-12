@@ -1,0 +1,439 @@
+/* Fonts (from my-blog src/index.css) */
+@font-face {
+  font-family: "EnglishFonts";
+  src: url("../fonts/Bacchus-Bold-2.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ChineseFonts";
+  src: url("../fonts/jjt.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 2-web.ttf：修复原 2.ttf 的 vhea 0x10001（Chrome OTS 无法解析） */
+@font-face {
+  font-family: "ChineseBodyFonts";
+  src: url("../fonts/2-web.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-heading: "EnglishFonts", "ChineseFonts", "Segoe UI", sans-serif;
+  --font-body: "ChineseBodyFonts";
+  --font-mono: "Cascadia Code", "JetBrains Mono", "Fira Code", Consolas,
+    "Segoe UI Mono", ui-monospace, monospace;
+  /* 字号：改这里即可全局生效（正文 / 标题 / 侧栏） */
+  --prose-size: 1.2rem;        /* 正文 p、li，默认 16px；可试 1.0625rem(17px) 或 1.125rem(18px) */
+  --prose-size-h1: 1.6rem;  /* 页面标题 */
+  --prose-size-h2: 1.4rem;   /* ## */
+  --prose-size-h3: 1.25rem;  /* ### */
+  --prose-size-h2-fold: 1.3rem; /* 折叠区块 summary 里的 h2 */
+  --sidebar-size: 1rem;  /* 左侧导航（在 baseof 内联样式里引用不到，见下方 body） */
+  --code-bg: #0d1117;
+  --code-bar: #161b22;
+  --code-bar-border: #30363d;
+}
+
+body {
+  font-family: var(--font-heading);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Prose (light-adapted from my-blog MarkdownRenderer + index.css) */
+article.prose {
+  max-width: none;
+  color: #111827;
+  font-family: var(--font-body);
+  font-size: var(--prose-size);
+  /* jjt 只有 regular；禁止浏览器伪加粗，避免中文标题/粗体发糊 */
+  font-synthesis: none;
+}
+
+article.prose p,
+article.prose li,
+article.prose blockquote,
+article.prose td,
+article.prose th,
+article.prose .section-body,
+article.prose .section-body p,
+article.prose .section-body li {
+  font-family: var(--font-body);
+}
+
+/* 标题仍用原自定义字体 */
+article.prose h1,
+article.prose h2,
+article.prose h3,
+article.prose h4,
+article.prose h5,
+article.prose h6,
+article.prose details.section-fold > summary h2 {
+  font-family: var(--font-heading);
+}
+
+@media (prefers-color-scheme: dark) {
+  article.prose {
+    color: #e4e4e4;
+  }
+}
+
+/* Page title (outside markdown body headings) */
+article.prose > h1:first-child {
+  margin-top: 0;
+  margin-bottom: 0.35rem;
+  font-size: var(--prose-size-h1);
+  font-weight: normal;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+article.prose > p:has(time) {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+}
+
+article.prose h2 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-size: var(--prose-size-h2);
+  font-weight: normal;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+  color: #030712;
+}
+
+article.prose h3 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: var(--prose-size-h3);
+  font-weight: normal;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+  color: #030712;
+}
+
+article.prose h4,
+article.prose h5,
+article.prose h6 {
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-weight: normal;
+  color: #030712;
+}
+
+/* Markdown **粗体**：淡紫底高亮，避免中文伪加粗发糊 */
+article.prose strong,
+article.prose b {
+  font-weight: inherit;
+  color: #5b21b6;
+  background: #ede9fe;
+  padding: 0.1em 0.35em;
+  border-radius: 0.25em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+@media (prefers-color-scheme: dark) {
+  article.prose h2,
+  article.prose h3,
+  article.prose h4,
+  article.prose h5,
+  article.prose h6 {
+    color: #f3f4f6;
+  }
+
+  article.prose strong,
+  article.prose b {
+    color: #e9d5ff;
+    background: rgba(139, 92, 246, 0.22);
+  }
+}
+
+article.prose p {
+  margin-top: 0.75rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.625;
+}
+
+article.prose ul,
+article.prose ol {
+  margin: 1rem 0;
+  padding-left: 0;
+  list-style-position: inside;
+}
+
+article.prose ul {
+  list-style-type: disc;
+}
+
+article.prose ol {
+  list-style-type: decimal;
+}
+
+article.prose li {
+  margin: 0.25rem 0;
+  line-height: 1.625;
+}
+
+article.prose li > ul,
+article.prose li > ol {
+  margin: 0.5rem 0;
+  margin-left: 2ch;
+}
+
+article.prose a {
+  color: #7c3aed;
+  text-decoration: none;
+}
+
+article.prose a:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-color-scheme: dark) {
+  article.prose a {
+    color: #c4b5fd;
+  }
+}
+
+article.prose blockquote {
+  margin: 1rem 0;
+  padding: 0.5rem 1rem;
+  border-left: 4px solid #8b5cf6;
+  border-radius: 0 0.5rem 0.5rem 0;
+  background: #f5f3ff;
+  color: #374151;
+}
+
+@media (prefers-color-scheme: dark) {
+  article.prose blockquote {
+    background: #252525;
+    color: #d1d5db;
+    border-left-color: #7c3aed;
+  }
+}
+
+article.prose img {
+  display: block;
+  width: auto;
+  max-width: min(100%, 42rem);
+  height: auto;
+  margin: 1.5rem 0;
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+article.prose p:has(> img:only-child) {
+  margin: 0.5rem 0;
+}
+
+article.prose hr {
+  margin: 2rem 0;
+  border: 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  article.prose hr {
+    border-top-color: #404040;
+  }
+}
+
+article.prose table {
+  width: 100%;
+  margin: 1rem 0;
+  border-collapse: collapse;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  font-size: 0.875rem;
+}
+
+article.prose thead {
+  background: #f3f4f6;
+}
+
+article.prose th,
+article.prose td {
+  padding: 0.5rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+article.prose th {
+  font-weight: normal;
+  color: #030712;
+}
+
+article.prose td {
+  color: #374151;
+}
+
+@media (prefers-color-scheme: dark) {
+  article.prose table {
+    border-color: #404040;
+  }
+  article.prose thead {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  article.prose th,
+  article.prose td {
+    border-bottom-color: #404040;
+  }
+  article.prose th {
+    color: #e8e8e8;
+  }
+  article.prose td {
+    color: #d1d5db;
+  }
+}
+
+/* 行内代码（`sema`）：黑底等宽，与淡紫 **强调** 区分 */
+article.prose :not(pre) > code {
+  font-family: var(--font-mono);
+  padding: 0.12em 0.45em;
+  font-size: 0.85em;
+  font-weight: normal;
+  color: #e6edf3;
+  background: #24292f;
+  border: 1px solid #30363d;
+  border-radius: 0.35rem;
+}
+
+/* **里的 `code`**：保持黑底小标签，不用紫色字 */
+article.prose strong code,
+article.prose b code {
+  color: #c9d1d9;
+  background: #1c2128;
+  border-color: #444c56;
+}
+
+@media (prefers-color-scheme: dark) {
+  article.prose :not(pre) > code {
+    color: #e6edf3;
+    background: #161b22;
+    border-color: #30363d;
+  }
+
+  article.prose strong code,
+  article.prose b code {
+    color: #e6edf3;
+    background: #0d1117;
+    border-color: #388bfd66;
+  }
+}
+
+/* 代码块（Chroma github-dark + render-codeblock） */
+.code-block {
+  margin: 1.25rem 0 1.75rem;
+  border-radius: 0.625rem;
+  overflow: hidden;
+  border: 1px solid var(--code-bar-border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08),
+    0 2px 4px -2px rgba(0, 0, 0, 0.06);
+}
+
+.code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0.45rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+  color: #8b949e;
+  background: var(--code-bar);
+  border-bottom: 1px solid var(--code-bar-border);
+}
+
+.code-block-lang {
+  text-transform: lowercase;
+  color: #c9d1d9;
+}
+
+.code-copy-btn {
+  padding: 0.2rem 0.55rem;
+  font-size: 0.75rem;
+  font-family: inherit;
+  color: #8b949e;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--code-bar-border);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  opacity: 0.65;
+  transition: opacity 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.code-block:hover .code-copy-btn,
+.code-copy-btn:focus {
+  opacity: 1;
+}
+
+.code-copy-btn:hover {
+  color: #e6edf3;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.code-block .highlight {
+  margin: 0;
+}
+
+.code-block .highlight pre,
+.code-block pre.chroma {
+  margin: 0;
+  padding: 1rem 1.125rem;
+  overflow-x: auto;
+  border-radius: 0;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  tab-size: 4;
+  background: var(--code-bg) !important;
+}
+
+.code-block .chroma {
+  background: var(--code-bg) !important;
+  color: #e6edf3;
+}
+
+.code-block .chroma .line {
+  min-height: 1.65em;
+}
+
+/* 无自定义 wrapper 时的 fallback */
+article.prose > .highlight,
+article.prose .section-body > .highlight {
+  margin: 1.25rem 0 1.75rem;
+  border-radius: 0.625rem;
+  overflow: hidden;
+  border: 1px solid var(--code-bar-border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+}
+
+article.prose .highlight pre,
+article.prose .highlight .chroma {
+  margin: 0;
+  padding: 1rem 1.125rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  tab-size: 4;
+}
+
+/* Folded sections: h2 inside summary */
+article.prose details.section-fold > summary h2 {
+  margin: 0;
+  font-size: var(--prose-size-h2-fold);
+}

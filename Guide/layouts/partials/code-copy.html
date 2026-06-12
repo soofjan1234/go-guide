@@ -1,0 +1,20 @@
+<script>
+(function () {
+  document.querySelectorAll(".code-block").forEach(function (block) {
+    var btn = block.querySelector(".code-copy-btn");
+    if (!btn) return;
+    var code = block.querySelector("code");
+    if (!code) return;
+    btn.addEventListener("click", function () {
+      var text = code.innerText.replace(/\n$/, "");
+      navigator.clipboard.writeText(text).then(function () {
+        var label = btn.textContent;
+        btn.textContent = "已复制";
+        setTimeout(function () {
+          btn.textContent = label;
+        }, 1500);
+      });
+    });
+  });
+})();
+</script>

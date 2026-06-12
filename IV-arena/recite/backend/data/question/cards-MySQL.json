@@ -1,0 +1,17 @@
+{
+  "cards": [
+    {
+      "id": "card-15",
+      "question": "EXPLAIN 与索引诊断",
+      "answer": "判断 SQL 是否真的用到了索引，最直接的方法是执行 EXPLAIN。\n\n重点看以下几个字段：\n\n1. type\n\ntype 表示访问方式，越靠前通常越好：\n\nsystem / const：极优，通过主键或唯一索引一次定位。\neq_ref / ref：较好，常见于普通索引等值查询。\nrange：中等，适用于范围查询。\nindex：全索引扫描，说明虽然扫描的是索引树，但仍然遍历了大量叶子节点。\nALL：全表扫描，数据量一大就是危险信号。\n\n2. key\n\n表示实际使用到的索引。\n若为 NULL，说明这条 SQL 没能使用索引，或者优化器判断不值得使用索引。\n\n3. key_len\n\n用来判断联合索引到底命中了多少列。\n比如联合索引 (a, b)，若 key_len 只体现了 a 的长度，说明 b 没有真正参与索引过滤。\n\n4. Extra\n\nUsing index：命中了覆盖索引，不需要回表。\nUsing index condition：触发了 ICP（索引下推），在索引遍历阶段就做了一部分过滤。\nUsing filesort / Using temporary：说明排序、分组、去重没有很好地利用索引，往往需要进一步优化。",
+      "category": "MySQL",
+      "source_path": "manual-import",
+      "source_type": "pasted_text",
+      "status": "active",
+      "next_review_at": "2026-05-15",
+      "review_count": 0,
+      "last_ai_grade": null,
+      "last_user_grade": null
+    }
+  ]
+}

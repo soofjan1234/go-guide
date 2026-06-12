@@ -1,0 +1,6 @@
+# hugo（构建部署）默认使用 production 环境
+params:
+  showPrivate: false
+
+ignoreFiles:
+  - content/项目/

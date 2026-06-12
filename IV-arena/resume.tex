@@ -1,0 +1,114 @@
+% !TEX TS-program = xelatex
+% !TEX encoding = UTF-8 Unicode
+% !Mode:: "TeX:UTF-8"
+
+\documentclass{resume}
+\usepackage{zh_CN-Adobefonts_external}
+\usepackage{linespacing_fix}
+\usepackage{cite}
+\usepackage{titlesec}
+\usepackage{enumitem}
+% 调整 \section 间距：{左缩进}{标题前间距}{标题后间距}
+\titlespacing*{\section}{0pt}{3ex plus 1ex minus .2ex}{1ex plus .2ex}
+% 调整 itemize 间距：itemsep=item 之间，parsep=同条内段落之间，topsep=列表上下
+\setlist[itemize,1]{itemsep=0.8ex, parsep=0.2ex, topsep=0.3ex}
+\setlist[itemize,2]{itemsep=0.4ex, parsep=0.1ex, topsep=0.2ex}
+\renewcommand{\CJKglue}{\hskip 0.06em}
+
+\begin{document}
+\pagenumbering{gobble}
+
+\name{侯汶政｜Go后端工程师}
+
+\section{\faInfoCircle\ 基本信息}
+\vspace{0.5ex}
+\begin{itemize}
+\large
+\textbf{当前状态：}\textbf{深圳在职}\\[0.5ex]
+\textbf{到岗时间：}\textbf{2-4周}\\[0.5ex]
+\textbf{学历：}\textbf{本科全日制（学信网可查）}\\[0.5ex]
+\textbf{求职偏好：}不外包 / 不驻场\\[0.5ex]
+\textbf{微信：}1489938120\\[0.5ex]
+\textbf{邮箱：}Soofjan1489938120@gmail.com\\[0.5ex]
+\textbf{个人网站：}\href{https://Soofjan.com}{Soofjan.com}\\[0.5ex]
+\textbf{技术博客：}\href{https://juejin.cn/user/4074147977125020}{技术博客}
+\end{itemize}
+
+\section{\faCogs\ 技术能力}
+\begin{itemize}
+    \item \textbf{编程语言}
+    \begin{itemize}
+        \item 深入理解 Go runtime GMP 模型，掌握调度循环、工作窃取、阻塞处理及 goroutine 抢占。
+        \item 掌握 Go 并发编程与源码机制，熟悉 channel、select、锁及 context 等组件的实现原理，能结合业务场景选择通信、加锁、并发编排和超时控制方案。
+        \item 掌握 Go 常用语法与底层结构，理解 slice、map、interface、defer 等核心特性的实现机制，熟悉 map 并发安全、哈希冲突、扩容迁移和 SwissTable 相关机制。
+        \item 深入理解 Go 内存管理与性能排查方法，掌握逃逸分析、栈/堆分配、内存分配器、三色标记、写屏障、GC 触发与 pprof 排查流程。
+        \item 拥有 Vue/React/Android 实战经验，具备多端适应能力。
+    \end{itemize}
+
+    \item \textbf{数据存储}
+    \begin{itemize}
+        \item 掌握 MySQL InnoDB 存储引擎的 Buffer Pool，事务，隔离性，MVCC，索引，内部日志底层的工作原理。
+        \item 熟悉 MySQL 性能优化与线上排查，掌握 EXPLAIN、慢查询日志、索引失效、CPU 高与内存高排查方法，能结合业务场景设计索引与缓存方案。
+        \item 掌握 Redis 数据结构与底层实现，熟悉过期删除、持久化等机制，掌握缓存三兄弟问题、双写一致性的解决方案。
+    \end{itemize}
+
+    \item \textbf{计算机网络}
+    \begin{itemize}
+        \item 熟悉计算机网络核心协议，掌握 HTTP/HTTPS、NAT、DNS、TCP/UDP 等基础机制。
+    \end{itemize}
+
+    \item \textbf{中间件}
+    \begin{itemize}
+        \item 掌握消息队列与生产者消费者模型，熟悉 NSQ 架构，能处理消息丢失与重复消费；了解 Kafka、RocketMQ 等消息队列在不同场景下的使用选择。
+    \end{itemize}
+
+    \item \textbf{开发工具}
+    \begin{itemize}
+        \item 熟悉 Docker 容器化部署技术，了解 k8s 架构。
+        \item 合理使用 superpowers 插件搭配 codex/cursor 等 AI 工具，优化工作效率。
+    \end{itemize}
+\end{itemize}
+
+\section{\faGraduationCap\ 教育背景}
+\datedsubsection{\textbf{广州大学} \quad 学士，计算机科学与技术}{2019.09 -- 2023.06}
+CET-6 英语六级（602分），全国大学生算法设计与编程挑战赛（银奖）
+
+\section{\faSuitcase\ 工作经历}
+\datedsubsection{\textbf{软件工程师 @ 慧为智能科技有限公司}}{2023.05 - 至今}
+
+\paragraph*{私有云存储系统（NAS）开发}
+\noindent\small NAS（Network Attached Storage，网络附加存储）是部署于局域网内的私有云存储设备，为用户提供文件存储、备份及远程访问等能力。\\
+\noindent\textcolor{gray}{\textbf{技术栈：} Go, Gin, Gorm, MySQL, SQLite, Redis, NSQ, Bleve, Docker, Vue, RKNN, OpenCV}
+\vspace{0.3ex}
+
+\begin{itemize}
+
+    \item \textbf{云端}：
+    \begin{itemize}
+        \item 主导设计 NAT 穿透交互架构，规范客户端、服务端、云端及穿透端的通信流程，实现复杂网络下稳定高效访问。
+        \item 引入 NSQ 消息队列，实现事件异步解耦，提升吞吐1.6倍，高并发平均延迟降低约 50\%。
+        \item 采用应用层 AES+RSA 和传输层 TLS 的双层加密方案，保障凭证与敏感字段在复杂网络下的传输安全。
+    \end{itemize}
+
+    \item \textbf{智能文档中心}：
+    \begin{itemize}
+        \item 针对内存受限环境，完成了从 Elasticsearch 到 Bleve 的搜索引擎迁移，结合 GPT 实现快速的全文与多维度检索。
+        \item 设计基于块的索引策略与搜索结果聚合算法，解决超长文档索引阶段内存占用过高问题，峰值 heapInuse 降幅约 76\%+。
+    \end{itemize}
+
+    \item \textbf{AI相册}：
+    \begin{itemize}
+        \item 在 RKNN 平台上基于 JNI 封装实现标签分类；通过 DBSCAN 聚类算法实现万级人脸库的无监督聚类，支持动态聚类中心更新，识别准确率达 97.3\%。
+        \item 通过拉普拉斯方差算法检测模糊照片；通过 dHash+qHash 算法检测重复照片。
+    \end{itemize}
+
+    \item \textbf{其他}：
+    \begin{itemize}
+        \item 文件索引同步系统：自研 BFS+Queue 架构替代 fsnotify 监听，在海量文件场景下内存开销降低 87\% 以上。
+        \item 通过 rate 限流与 Ristretto 缓存库有效缓解并发流量冲击，核心接口缓存命中率达 85\%，响应时间缩短 90ms。
+        \item 开发并维护 Docker、虚拟机、Webdav 等前后端项目，提供 NAS 生态支持。
+    \end{itemize}
+
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,15 @@
+<nav class="top-index" aria-label="技术索引">
+  <a href="{{ "/go/" | relLangURL }}" class="top-index-link{{ if eq .Section "go" }} is-active{{ end }}">Go</a>
+  <span class="top-index-sep" aria-hidden="true">·</span>
+  <a href="{{ "/mysql/" | relLangURL }}" class="top-index-link{{ if eq .Section "mysql" }} is-active{{ end }}">MySQL</a>
+  <span class="top-index-sep" aria-hidden="true">·</span>
+  <a href="{{ "/redis/" | relLangURL }}" class="top-index-link{{ if eq .Section "redis" }} is-active{{ end }}">Redis</a>
+  <span class="top-index-sep" aria-hidden="true">·</span>
+  <a href="{{ "/网络/" | relLangURL }}" class="top-index-link{{ if eq .Section "网络" }} is-active{{ end }}">网络</a>
+  <span class="top-index-sep" aria-hidden="true">·</span>
+  <a href="{{ "/其它/" | relLangURL }}" class="top-index-link{{ if eq .Section "其它" }} is-active{{ end }}">其它</a>
+  {{ if site.Params.showPrivate }}
+  <span class="top-index-sep" aria-hidden="true">·</span>
+  <a href="{{ "/项目/" | relLangURL }}" class="top-index-link{{ if eq .Section "项目" }} is-active{{ end }}">项目</a>
+  {{ end }}
+</nav>

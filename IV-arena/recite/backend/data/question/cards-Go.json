@@ -1,0 +1,43 @@
+{
+  "cards": [
+    {
+      "id": "card-14",
+      "question": "代码变程序会经历哪些步骤",
+      "answer": "1. 编写代码\n2. 预处理，决定哪些文件参与编译、生成辅助代码\n3. 编译，将源代码转换为汇编代码\n4. 汇编，将汇编代码转换为机器码\n5. 链接，静态链接，转换为可执行文件\n6. 运行",
+      "category": "Go",
+      "source_path": "manual-import",
+      "source_type": "pasted_text",
+      "status": "active",
+      "next_review_at": "2026-05-08",
+      "review_count": 0,
+      "last_ai_grade": null,
+      "last_user_grade": null
+    },
+    {
+      "id": "card-8",
+      "question": "make & new的区别",
+      "answer": "1. new：new(T) 做的事情为类型 T 分配一块内存；将这块内存置为 零值；返回 T（指向这块零值内存的指针）。\n2. make 只用于三种类型：slice、map、chan，返回 非零值 的该类型，而不是指针。",
+      "category": "Go",
+      "source_path": "manual-import",
+      "source_type": "pasted_text",
+      "status": "active",
+      "next_review_at": "2026-05-13",
+      "review_count": 1,
+      "last_ai_grade": "A",
+      "last_user_grade": "A"
+    },
+    {
+      "id": "card-9",
+      "question": "GO接口值长什么样",
+      "answer": "运行时里，接口值有两种形态：\n\n空接口：eface = (_type, data)\n非空接口：iface = (itab, data)\n\n可以把它理解成“两个槽位”：\n\n1. 第一格存“当前具体类型是谁”\neface 用 _type\niface 用 itab（里面还带方法跳转表 Fun[]）\n2. 第二格 data 存“具体值放在哪”\n\ndata 常见三种情况：\n\n值副本地址：如 int/struct 装进接口，常见是拷贝后由 data 指向\n原指针值：如 *T 装进接口，data 通常就是这根指针\n静态区地址：小整数/空串/nil slice 等优化场景，data 可指向只读或零值区域",
+      "category": "Go",
+      "source_path": "manual-import",
+      "source_type": "pasted_text",
+      "status": "active",
+      "next_review_at": "2026-05-13",
+      "review_count": 1,
+      "last_ai_grade": "A",
+      "last_user_grade": "A"
+    }
+  ]
+}

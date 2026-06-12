@@ -1,0 +1,11 @@
+<nav class="site-nav" aria-label="站点目录">
+  <h2 class="sidebar-heading">目录</h2>
+  <ul class="site-nav-list">
+    <li><a href="{{ "/" | relURL }}" class="nav-link{{ if .IsHome }} active{{ end }}">首页</a></li>
+    {{ range site.RegularPages.ByWeight }}
+    <li>
+      <a href="{{ .RelPermalink }}" class="nav-link{{ if eq $.RelPermalink .RelPermalink }} active{{ end }}">{{ .Title }}</a>
+    </li>
+    {{ end }}
+  </ul>
+</nav>

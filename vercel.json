@@ -1,0 +1,4 @@
+{
+  "buildCommand": "cd Guide && hugo --environment production --baseURL \"https://${VERCEL_URL}/\"",
+  "outputDirectory": "Guide/public"
+}

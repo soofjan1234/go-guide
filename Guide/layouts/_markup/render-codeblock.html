@@ -1,0 +1,8 @@
+{{- $lang := .Type | default "text" -}}
+<div class="code-block">
+  <div class="code-block-header">
+    <span class="code-block-lang">{{ $lang }}</span>
+    <button type="button" class="code-copy-btn" aria-label="复制代码">复制</button>
+  </div>
+  {{- highlight .Inner $lang "linenos=false,noClasses=false" -}}
+</div>

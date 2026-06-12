@@ -1,0 +1,140 @@
+% !TEX TS-program = xelatex
+% !TEX encoding = UTF-8 Unicode
+% !Mode:: "TeX:UTF-8"
+
+\documentclass{resume}
+\usepackage{zh_CN-Adobefonts_external} % 中英双语版，需要中文字体支持
+\usepackage{linespacing_fix}
+\usepackage{cite}
+
+\begin{document}
+\pagenumbering{gobble}
+
+% ===================== 第一页：中文简历 =====================
+
+\name{侯汶政｜Go后端工程师}
+
+\section{\faInfoCircle\ 基本信息}
+\vspace{0.5ex} % 增加一点间距避免拥挤
+\begin{center}
+\begin{tabular}{p{0.45\textwidth} p{0.45\textwidth}}
+    \textbf{个人网站：}\href{https://Soofjan.com}{Soofjan.com}\\
+    
+    \textbf{微信：}1489938120          & \textbf{当前状态：}深圳在职 \\
+    \textbf{邮箱：}Soofjan1489938120@gmail.com & \textbf{到岗时间：}\textbf{2周} \\
+    \textbf{学历：}本科全日制（\textbf{学信网可查}） & \textbf{求职偏好：}不外包 / 不驻场 \\
+\end{tabular}
+\end{center}
+
+\section{\faCogs\ 技术能力}
+\begin{itemize}[parsep=0.3ex]
+    \item \textbf{编程语言与框架}：使用 Go（Gin、Gorm） 开发，系统掌握 关键字、并发、GMP 调度、内存管理等知识；拥有 Vue 实战经验，具备多端适应能力。
+    \item \textbf{数据存储与缓存}：掌握 MySQL 存储引擎（InnoDB）、B+ 树索引、锁与事务（ACID、隔离级别、MVCC）；掌握 Redis 底层数据结构以及内部实现，熟悉过期策略、持久化、缓存等相关问题。
+    \item \textbf{中间件}：熟悉 NSQ 架构，能处理消息丢失与重复消费；了解Kafka、RocketMQ等消息队列在不同场景下的使用选择。
+    \item \textbf{开发工具}：熟悉 Git/Linux 开发环境；熟悉 TCP/IP、HTTP/HTTPS 等网络基础；高效使用 Cursor AI 工具。
+\end{itemize}
+
+\section{\faGraduationCap\ 教育背景}
+\datedsubsection{\textbf{广州大学} \quad 学士，计算机科学与技术}{2019.09 -- 2023.06}
+CET-6 英语六级（602分），全国大学生算法设计与编程挑战赛（银奖）
+
+\section{\faSuitcase\ 工作经历}
+\datedsubsection{\textbf{软件工程师 @ 慧为智能科技有限公司}}{2023.05 - 至今}
+
+\paragraph*{私有云存储系统（NAS）开发}
+
+\begin{itemize}
+
+    \item \textbf{云端}：
+    \begin{itemize}
+        \item 主导设计 NAT 穿透交互架构，规范客户端、服务端、云端及穿透端的通信流程，实现复杂网络下稳定高效访问。
+        \item 引入 NSQ 消息队列，实现事件异步解耦，提升吞吐1.6倍，高并发平均延迟降低约 50\%。
+        \item 采用应用层 AES+RSA 和传输层 TLS 的双层加密方案，保障凭证与敏感字段在复杂网络下的传输安全。
+    \end{itemize}
+
+    \item \textbf{智能文档中心}：
+    \begin{itemize}
+        \item 针对内存受限环境，完成了从 Elasticsearch 到 Bleve 的搜索引擎迁移，结合 GPT 实现快速的全文与多维度检索。
+        \item 设计基于块的索引策略与搜索结果聚合算法，解决超长文档索引阶段内存占用过高问题，峰值 heapInuse 降幅约 76\%+。
+    \end{itemize}
+    
+    \item \textbf{文件索引同步系统}：
+    \begin{itemize}
+        \item 自研 BFS+Queue 架构替代 fsnotify 监听，在海量文件场景下内存开销降低 90\% 以上。
+        \item 基于接口抽象与 Functional Options 模式，实现同步逻辑与底层存储、IO 的深度解耦，支持跨项目的高内聚集成。
+    \end{itemize}
+    
+    \item \textbf{其他}：
+    \begin{itemize}
+        \item AI相册: 在RKNN平台上基于 JNI 封装实现标签分类；通过 DBSCAN 聚类算法实现万级人脸库的无监督聚类，支持动态聚类中心更新，识别准确率达 97.3\%。
+        \item 通过 rate 限流、Ristretto 缓存库的方式有效缓解并发流量冲击，核心接口缓存命中率达 85\%，响应时间缩短 90ms。
+        \item 开发并维护 Docker、虚拟机、Webdav 等前后端项目，提供 NAS 生态支持。
+    \end{itemize}
+
+\end{itemize}
+
+% ===================== 第二页：英文简历 =====================
+\newpage
+
+\name{Wenzheng Hou | Go Backend Engineer}
+
+\section{\faInfoCircle\ Basic Information}
+\vspace{0.5ex}
+\begin{center}
+\begin{tabular}{p{0.45\textwidth} p{0.45\textwidth}}
+    \textbf{Website: }\href{https://Soofjan.com}{Soofjan.com}\\
+    
+    \textbf{WeChat: }1489938120          & \textbf{Location: }Shenzhen, China \\
+    \textbf{Email: }Soofjan1489938120@gmail.com & \textbf{Availability: }\textbf{2 Weeks} \\
+    \textbf{Education: }Bachelor's Degree (Full-time) & \textbf{Preference: }No Outsource \\
+\end{tabular}
+\end{center}
+
+\section{\faCogs\ Technical Skills}
+\begin{itemize}[parsep=0.3ex]
+    \item \textbf{Languages \& Frameworks}: Expert in Go (Gin, Gorm) with deep understanding of keywords, concurrency, GMP scheduling, and memory management; experienced with Vue and multi-platform adaptation.
+    \item \textbf{Storage \& Caching}: Proficient in MySQL (InnoDB, B+ Tree, locks, ACID, isolation levels, MVCC); expert in Redis internals including eviction policies, persistence, and caching strategies.
+    \item \textbf{Middleware}: Experienced with NSQ architecture, capable of handling message loss and duplicate consumption; familiar with choosing between Kafka and RocketMQ for different scenarios.
+    \item \textbf{Tools \& Networking}: Proficient in Git/Linux development environments; solid foundation in TCP/IP, HTTP/HTTPS; highly proficient in using Cursor AI tools for development.
+\end{itemize}
+
+\section{\faGraduationCap\ Education}
+\datedsubsection{\textbf{Guangzhou University} \quad B.Eng. in Computer Science and Technology}{Sep 2019 -- Jun 2023}
+CET-6 (Score: 602), Silver Medal in National Undergraduate Algorithm Design and Programming Challenge.
+
+\section{\faSuitcase\ Work Experience}
+\datedsubsection{\textbf{Software Engineer @ Huiwei Intelligence Technology Co., Ltd.}}{May 2023 -- Present}
+
+\paragraph*{Private Cloud Storage System (NAS) Development}
+
+\begin{itemize}
+
+    \item \textbf{Cloud Infrastructure}:
+    \begin{itemize}
+        \item Led the design of NAT traversal architecture, standardized communication protocols between clients, servers, cloud, and traversal nodes, ensuring stable access in complex network environments.
+        \item Integrated NSQ message queue for asynchronous event decoupling, increasing throughput by 1.6x and reducing average latency under high concurrency by approximately 50\%.
+        \item Implemented dual-layer encryption (AES+RSA at application layer, TLS at transport layer) to secure credentials and sensitive data in transit.
+    \end{itemize}
+
+    \item \textbf{Intelligent Document Center}:
+    \begin{itemize}
+        \item Migrated the search engine from Elasticsearch to Bleve for memory-constrained environments, integrating with GPT for rapid full-text and multi-dimensional search.
+        \item Designed a block-based indexing strategy and search result aggregation algorithm, solving memory exhaustion issues during large document indexing, reducing peak heapInuse by over 76\%.
+    \end{itemize}
+    
+    \item \textbf{File Indexing \& Sync System}:
+    \begin{itemize}
+        \item Developed a custom BFS+Queue architecture to replace fsnotify for file monitoring, reducing memory overhead by over 90\% in massive file scenarios.
+        \item Decoupled sync logic from storage and I/O via interface abstraction and Functional Options patterns, enabling high-cohesion cross-project integration.
+    \end{itemize}
+    
+    \item \textbf{Other Projects}:
+    \begin{itemize}
+        \item AI Album: Implemented JNI-based tag classification on RKNN; applied DBSCAN for unsupervised face clustering (10K+ faces) with dynamic center updates, reaching 97.3\% accuracy.
+        \item Mitigated high-concurrency traffic impacts using rate limiting and the Ristretto caching library, achieving an 85\% cache hit rate for core interfaces and reducing response time by 90ms.
+        \item Developed and maintained Docker, Virtual Machine, and Webdav projects, providing a comprehensive NAS ecosystem.
+    \end{itemize}
+
+\end{itemize}
+
+\end{document}

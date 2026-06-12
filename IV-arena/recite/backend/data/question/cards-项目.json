@@ -1,0 +1,30 @@
+{
+  "cards": [
+    {
+      "id": "card-4",
+      "question": "分块 + Batch 后，峰值 heapInuse 降幅约 76%+，怎么测的",
+      "answer": "20多种情况，不同的分块0-10mb，不同的batch5-50mb，互相匹配，计算得出最佳方案，最终选定1mb分块，10mb batch",
+      "category": "项目",
+      "source_path": "manual-import",
+      "source_type": "pasted_text",
+      "status": "active",
+      "next_review_at": "2026-05-10",
+      "review_count": 1,
+      "last_ai_grade": "B",
+      "last_user_grade": "A"
+    },
+    {
+      "id": "card-6",
+      "question": "限流 + 缓存：核心接口缓存命中率约 85%，响应时间缩短约 90ms，怎么做的",
+      "answer": "实验分组：\n1. 都关：基线组，用于对照“缩短了多少 ms”。\n2. 只开限流：观察稳定性指标，如 429Ratio、错误率、服务降级情况。\n3. 只开缓存：观察缓存命中率（HitRate）与平均/分位延迟变化。\n4. 都开：观察综合收益，重点看 p99Latency（99 分位延迟）、错误率与吞吐。\n结论表达：在相同流量模型下，命中率约 85%，接口响应缩短约 90ms；并且在突发流量下曲线更稳。",
+      "category": "项目",
+      "source_path": "manual-import",
+      "source_type": "pasted_text",
+      "status": "active",
+      "next_review_at": "2026-05-09",
+      "review_count": 1,
+      "last_ai_grade": "B",
+      "last_user_grade": "B"
+    }
+  ]
+}

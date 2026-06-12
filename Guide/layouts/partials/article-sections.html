@@ -1,0 +1,56 @@
+<script>
+(function () {
+  var article = document.querySelector("article");
+  if (!article) return;
+
+  var h2s = Array.prototype.slice.call(article.querySelectorAll("h2"));
+  if (!h2s.length) return;
+
+  function parsePlus(text) {
+    var m = String(text).match(/\s*\+(\d+)\s*$/);
+    return m ? parseInt(m[1], 10) : null;
+  }
+
+  function baseTitle(text) {
+    return String(text).replace(/\s*\+\d+\s*$/, "").trim();
+  }
+
+  function plusMarkup(count) {
+    return ' <span class="section-plus">+' + count + "</span>";
+  }
+
+  h2s.forEach(function (h2) {
+    var parent = h2.parentNode;
+    var count = parsePlus(h2.textContent);
+    var title = baseTitle(h2.textContent);
+    var details = document.createElement("details");
+    details.className = "section-fold";
+
+    var summary = document.createElement("summary");
+    summary.className = "section-summary";
+
+    var body = document.createElement("div");
+    body.className = "section-body";
+
+    parent.insertBefore(details, h2);
+    summary.appendChild(h2);
+
+    var node = details.nextSibling;
+    while (node && !(node.nodeType === 1 && node.tagName === "H2")) {
+      var next = node.nextSibling;
+      body.appendChild(node);
+      node = next;
+    }
+
+    details.appendChild(summary);
+    if (body.childNodes.length) {
+      details.appendChild(body);
+    }
+
+    h2.textContent = title;
+    if (count !== null) {
+      h2.insertAdjacentHTML("beforeend", plusMarkup(count));
+    }
+  });
+})();
+</script>

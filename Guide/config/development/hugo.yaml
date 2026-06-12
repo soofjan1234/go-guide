@@ -1,0 +1,3 @@
+# hugo server 默认使用 development 环境
+params:
+  showPrivate: true
