@@ -1,0 +1,194 @@
+{
+  "main": {
+    "id": "629ba8bb0f5fbefe",
+    "type": "split",
+    "children": [
+      {
+        "id": "00d871d81d8210a8",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "3921dbc435643fa9",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "IV-arena/battle/26.6/6-12.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "6-12"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "804556352c685912",
+    "type": "split",
+    "children": [
+      {
+        "id": "13ff7de543c35d60",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "43455761953a97a6",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "7f9b8a60dad877f1",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "000f2c9bd0e0b9e2",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "cf92bcdb9354adac",
+    "type": "split",
+    "children": [
+      {
+        "id": "6ca42f5ac56004b0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a1dc32a1730e50e3",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "IV-arena/battle/26.6/6-12.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "6-12 的反向链接列表"
+            }
+          },
+          {
+            "id": "39670df733a8c26d",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "IV-arena/battle/26.6/6-12.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "6-12 的出链列表"
+            }
+          },
+          {
+            "id": "287169d4c483f39a",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "d4349ad33075b501",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "添加笔记属性"
+            }
+          },
+          {
+            "id": "4a7f4db8989d7f28",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "IV-arena/battle/26.6/6-12.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "6-12 的大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "bases:新建数据库": false
+    }
+  },
+  "active": "3921dbc435643fa9",
+  "lastOpenFiles": [
+    "IV-arena/battle/26.6/6-10.md",
+    "IV-arena/battle/26.6/6-8.md",
+    "IV-arena/battle/26.6/6-4.md",
+    "IV-arena/battle/26.6/6-1.md",
+    "IV-arena/battle/26.6/6-3.md"
+  ]
+}
