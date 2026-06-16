@@ -37,7 +37,7 @@ python transcribe.py <你的文件路径>
 ```bash
 export KMP_DUPLICATE_LIB_OK=TRUE  # macOS 必填，防止 OpenMP 报错
 cd /Users/Zhuanz/projects/OtherWS/Note/IV-arena/conv
-conda run -n iv-helper-speech python transcribe.py 
+conda run -n iv-helper-speech python transcribe.py '文件'
 ```
 
 ### 3. 先提取音频再转录 (处理超大视频推荐)
