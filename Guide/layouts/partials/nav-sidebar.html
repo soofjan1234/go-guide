@@ -2,7 +2,7 @@
 <nav class="nav-sidebar" aria-label="站点目录">
   <h2 class="side-title">目录</h2>
   <ul class="side-list">
-    {{ if or (eq $current.Section "go") (eq $current.Section "mysql") (eq $current.Section "redis") (eq $current.Section "网络") (eq $current.Section "其它") (and site.Params.showPrivate (eq $current.Section "项目")) }}
+    {{ if or (eq $current.Section "go") (eq $current.Section "go实战") (eq $current.Section "mysql") (eq $current.Section "redis") (eq $current.Section "网络") (eq $current.Section "其它") (and site.Params.showPrivate (eq $current.Section "项目")) }}
       {{ with site.GetPage "section" $current.Section }}
         <li>
           <a href="{{ .RelPermalink }}" class="side-link{{ if $current.Eq . }} is-active{{ end }}">{{ .Title }}（索引）</a>
