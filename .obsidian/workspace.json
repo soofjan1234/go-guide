@@ -4,17 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "5cf4abfe05488601",
+        "id": "00d871d81d8210a8",
         "type": "tabs",
         "children": [
           {
-            "id": "e45561f532e6d896",
+            "id": "3921dbc435643fa9",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "IV-arena/battle/26.6/6-12.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "新标签页"
+              "title": "6-12"
             }
           }
         ]
@@ -181,7 +185,7 @@
   },
   "active": "43455761953a97a6",
   "lastOpenFiles": [
-<<<<<<< HEAD
+    "IV-arena/IMG_4179.jpg",
     "Guide/content/go实战/8-mutex-rwmutex",
     "Guide/public/go实战/7-goroutine-context-waitgroup/index.html",
     "Guide/public/go实战/7-goroutine-context-waitgroup",
@@ -195,7 +199,6 @@
     "Guide/public/go实战/5-map-syncmap-mutex",
     "Guide/content/go实战/5-map-syncmap-mutex/index.md",
     "Guide/content/go实战/5-map-syncmap-mutex",
-    "Guide/public/go实战/4-channel-select/index.html",
     "Guide/content/go实战/4-channel-select/index.md",
     "Guide/content/go实战/3-range-closure/index.md",
     "Guide/content/go实战/2-slice-array-append/index.md",
@@ -208,18 +211,6 @@
     "IV-arena/mock/6/iv.md",
     "IV-arena/battle/26.6/6-15.md",
     "IV-arena/battle/26.3/3-24-纯问题.md",
-=======
-    "IV-arena/battle/26.3/3-24-纯问题.md",
-    "Guide/content/网络/HTTP/index.md",
-    "Guide/content/网络/TCP/index.md",
-    "Guide/content/项目/1-云端/index.md",
-    "IV-arena/battle/26.6/6-12.md",
-    "IV-arena/mock/6/录屏2026-06-13 10.26.41.txt",
-    "IV-arena/mock/6/录屏2026-06-13 10.26.41.mov",
-    "IV-arena/mock/6",
-    "IV-arena/battle/26.6/录屏2026-06-15 18.30.13.txt",
-    "IV-arena/battle/26.6/录屏2026-06-15 18.30.13.mov",
->>>>>>> 9db2fe5650441b70c6fb45cd2effcf71f8ffcdd4
     "IV-arena/battle/26.6/6-10.md",
     "IV-arena/battle/26.6/6-8.md",
     "IV-arena/battle/26.6/6-4.md",

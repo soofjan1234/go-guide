@@ -11,3 +11,5 @@ Guide/.hugo_build.lock
 *.mp3
 _uv*.txt
 uvicorn-log.json
+
+.obsidian/workspace.json

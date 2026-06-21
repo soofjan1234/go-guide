@@ -8,9 +8,15 @@ draft: false
 ##  ES、MS、bleve、MySQL 对比？
 
 在搜索引擎选型中，我们优先考虑部署复杂度与空间占用。ES虽然功能强大，但更适用于大规模分布式场景，对于资源敏感的nas产品来说 内存占用巨大，默认消耗 1-2GB，同时需要 Java 环境；
-Meilisearch降低了使用门槛，但仍需独立部署，同时中文分词有问题。
+Meilisearch降低了使用门槛，但仍需独立部署。
 MySQL 的 FULLTEXT 索引能做简单全文检索，但文档中心需要更好的相关性排序、模糊/纠错、中文分词与高亮等，用 MySQL 要么能力不足要么要自己拼，维护成本高；且把「文档检索」和业务结构化数据分开，用嵌入式检索引擎更清晰
 Bleve，就像sqlite，完全嵌入式，同时是go原生，无需额外服务，从而降低运维成本并提升部署效率。
+
+## ES和bleve内存占用
+
+即使排除 JVM 和 HTTP 服务，ES 仍然会因为 DocValues、Query Cache、Aggregation 中间状态、Shard Reader、Cluster Metadata 等数据结构占用远高于 Bleve 的内存。
+
+Bleve 更偏嵌入式搜索库，而 ES 更像一个完整的分布式搜索数据库，因此需要用更多内存换取查询能力和集群能力
 
 ## 倒排概念以及优缺点
 
