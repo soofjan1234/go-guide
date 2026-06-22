@@ -5,12 +5,12 @@ date: 2026-06-12
 draft: false
 ---
 
+# 一、算法
 ## 人脸检测和识别的流程
 
-1. 人脸检测：使用了 OpenCV 的算法检测人脸，返回人脸的位置信息。
-2. 人脸识别：使用了 OpenCV 的另一个算法，提取人脸特征向量
-3. 人脸聚类：计算人脸特征之间的距离矩阵，再使用DBSCAN聚类，并得到每个类别的中心特征向量
-4. 人脸分类：计算新人脸特征与聚类中心特征的距离，根据阈值来确定是加入还是创建新类别
+1. 人脸检测和识别：使用了 OpenCV ，返回人脸的位置信息并提取人脸特征向量
+2. 人脸聚类：计算人脸特征之间的距离矩阵，再使用DBSCAN聚类，并得到每个类别的中心特征向量
+3. 人脸分类：计算新人脸特征与聚类中心特征的距离，根据阈值来确定是加入还是创建新类别
 
 ## DBSCAN算法
 
@@ -28,29 +28,16 @@ draft: false
     2. 再看小弟，是否也是大佬，如此套娃
     3. 知道所有人都被判定身份
 
-## OpenCV 、DBSCAN的技术选型
+## DBSCAN的技术选型
 
-1. OpenCV 是一个成熟稳定的计算机视觉库， 精度高、速度快，适用于实时应用。
-此外，OpenCV 的模型文件较小，且开源免费。
-2. 人脸聚类有K-Means、DBSCAN和HDBSCAN。
-    1. **K-Means**：简单、易于理解；需要预先指定簇的数量。
-    2. **DBSCAN**：适合处理噪声和复杂的簇形状；不需要预先指定簇的数量。
-    3. **HDBSCAN**：更智能的聚类，处理复杂分布更稳健；比 DBSCAN 慢一些。
-
-## DBSCAN 的两个核心参数 eps、minPts 是怎么选出来的？
-
-先在一小批 embedding 上统计"同人 vs 异人"的距离分布，把 eps 粗范围卡出来，
-然后在这个范围内配合 minPts 做了一个小网格搜索，
-用簇纯度、簇数、噪声比例这些简单指标选出一组在我们人脸场景下最平衡的参数
+人脸聚类有K-Means、DBSCAN和HDBSCAN。
+1. **K-Means**：简单、易于理解；需要预先指定簇的数量。
+2. **DBSCAN**：适合处理噪声和复杂的簇形状；不需要预先指定簇的数量。
+3. **HDBSCAN**：更智能的聚类，处理复杂分布更稳健；比 DBSCAN 慢一些。
 
 ## 相册 AI 用了什么模型？走了CPU吗
 
-**只有「场景/标签分类」走了 NPU（RKNN）；「人脸」没有走 NPU。**
-
-| 功能 | 模型 | 推理方式 | 是否 NPU/RKNN |
-| --- | --- | --- | --- |
-| **场景/标签分类**（LabelService） | nas_classify_quantized.rknn | rknn4j JNI → native 推理 | **是，走 NPU（RKNN Toolkit）** |
-| **人脸检测 + 人脸识别**（FaceService） | face_detection_yunet_2023mar.onnx、face_recognition_sface_2021dec.onnx | OpenCV FaceDetectorYN / FaceRecognizerSF（DNN 读 ONNX） | **否，当前是 CPU（OpenCV DNN）** |
+只有「场景/标签分类」走了 NPU（RKNN）；「人脸」没有走 NPU。
 
 ## 新照片来了怎么分类？
 
@@ -58,6 +45,24 @@ draft: false
 2. 距离 < 阈值 → 归入已有聚类
 3. 距离 > 阈值 → 创建新聚类，该特征向量作为新聚类中心
 
+## 跑万级照片性能、时间如何？
+## 照片的选取有什么讲究
+
+人脸检测用了WIDER FACE，测试集分为 Easy（简单）、Medium（中等）、Hard（困难） 三个等级
+人脸识别/验证用了 LFW (Labeled Faces in the Wild) 人脸识别数据集
+
+## RKNN + JNI 这块你具体做了什么？
+
+RKNN 主要用于端侧模型推理。流程上先把训练好的模型转换成 RKNN 支持的格式，然后在 native 层加载模型、初始化 RKNN runtime，并封装输入预处理、推理、输出解析这些步骤。
+JNI 这块主要是把 native 层能力暴露给 Android 层，比如：
+initModel()
+classifyImage()
+extractFaceFeature()
+release()
+Android 层负责图片读取、任务调度和结果入库，native 层负责模型推理。为了减少 JNI 调用开销，会尽量批量处理图片，并避免频繁传递大对象，图片会先做 resize 和格式转换，只传递推理所需的数据。
+
+
+# 二、模糊、重复检测
 ## 模糊算法
 
 - **拉普拉斯方差（Laplacian Variance）**
@@ -65,11 +70,8 @@ draft: false
 
 ## 重复照片
 
-- **dHash（差分哈希，Difference Hash）**。
-- 比较方式：**汉明距离（Hamming distance）**，范围 0–64；距离越小越相似。
+## 为什么选这两个 
 
-**流程**
+# 三、优化
 
-1. **先做模糊检测**：只对**非模糊**的照片做重复检测（清晰照片列表 clearPhotos）。
-2. **算每张图的**：清晰度分数 + dHash。
-3. **两两比较**：汉明距离 ≤ duplicate_threshold（默认 4）则视为同一组重复。
+## 怎么做的
