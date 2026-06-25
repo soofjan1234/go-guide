@@ -7,6 +7,8 @@ draft: false
 
 ## Docker 多阶段构建是什么 +1
 
+![](pic/docker.png)
+
 多阶段构建是在一个 Dockerfile 里写多个 `FROM`，前面的阶段负责编译、构建，最后一个阶段只保留运行需要的产物。
 
 核心目的：
@@ -83,6 +85,8 @@ ENTRYPOINT ["/app/server"]
 
 ## Nginx 用来干嘛 +1
 
+![](pic/nginx.png)
+
 Nginx 是高性能 Web 服务器，常见作用：
 
 1. 静态资源服务：托管 HTML、CSS、JS、图片等前端构建产物。
@@ -123,6 +127,8 @@ Kubernetes 是容器编排平台，用来管理大量容器的部署、扩缩容
 Docker 解决的是单个容器如何构建和运行，K8s 解决的是一组容器如何在多台机器上稳定运行。
 
 ### K8s 基本架构
+
+![](pic/k8s架构.png)
 
 K8s 集群分为控制平面和工作节点。
 
