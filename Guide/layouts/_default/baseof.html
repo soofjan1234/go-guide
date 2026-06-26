@@ -67,7 +67,8 @@
         grid-column: 1;
       }
       .header-end {
-        display: none;
+        grid-column: 1;
+        justify-self: center;
       }
     }
     header.site-header h1 {
@@ -262,7 +263,7 @@
     }
   </style>
 </head>
-<body>
+<body data-language-mode="bilingual">
   <header class="site-header">
     <div class="header-inner">
       <div class="header-brand">
@@ -271,7 +272,9 @@
       <div class="header-center">
         {{ partial "header-topnav.html" . }}
       </div>
-      <div class="header-end" aria-hidden="true"></div>
+      <div class="header-end">
+        {{ partial "language-mode-toggle.html" . }}
+      </div>
     </div>
   </header>
   <div class="shell">

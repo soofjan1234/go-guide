@@ -1,0 +1,34 @@
+<div class="language-mode-toggle" role="group" aria-label="Language mode">
+  <button type="button" data-language-mode-value="zh">中文</button>
+  <button type="button" data-language-mode-value="bilingual">中英</button>
+  <button type="button" data-language-mode-value="en">English</button>
+</div>
+<script>
+(function () {
+  var key = "guide-language-mode";
+  var modes = { zh: true, bilingual: true, en: true };
+  var fallback = "bilingual";
+  var stored = localStorage.getItem(key);
+  var initial = modes[stored] ? stored : fallback;
+  var buttons = Array.prototype.slice.call(document.querySelectorAll("[data-language-mode-value]"));
+
+  function setMode(mode) {
+    if (!modes[mode]) mode = fallback;
+    document.body.setAttribute("data-language-mode", mode);
+    localStorage.setItem(key, mode);
+    buttons.forEach(function (button) {
+      var active = button.getAttribute("data-language-mode-value") === mode;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+  }
+
+  buttons.forEach(function (button) {
+    button.addEventListener("click", function () {
+      setMode(button.getAttribute("data-language-mode-value"));
+    });
+  });
+
+  setMode(initial);
+})();
+</script>

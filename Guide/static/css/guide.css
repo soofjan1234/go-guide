@@ -163,6 +163,111 @@ article.prose p {
   line-height: 1.625;
 }
 
+.language-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin: 0.25rem 0 1rem;
+  padding: 0.2rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.language-mode-toggle button {
+  border: 0;
+  border-radius: 6px;
+  padding: 0.32rem 0.65rem;
+  color: #374151;
+  background: transparent;
+  font: inherit;
+  font-size: 0.88rem;
+  line-height: 1.3;
+  cursor: pointer;
+}
+
+.language-mode-toggle button:hover {
+  background: #eef2ff;
+}
+
+.language-mode-toggle button.is-active {
+  color: #111827;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+}
+
+.header-end .language-mode-toggle {
+  margin: 0;
+  padding: 0.12rem;
+  border-radius: 7px;
+}
+
+.header-end .language-mode-toggle button {
+  padding: 0.18rem 0.46rem;
+  border-radius: 5px;
+  font-size: 0.78rem;
+  line-height: 1.25;
+}
+
+.bilingual-block {
+  margin: 0.75rem 0 1.5rem;
+}
+
+.bilingual-text > :first-child {
+  margin-top: 0;
+}
+
+.bilingual-text > :last-child {
+  margin-bottom: 0;
+}
+
+.bilingual-text-en {
+  font-family: var(--font-heading);
+}
+
+body[data-language-mode="zh"] .bilingual-text-en,
+body[data-language-mode="en"] .bilingual-text-zh {
+  display: none;
+}
+
+body[data-language-mode="bilingual"] .bilingual-text-zh {
+  margin-top: 0.35rem;
+  color: #6b7280;
+  font-size: 0.86em;
+  line-height: 1.55;
+}
+
+body[data-language-mode="zh"] .bilingual-text-zh,
+body[data-language-mode="en"] .bilingual-text-en {
+  color: inherit;
+  font-size: 1em;
+}
+
+@media (prefers-color-scheme: dark) {
+  .language-mode-toggle {
+    border-color: #333;
+    background: #171717;
+  }
+
+  .language-mode-toggle button {
+    color: #d1d5db;
+  }
+
+  .language-mode-toggle button:hover {
+    background: rgba(138, 180, 248, 0.14);
+  }
+
+  .language-mode-toggle button.is-active {
+    color: #f9fafb;
+    background: #262626;
+    box-shadow: none;
+  }
+
+  body[data-language-mode="bilingual"] .bilingual-text-zh {
+    color: #9ca3af;
+  }
+}
+
 article.prose ul,
 article.prose ol {
   margin: 1rem 0;
