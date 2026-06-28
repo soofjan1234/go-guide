@@ -303,17 +303,29 @@ The catch: a tight loop like `for {}` with no function calls is hard to preempt 
 
 {{< bilingual >}}
 {{< en >}}
+Trigger case:
+A G enters a potentially long-blocking syscall, such as blocking I/O, file I/O, or a device syscall.
 
+Flow:
+1. The G calls a syscall from user code. Before entering the syscall, the runtime executes entersyscall.
+2. The G changes its state from _Grunning to _Gsyscall.
+3. The M executing this G enters the kernel and may block, so the runtime releases the P from this M before the syscall blocks.
+4. The released P can then be acquired by another M to continue running other runnable Gs.
+5. When the syscall returns, the runtime executes exitsyscall. The G first tries the fast path to acquire an available P immediately.
+6. If it succeeds, the G continues execution in user mode.
+7. If it cannot acquire a P, the G is changed to _Grunnable and put into the global run queue, waiting to be scheduled again.
 {{< /en >}}
 
 {{< zh >}}
-**触发情况**：`G` 进入可能长时间阻塞的系统调用（如阻塞 I/O、文件/设备调用等）。
+触发场景：
+当 G 执行可能阻塞较久的 syscall 时，例如阻塞文件 I/O、设备调用、某些系统调用等，当前执行它的 M 会随 G 一起陷入内核阻塞。
 
-**流程**
-1. G 在业务代码里调用会陷入内核的 syscall（常见是 `_Gsyscall`）。
-2. 执行 syscall 的 M 随该 G 一起进内核，此时阻塞。
-3. runtime 在进入 syscall 前后（entersyscall / 返回路径）做处理：尽量把当前 M 上的 `P` 让出来（handoff / retake 等），交给其它 `M` 接管 `P`。
-4. syscall 返回后，该 G 先走 快速路径：尝试立刻 拿回可用的 `P`，若成功则继续在用户态执行。
-5. 若暂时拿不到 `P`，则把自己转为 `_Grunnable` 放入全局队列等待调度。
+流程：
+1. G 在用户代码中调用 syscall，runtime 在进入 syscall 前执行 entersyscall。
+2. G 状态从 _Grunning 变为 _Gsyscall。
+3. 当前 M 会释放绑定的 P，使这个 P 可以被其他 M 接管，继续调度其他 runnable G，避免因为一个阻塞 syscall 浪费 P。
+4. syscall 返回后，runtime 走 exitsyscall 路径，G 会优先尝试快速重新获取一个可用的 P。
+5. 如果获取 P 成功，G 继续执行用户代码。
+6. 如果暂时获取不到 P，G 会被标记为 _Grunnable，并放入全局运行队列，等待后续调度。
 {{< /zh >}}
 {{< /bilingual >}}
