@@ -230,7 +230,7 @@ The catch: a tight loop like `for {}` with no function calls is hard to preempt 
 {{< /zh >}}
 {{< /bilingual >}}
 
-## 阻塞与唤醒、网络 +3
+## 阻塞与唤醒、网络 +4
 
 #### 普通阻塞（G 级别）
 ![](pic/GMP机制.普通阻塞.png)

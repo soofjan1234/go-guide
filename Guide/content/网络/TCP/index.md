@@ -7,8 +7,13 @@ draft: false
 
 ## TCP状态 +1 
 
-1. TIME_WAIT：第四次挥手时主动关闭方进入的状态，要等2MSL，确保超时重传以及所有报文消亡
-2. CLOSE_WAIT：第二次挥手时接收端进入的状态，还可继续发数据，大量CLOSE_WAIT可能是因为代码没写close。
+1. TIME_WAIT：
+    - 第四次挥手时主动关闭方进入的状态
+    - 等2MSL，确保超时重传以及所有报文消亡
+    - 大量TIME_WAIT短连接太多、主动关闭太频繁，可以HTTP Keep-Alive、连接池
+2. CLOSE_WAIT：
+    - 第二次挥手时接收端进入的状态，还可继续发数据
+    - 大量CLOSE_WAIT可能是因为代码没写close，可以修代码、设置读写超时
 
 > MSL（Maximum Segment Lifetime，报文最大生存时间，通常是 1-2 分钟）
 

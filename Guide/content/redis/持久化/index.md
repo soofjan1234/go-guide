@@ -5,7 +5,9 @@ date: 2026-05-27
 draft: false
 ---
 
-## RDB +1
+## 持久化 +2
+
+### RDB
 
 ![持久化.RDB](pic/持久化.RDB.png)
 
@@ -15,7 +17,7 @@ draft: false
 
 fork 后共用物理页；主进程**改**某页时 OS 复制该页再改；子进程看到的是 fork 瞬间镜像，据此写 `.rdb`。
 
-## AOF +1
+### AOF
 
 ![持久化.AOF](pic/持久化.AOF.png)
 
