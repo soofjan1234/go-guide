@@ -1,7 +1,7 @@
 ---
 name: iv-interview-debrief
 description: >-
-  面试录音复盘全流程：Whisper 转录 → 问答整理 txt → 提取 iv.md 问题清单。
+  面试录音复盘全流程：Whisper 转录 → 问答整理 txt → 提取问题清单与同类追问预测。
   触发词：面试复盘、转录、iv.md、iv2.md、录音转文字、面试录音、Whisper、IV-arena。
 ---
 
@@ -20,7 +20,7 @@ IV-arena/
 └── battle/{M-D}/                  # 如 6-1 = 6月1日
     ├── 录音.m4a
     ├── 录音.txt                   # 问答整理（Step 2 产出）
-    ├── iv.md                      # 第 1 轮问题清单
+    ├── iv.md                      # 第 1 轮问题清单 + 同类追问预测
     └── iv2.md                     # 第 2 轮（依次 iv3.md …）
 ```
 
@@ -31,7 +31,7 @@ IV-arena/
 ```
 - [ ] Step 1: Whisper 转录 → 原始 .txt
 - [ ] Step 2: 整理为问答格式 .txt
-- [ ] Step 3: 提取问题清单 iv{N}.md
+- [ ] Step 3: 提取问题清单 + 同类追问预测 iv{N}.md
 ```
 
 用户若只要求其中一步，只执行对应步骤；若已有原始 txt，跳过 Step 1。
@@ -129,9 +129,15 @@ conda run -n iv-helper-speech python IV-arena/conv/transcribe.py "IV-arena/battl
 
 ---
 
-## Step 3: 问题清单 iv{N}.md
+## Step 3: 问题清单 + 同类追问预测 iv{N}.md
 
-从问答 txt 提取**面试官的问题**，不写答案。
+从问答 txt 提取**面试官的问题**，再基于本轮提问风格生成**同类追问预测**。
+
+默认不再生成 `[复盘]` 模块；除非用户明确要求“复盘建议 / 答案 / 标准答案 / 扣分点”，否则 iv{N}.md 只包含：
+
+1. `[问题]`
+2. 关键词行
+3. `[同类追问预测]`
 
 ### 命名
 
@@ -154,6 +160,16 @@ conda run -n iv-helper-speech python IV-arena/conv/transcribe.py "IV-arena/battl
     1. …
 
 关键词1、关键词2、关键词3
+
+
+[同类追问预测]
+这个面试官的风格是……
+
+1. 主题大类
+    1. 可能追问 1
+    2. 可能追问 2
+2. 主题大类
+    1. …
 ```
 
 规则：
@@ -161,6 +177,11 @@ conda run -n iv-helper-speech python IV-arena/conv/transcribe.py "IV-arena/battl
 - 同一大题下的追问合并为子项，避免一行一题过于碎片化
 - 场景题单独成类（如「广告出价接口设计（场景题）」）
 - 最后一行：3–8 个话题标签，空格或顿号分隔
+- `[同类追问预测]` 要从本轮面试官的提问习惯反推，不泛泛刷题：
+  - 优先延展已问主题的边界场景、失败场景、底层机制、工程取舍
+  - 保持面试官原有风格：如果本轮偏场景压迫，就生成场景追问；如果偏源码底层，就生成底层追问
+  - 每个主题 3–8 个问题，按“场景 -> 机制 -> 风险 -> 兜底方案”组织
+  - 只写问题，不写答案；不要生成 `[复盘]`、标准答案或长段建议
 
 完整示例见 [templates.md](templates.md)。
 
@@ -175,6 +196,8 @@ conda run -n iv-helper-speech python IV-arena/conv/transcribe.py "IV-arena/battl
 - [ ] `[...x.xs]` / `[...x s]` 停顿标记已保留；长停顿和频繁停顿没有被清理掉
 - [ ] 长答已按自然断点换行，无整段超长单行堆砌
 - [ ] iv{N}.md 覆盖 txt 中所有面试问题，无遗漏大题
+- [ ] iv{N}.md 包含 `[同类追问预测]`，且问题贴近本轮面试官风格
+- [ ] 除非用户明确要求，iv{N}.md 不生成 `[复盘]` 模块或标准答案
 - [ ] 技术名词已修正，无 Whisper 乱码残留
 - [ ] iv 编号与本轮录音对应（第 2 轮写 iv2.md，不覆盖 iv.md）
 
@@ -186,4 +209,4 @@ conda run -n iv-helper-speech python IV-arena/conv/transcribe.py "IV-arena/battl
 |------|------|
 | `@录音.m4a @conv/README.md 转为 txt 并编写 iv2.md` | 全流程；iv 编号按用户指定 |
 | `按问题-答案用空行分割` | 仅 Step 2；**尽量不删字**，只改正错别字/误识别 |
-| `编写 iv2.md` | Step 3（需已有问答 txt） |
+| `编写 iv2.md` | Step 3：问题清单 + 同类追问预测（需已有问答 txt） |

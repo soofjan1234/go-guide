@@ -9,8 +9,22 @@ draft: false
 
 ### 1. GMP 调度流程（主循环在干什么）
 
+![](pic/GMP机制.调度主链冷启动.png)
+
 {{< bilingual >}}
 {{< en >}}
+
+You can first remember the main flow as this chain:
+
+`rt0_go -> schedinit -> newproc -> mstart -> schedule -> findRunnable -> execute`
+
+In plain language, step by step:
+
+1. **When the program starts**, it first enters `rt0_go` (the assembly/bootstrap entry point).
+2. Then **`schedinit` sets up the scheduler, the number of Ps, memory, GC, and other runtime foundations**.
+3. Next, **`newproc` creates the first goroutine to run (for example, `main`) and puts it into a queue**.
+4. The current thread enters **`mstart`, which is like saying "I am starting work"**: from then on, it stays in the scheduling logic for a long time.
+5. It enters the infinite **`schedule` loop**: each round first uses **`findRunnable` to find a runnable G**, then uses **`execute` to actually run it**. If that G can no longer continue (yield, block, preemption, syscall, etc.), execution returns to **`schedule`**, and the cycle repeats.
 
 {{< /en >}}
 
@@ -18,8 +32,6 @@ draft: false
 主流程可以先记这条链：
 
 `rt0_go -> schedinit -> newproc -> mstart -> schedule -> findRunnable -> execute`
-
-![](pic/GMP机制.调度主链冷启动.png)
 
 用大白话按顺序过一遍：
 
@@ -35,6 +47,12 @@ draft: false
 
 {{< bilingual >}}
 {{< en >}}
+
+When you write `go f()`, the rough path is:
+
+1. `newproc` runs on the user G, but uses `systemstack` to switch to the **g0 stack**, so complex scheduling logic does not run on the user stack.
+2. In `newproc1`, `gfget` **tries to reuse** a G from the local P or global `gFree` list first; if none is available, it creates a new one. The state is set to `_Grunnable` (a few parked paths use `_Gwaiting`).
+3. `runqput` puts the new G into the current P's queue, often preferring `runnext`.
 
 {{< /en >}}
 
@@ -53,6 +71,17 @@ draft: false
 
 {{< bilingual >}}
 {{< en >}}
+
+1. First check **special runtime tasks**, such as the trace reader and GC workers. These are high-priority internal runtime jobs.
+2. Then perform a **fairness check**. The scheduler does not check the global queue every time, but it does look at it periodically (for example, every certain number of ticks) to avoid letting local queues starve global tasks forever.
+3. Next, check the local queue: internally, `runqget` checks `runnext` first, then the normal `runq`.
+4. If the local queue has nothing, check the global run queue.
+5. Then check netpoll: whether network events have just made some Gs runnable.
+6. If there is still nothing, enter `stealWork` and try to "borrow/steal" work from other Ps. This usually happens when work is unevenly distributed.
+7. If there is still no work: release the P, and the M enters spinning or sleeping, waiting to be woken later by `wakep` or another event.
+
+**Why does the "global queue" appear twice in explanations?**
+The first one is about **fairness**: preventing a P whose local queue always has work from starving Gs in the global queue. The second one is a **fallback after the earlier steps fail**: take another centralized look at the global queue.
 
 {{< /en >}}
 
@@ -75,6 +104,14 @@ draft: false
 {{< bilingual >}}
 {{< en >}}
 
+Goroutines are lightweight mainly because:
+
+1. The initial stack is small (KB-level), and it can grow or shrink dynamically.
+2. Scheduling mostly happens in user space, reducing kernel context switches.
+3. GMP makes task distribution more efficient: local-first, global fallback, and work stealing for balance.
+4. Preemption prevents long-running tasks from occupying the CPU for too long.
+5. The number of goroutines can be far higher than the number of threads, which fits high-concurrency models well.
+
 {{< /en >}}
 
 {{< zh >}}
@@ -93,6 +130,10 @@ goroutine 轻量主要来自：
 {{< bilingual >}}
 {{< en >}}
 
+1. P separates "queues and resources" from M. M can change, while P's local scheduling context remains.
+2. Local-first scheduling reduces contention on the global lock.
+3. Work stealing and load balancing become easier.
+
 {{< /en >}}
 
 {{< zh >}}
@@ -106,6 +147,14 @@ goroutine 轻量主要来自：
 
 {{< bilingual >}}
 {{< en >}}
+
+The number of Ps is usually the number of CPU cores, and it can be set with the `GOMAXPROCS` environment variable.
+
+When a Go program starts, it sets the maximum number of Ms to 10000 by default. In practice, the kernel usually cannot support that many threads, so this limit can mostly be ignored.
+The number of Ms is not fixed. The runtime creates and recycles them as needed:
+
+1. **The upper bound of parallelism mainly depends on P (`GOMAXPROCS`)**.
+2. **There can be more Ms than Ps, but an M must bind to a P before it can run a user G**.
 
 {{< /en >}}
 
