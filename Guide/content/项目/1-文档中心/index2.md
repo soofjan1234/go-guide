@@ -236,62 +236,6 @@ consensus -> doc 1, doc 8, doc 20
 
 然后再结合词频、字段长度、字段 boost 等信息计算分数。
 
-## 3. 跨 segment 怎么查？
-
-因为索引被拆成多个 segment，所以一次查询会在多个 segment 上执行。
-
-比如：
-
-```text
-segment A:
-  content:raft -> local doc 1, local doc 5
-
-segment B:
-  content:raft -> local doc 2, local doc 9
-```
-
-搜索时会分别查每个 segment，然后把每个 segment 的局部 docID 映射成全局文档，再合并排序。
-
-可以理解成：
-
-```text
-每个 segment 内部先查一次
-多个 segment 的结果再归并
-```
-
-segment 越多，查询时需要参与归并的结果也越多，所以后台 merge 对查询性能也有帮助。
-
-## 4. `_all` 字段在查询里的作用
-
-`_all` 是一个聚合字段，它会把多个字段中允许进入 `_all` 的文本汇总到一起建索引。
-
-比如：
-
-```text
-title: raft consensus
-content: raft is a consensus algorithm
-```
-
-如果开启 `_all`，会额外形成：
-
-```text
-_all: raft consensus raft is a consensus algorithm
-```
-
-这样用户输入一个关键词时，可以直接查 `_all`：
-
-```text
-_all:raft
-```
-
-不用应用层手动拼：
-
-```text
-title:raft OR content:raft OR summary:raft
-```
-
-它的收益是默认搜索体验简单、字段解耦、不容易漏查；代价是索引体积变大，并且字段语义会被弱化。
-
 # 三、删除和修改是什么样的？
 
 Bleve 这种 segment-based 的索引，通常不会在旧 segment 里原地修改 posting list。
