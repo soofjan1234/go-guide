@@ -15,8 +15,8 @@ draft: false
 
 我们会先根据扩展名、MIME 和文件结构判断文档类型，然后不同格式走不同解析器，最终都抽取成纯文本 content，写入统一的 Document 模型。
 
-PDF：先通过 soffice 转成 HTML，再用 HTML 解析器提取文本。
-Word：docx 直接读取 docx 内部 XML，提取 w:t 文本节点；doc 会先通过 soffice 转成 docx，再按 docx 解析。
+PDF：通过pdftotext解析
+Word：docx 直接读取 docx 内部 XML，提取 w:t 文本节点；doc 会通过 antiword 解析。
 Excel：使用 excelize 打开 xlsx，遍历 sheet 和 row，把单元格内容拼成文本。
 PPT：pptx 本质是 zip 包，读取 ppt/slides/slide*.xml，按页码排序后提取 a:t 文本节点。
 Markdown：先用 Markdown parser 转成 HTML，再用 HTML 解析器提取纯文本。
@@ -24,18 +24,12 @@ HTML：用 goquery 解析 DOM，然后提取 text。
 TXT：会先做编码检测，如果不是 UTF-8，就转换成 UTF-8 后再读取。
 EPUB：先解压 EPUB，再按 EPUB 内部章节顺序提取文本。
 
-###  `.doc` 和 `.docx` 的处理有什么区别？
-
-docx 是 Office Open XML，本质是 zip 包，里面是 XML 文件，所以可以直接读取里面的文档 XML，提取文本节点。
-
-doc 是老的二进制格式，直接解析复杂很多，也容易踩兼容性问题。所以我们没有自己实现 doc 二进制解析，而是通过 LibreOffice/soffice 先把 doc 转成 docx，再走统一的 docx 解析流程。
-
 ## 为什么不用其它方法
 
 1. Apache Tika：极度稳定、格式支持最全，但是基于JVM环境
-2. Pandoc：不是通用文本抽取器，PDF/Excel/PPT 场景不是它强项
-3. LibreOffice：还原度最高，支持老旧格式
-4. Docling\RapidDoc\MarkItDown：都需要python环境
+2. Pandoc：内存占用高
+3. LibreOffice：还原度最高，支持老旧格式，但是太重
+4. Docling\RapidDoc\MarkItDown：都需要python环境，cpu、内存占用效果不如第三方库
 
 我选型时优先考虑四个指标：格式覆盖、文本抽取质量、部署成本、失败可控性
 
@@ -47,6 +41,8 @@ doc 是老的二进制格式，直接解析复杂很多，也容易踩兼容性�
 Meilisearch降低了使用门槛，但仍需独立部署。
 
 MySQL 的 FULLTEXT 索引能做简单全文检索，但文档中心需要更好的相关性排序、模糊/纠错、中文分词与高亮等，用 MySQL 要么能力不足要么要自己拼，维护成本高；且把「文档检索」和业务结构化数据分开，用嵌入式检索引擎更清晰
+
+SQLite FTS5更适合单机、轻量、简单查询、数据和 SQLite 强绑定的场景
 
 Bleve，就像sqlite，完全嵌入式，同时是go原生，无需额外服务，从而降低运维成本并提升部署效率。
 
@@ -91,7 +87,7 @@ Bleve 底层用 Scorch，和 ES/Lucene 类似，都是 段式倒排索引。
 
 ## 我印象最深的是
 
-项目刚上线时，有用户反馈文档中心执行异常。我先确认了问题现象，用户操作，版本。然后去看日志发现没有打印，怀疑是内存cpu问题，接着我在测试机复现，用 top 发现内存占用高，接着用 pprof 定位，发现瓶颈在 Bleve 建立索引阶段。
+项目刚上线时，有用户反馈文档中心执行异常。我先确认了问题现象，用户操作，版本。然后去看日志发现没有打印没有panic，怀疑是内存cpu问题，接着我在测试机复现，用 top 发现内存占用高，接着用 pprof 定位，发现瓶颈在 Bleve 建立索引阶段。
 
 查官方文档和 AI 建议效果都不太好，我就去读了 Bleve 的源码。最后通过三个方案解决：一是调整配置，比如禁用 _all 字段来减小索引体积；二是文档分块，1MB 一块；三是批量提交，累计 10MB 再写入，优化吞吐。
 
@@ -164,15 +160,8 @@ Bleve 默认 all=true 是为了让“无配置全文搜索”成立。偏向“�
 文件大小和解析后文本大小不完全线性，但大文件通常更容易触发解析耗时长、soffice 转换慢、内存峰值高等问题。我们希望保证后台同步任务不会被少数超大文件拖垮，所以先设定 50MB 作为准入上限。
 
 # 高概率追问
-你说根据扩展名、MIME、文件结构判断类型，如果三者冲突，以哪个为准？为什么？
-相关性排序用的是什么模型？TF-IDF、BM25，还是 Bleve 默认？
-有没有做模糊搜索、前缀搜索、拼音搜索、同义词？
-为什么不用 SQLite FTS5？它也是嵌入式，也不需要额外部署。
-
-heapInuse 降低 76%，那 RSS 有没有同步降低？为什么可能不一致？
-批量 10MB 提交如果中途失败，会不会丢数据？怎么保证幂等？
+heapInuse 降低 76%，那 RSS( Resident Set Size) 有没有同步降低？为什么可能不一致？
 
 ！！！待处理
 解析 zip/docx/pptx 时有没有防 zip bomb？
 用户上传畸形文档导致解析库 panic 怎么隔离？
-文件路径、文件名、文档内容里有特殊字符，会不会影响索引或前端高亮？
