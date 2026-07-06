@@ -36,7 +36,7 @@
     summary.appendChild(h2);
 
     var node = details.nextSibling;
-    while (node && !(node.nodeType === 1 && node.tagName === "H2")) {
+    while (node && !(node.nodeType === 1 && /^(H1|H2)$/.test(node.tagName))) {
       var next = node.nextSibling;
       body.appendChild(node);
       node = next;
