@@ -5,7 +5,7 @@ date: 2026-05-19
 draft: false
 ---
 
-## 并发安全 +3
+## 并发安全 +999
 
 ![sync.Map.基础概念](pic/sync.Map.基础概念.png)
 
@@ -18,11 +18,22 @@ concurrent map writes/concurrent map read and map write / concurrent map iterati
 解决方法有：
 
 1. sync.Mutex
+    - 实现最简单、类型安全，适合绝大多数业务
+    - Go 官方文档明确写了：绝大多数情况应该使用普通 map + 锁。
 2. sync.RWMutex
+    - 读远多于写，比如配置中心、黑名单、白名单
 3. sync.Map
+    - 没有类型安全
+    - 读多写少；每个协程有自己的key
 4. 分段锁
+    - 一个map分成多个段，每段各持有一个锁
+    - 百万 Key、高频读写、高并发缓存
 
-> 分段锁：一个map分成多个段，每段各持有一个锁
+### 为什么不把Map设计成支持并发读写呢？ +1
+
+1. 为了效率，读写不加锁
+2. 并发策略没有唯一答案，我们可以根据场景选择不同的锁
+3. 简单比自动更重要
 
 ## 结构 +2
 

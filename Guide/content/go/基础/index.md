@@ -29,4 +29,26 @@ draft: false
     - 批量 IO：并发读多个文件、多条 DB/Redis 查询
 5. 带超时、可取消的长操作
 
+## 一个包里边有多个 init，初始化顺序是 +1
 
+1. 同一文件内，是从上到下
+2. 同一包不同文件内，是文件名ascii字典序
+
+## API 版本化 +1
+
+多端并行使用、要做不兼容改动时，常见三种放法：
+
+1. URL Path：/api/v1、/api/v2
+    - 直观，调试、文档、日志、网关路由都好做
+    - Gin 里用路由组拆开：V1/V2 各一套 handler
+    - 缺点：URL 变了，缓存和监控要按版本隔离
+    - 最常见
+2. Header：Api-Version: 2  
+    - URL 不变，资源路径稳定
+    - 需在中间件或网关按 header 分流（if/switch 或转发到不同 handler）
+    - 缺点：不直观，curl/浏览器不好测
+    - 想保持 URL 干净、B 端 SDK 只改配置不改路径、有 API Gateway 统一路由
+3. Media Type（内容协商）：Accept: application/vnd.mycompany.user.v2+json
+    - 符合 HTTP 内容协商，REST 规范性强
+    - 缺点：实现和联调成本最高
+    - 对外公开 API、规范要求严、同一资源多种表示
