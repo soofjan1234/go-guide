@@ -5,6 +5,7 @@ date: 2026-06-06
 draft: false
 ---
 
+# Docker
 ## Docker 多阶段构建是什么 +1
 
 ![](pic/docker.png)
@@ -64,25 +65,38 @@ EXPOSE 80
 
 第一阶段构建前端，第二阶段只保留静态文件和 Nginx。
 
-### 后端 Dockerfile 示例
+## Docker Compose常见属性
 
-```dockerfile
-FROM golang:1.22-alpine AS builder
-WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
-COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o server ./cmd/server
+1. depends_on + healthcheck：保证“容器 A 启动好并能对外提供服务了，容器 B 再启动”
 
-FROM alpine:3.19
-WORKDIR /app
-COPY --from=builder /app/server /app/server
-EXPOSE 8080
-ENTRYPOINT ["/app/server"]
+```
+ depends_on:
+      postgres-db:
+        condition: service_healthy
+
+healthcheck:
+    test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+    interval: 10s       # 检查间隔：每 10 秒听诊一次
+    timeout: 5s         # 超时时间：如果 5 秒内没响应，算作一次失败
+    retries: 3          # 容错次数：连续失败 3 次，正式判定为 "unhealthy"
+    start_period: 30s   # 缓冲期/启动期：容器启动后的前 30 秒内，失败不计入次数
 ```
 
-后端镜像只负责提供 API，不负责托管前端页面。
+2. restart：崩溃重启策略
 
+- restart: unless-stopped
+
+3. logging：日志滚动限制
+
+```
+logging:
+      driver: "json-file"
+      options:
+        max-size: "10m" # 单个日志文件最大 10MB
+        max-file: "3"   # 最多保留 3 个归档，多余的自动删除
+```
+
+# Nginx
 ## Nginx 用来干嘛 +1
 
 ![](pic/nginx.png)

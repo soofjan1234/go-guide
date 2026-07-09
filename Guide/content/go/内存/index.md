@@ -45,7 +45,9 @@ draft: false
 
 ### 如何验证
 
-go build -gcflags="-m" .
+1. 用 go build -gcflags=-m 查看编译器的逃逸分析结果，重点看目标变量所在行有没有 moved to heap 或 escapes to heap
+2. 如果看到 does not escape，说明它没有逃逸
+3. 如果看到 leaking param，说明参数虽然不一定立刻分配到堆上，但它的引用可能流出当前函数，需要继续看调用链
 
 ## 内存回收机制 +2
 
