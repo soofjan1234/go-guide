@@ -1,0 +1,149 @@
+{
+  "title": "Go GMP 调度机制教学视频",
+  "source": "../index.md",
+  "language": "zh-CN",
+  "aspectRatio": "16:9",
+  "targetDurationSeconds": 480,
+  "visualStyle": "clean technical whiteboard animation, readable Chinese captions, subtle code aesthetics",
+  "assets": [
+    "../pic/GMP机制.GMP关系总览.png",
+    "../pic/GMP.工作窃取机制图.png",
+    "../pic/GMP.协作式抢占机制.png",
+    "../pic/GMP.信号式抢占机制.png",
+    "../pic/GMP机制.普通阻塞.png",
+    "../pic/GMP机制.网络阻塞.png",
+    "../pic/GMP机制.系统调用阻塞.png"
+  ],
+  "globalDirectives": [
+    "Use concise Chinese captions, no more than two lines.",
+    "Keep terms G, M, P, schedt, g0, runq, netpoll, syscall, asyncPreempt in English.",
+    "Prefer highlighting, zooming, arrows, and timeline movement over long paragraphs.",
+    "Do not create a marketing intro; start directly with the teaching content."
+  ],
+  "scenes": [
+    {
+      "id": "intro",
+      "timeRange": "0:00-0:35",
+      "title": "一句话理解 GMP",
+      "asset": "../pic/GMP机制.GMP关系总览.png",
+      "visual": "Blur the overview image lightly, then highlight G, M, P, and schedt one by one. Show the core sentence in the center.",
+      "voiceover": "这期我们用一个最小模型理解 Go 的 GMP 调度。你先记一句话：M 是工人，G 是任务，P 是工位和资源包，schedt 是全局总控室。后面所有调度、抢占、阻塞和唤醒，其实都围绕这四个角色展开。",
+      "captions": [
+        "GMP = G + M + P + schedt",
+        "M 跑 G，必须先绑定 P"
+      ]
+    },
+    {
+      "id": "g",
+      "timeRange": "0:35-1:20",
+      "title": "G：可调度的任务",
+      "asset": null,
+      "visual": "Animate a go func(){...} snippet turning into a G card. Split the card into execution context and scheduling state.",
+      "voiceover": "G，也就是 goroutine，不只是一个函数调用。对 runtime 来说，它是一份可以被调度的执行快照。里面有栈、PC、SP 这些执行现场，也有当前状态：可运行、运行中、等待中，或者正在系统调用里。因为 G 带着这些信息，所以它可以被挂起、恢复，甚至被换到另一个 M 上继续执行。",
+      "captions": [
+        "G = 可调度的执行单元",
+        "保存现场，才能切走再切回"
+      ]
+    },
+    {
+      "id": "m",
+      "timeRange": "1:20-2:05",
+      "title": "M：真正运行的线程",
+      "asset": null,
+      "visual": "Show an OS thread labeled M running a G on CPU. Reveal g0, curg, and p inside M. Present g0 as a backstage workbench.",
+      "voiceover": "M 是真正干活的操作系统线程。一个 M 当前跑哪个业务 goroutine，会记录在 curg 里。但调度器自己的工作，比如切换、调度、进入 mcall，通常不在业务 G 的栈上做，而是在 g0 这条专用调度栈上完成。你可以把 g0 理解成后台工作台：runtime 在这里整理现场，然后再把 CPU 交给下一个 G。",
+      "captions": [
+        "M = OS thread",
+        "g0 = 调度专用栈"
+      ]
+    },
+    {
+      "id": "p",
+      "timeRange": "2:05-2:55",
+      "title": "P：资源包",
+      "asset": null,
+      "visual": "Expand P into runnext, runq[256], mcache, gFree, and pcache. Dim M without P, then light it up after binding to P.",
+      "voiceover": "P 经常被误解成 CPU，但它更像运行 goroutine 需要的一包 runtime 资源。最关键的是本地运行队列：runnext 是下一跳优先位，runq 是普通本地队列，固定 256 个槽位，多数访问可以无锁。M 必须先绑定到 P，才有资格执行用户 G。没有 P 的 M，就像工人没有工位，不能开工。",
+      "captions": [
+        "P = 资源包，不是物理 CPU",
+        "本地队列优先"
+      ]
+    },
+    {
+      "id": "scheduling",
+      "timeRange": "2:55-3:55",
+      "title": "调度主线",
+      "asset": "../pic/GMP.工作窃取机制图.png",
+      "visual": "Animate M binding P, checking local runq, checking global queue, then stealing work from another P.",
+      "voiceover": "把三者连起来看：M 要跑 G，必须先拿到 P。拿到 P 后，它优先从这个 P 的本地队列找任务。本地没有，就去全局队列找；还没有，就去别的 P 那里偷一部分 G 过来。这样做有两个好处：大多数调度都在本地完成，减少锁竞争；当某个 P 太忙时，又能通过 work stealing 把压力摊开。",
+      "captions": [
+        "local first",
+        "global fallback",
+        "work stealing"
+      ]
+    },
+    {
+      "id": "preemption",
+      "timeRange": "3:55-5:10",
+      "title": "抢占机制",
+      "asset": "../pic/GMP.协作式抢占机制.png",
+      "secondaryAsset": "../pic/GMP.信号式抢占机制.png",
+      "visual": "First show cooperative preemption timeline, then switch to signal-based preemption: sysmon, SIGURG, sighandler, asyncPreempt, mcall, gopreempt_m.",
+      "voiceover": "如果一个 G 一直跑长循环，不主动让出 CPU，其他 G 就可能饿住。Go 的抢占经历过两个阶段。早期主要靠协作式抢占：调度器发现 G 跑太久，就把它标记成 stackPreempt，等它下次函数调用做 stack check 时，自己让出执行权。但如果代码是没有函数调用的死循环，这招就不够及时。Go 1.14 之后引入信号式抢占：sysmon 发现某个 G 跑太久，会向对应 M 发 SIGURG，sighandler 介入，修改寄存器，把 asyncPreempt 注入到当前执行点。随后通过 mcall 切到 g0，在调度栈上把这个 G 抢下来。",
+      "captions": [
+        "协作式：等 G 自己走到检查点",
+        "信号式：runtime 主动插入 asyncPreempt"
+      ]
+    },
+    {
+      "id": "normal-block",
+      "timeRange": "5:10-5:55",
+      "title": "普通阻塞",
+      "asset": "../pic/GMP机制.普通阻塞.png",
+      "visual": "Show G1 blocked on channel or lock. Keep M and P active and switch them to G2. Wake G1 through ready/runqput.",
+      "voiceover": "普通阻塞发生在 channel、锁、time.Sleep 这类场景。关键点是：阻塞的是 G，不是整个 M 和 P。G1 等条件满足时，M 还绑定着 P，可以马上去跑另一个 G。等条件满足，等待队列把 G1 唤醒，runtime 通过 ready 或 runqput 把它重新放回可运行队列，后面 findRunnable 再把它捞起来。",
+      "captions": [
+        "普通阻塞：只让 G 等",
+        "M/P 不浪费"
+      ]
+    },
+    {
+      "id": "network-block",
+      "timeRange": "5:55-6:45",
+      "title": "网络阻塞",
+      "asset": "../pic/GMP机制.网络阻塞.png",
+      "visual": "Connect G to fd, event, and pollDesc. Show kernel readiness notification and netpoll re-queueing G.",
+      "voiceover": "网络阻塞更特殊一点。比如 net.Conn Read 发现现在没数据，G 不会傻等在 M 上，而是 park 起来，并把自己关心的 fd 和读写事件记录到 pollDesc 里。M 继续跑别的 G。等内核通过 epoll 或 kqueue 通知这个 fd 就绪，runtime 的 netpoll 层会把对应的 G 设回 runnable，再放回本地或全局队列。下一次调度到它时，再重试 Read 或 Write。",
+      "captions": [
+        "fd 就绪由内核通知",
+        "netpoll 负责把 G 叫回来"
+      ]
+    },
+    {
+      "id": "syscall-block",
+      "timeRange": "6:45-7:35",
+      "title": "系统调用阻塞",
+      "asset": "../pic/GMP机制.系统调用阻塞.png",
+      "visual": "Move G into _Gsyscall, dim M inside kernel, release P to another M. On return, try fast path to acquire P; otherwise enqueue globally.",
+      "voiceover": "最后看系统调用阻塞。如果 G 进入一个可能长时间阻塞的 syscall，当前 M 也会跟着陷进内核。为了不浪费调度资源，runtime 会在 entersyscall 路径释放 P，让这个 P 可以被别的 M 接管，继续跑其他 runnable G。等 syscall 返回，G 走 exitsyscall，优先尝试快速拿一个 P 继续跑；如果拿不到，就变回 runnable，进入全局队列等待调度。",
+      "captions": [
+        "syscall 会拖住 M",
+        "释放 P，保证其他 G 继续跑"
+      ]
+    },
+    {
+      "id": "summary",
+      "timeRange": "7:35-8:00",
+      "title": "总结",
+      "asset": "../pic/GMP机制.GMP关系总览.png",
+      "visual": "Return to the overview image. Reveal four summary lines one by one.",
+      "voiceover": "所以 GMP 的核心不是死记结构体，而是记住这条链路：M 绑定 P 才能跑 G；调度本地优先，全局兜底，窃取均衡；抢占保证长任务不会一直霸占 CPU；阻塞时尽量只让该等的 G 等，把 M 和 P 释放给更多可运行任务。理解这条线，后面再看 findRunnable、sysmon、netpoll 和 syscall，就顺很多了。",
+      "captions": [
+        "M-P 绑定后跑 G",
+        "本地优先，全局兜底",
+        "抢占防独占",
+        "阻塞要释放调度资源"
+      ]
+    }
+  ]
+}

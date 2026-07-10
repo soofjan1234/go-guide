@@ -1,0 +1,11 @@
+{
+  "name": "gmp1-hyperframes",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "/Users/Zhuanz/.npm/_npx/702923228c2ce1e6/node_modules/.bin/hyperframes preview",
+    "check": "/Users/Zhuanz/.npm/_npx/702923228c2ce1e6/node_modules/.bin/hyperframes lint && /Users/Zhuanz/.npm/_npx/702923228c2ce1e6/node_modules/.bin/hyperframes validate && /Users/Zhuanz/.npm/_npx/702923228c2ce1e6/node_modules/.bin/hyperframes inspect",
+    "render": "/Users/Zhuanz/.npm/_npx/702923228c2ce1e6/node_modules/.bin/hyperframes render",
+    "publish": "/Users/Zhuanz/.npm/_npx/702923228c2ce1e6/node_modules/.bin/hyperframes publish"
+  }
+}
