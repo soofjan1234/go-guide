@@ -50,6 +50,16 @@ SSE 比轮询实时性好、实现简单；如果要双向控制才考虑 WebSoc
 
 对于慢查询，不让业务代码到处直接 db.Query()，而是统一经过一个 DAO/helper记录时间，如果稳定出现，会同时配套explain然后写入慢查询诊断日志
 
+## 数据库优化
+
+在code review中，发现分页查询又可以优化的地方，可以加联合索引user_id、is_dir、modified_at、filming_time
+
+但目前排序逻辑里有 CASE WHEN filming_time ELSE modified_at，会让索引效果变差。所以我会考虑冗余一个 sort_time 字段
+
+写入或扫描照片时提前计算一个统一的排序字段，比如 sort_time，优先取拍摄时间，没有拍摄时间就取修改时间。查询时直接按 sort_time DESC, id DESC 排序，并建立联合索引
+
+分页也从 OFFSET 改成游标分页，比如带上上一页最后一条的 sort_time 和 id
+
 # 个人
 ## 你在团队里的技术水平
 
