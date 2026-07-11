@@ -4,7 +4,6 @@ weight: 13
 date: 2026-05-25
 draft: false
 ---
-
 ## sync.Map最佳实践、优化手段 +1
 
 1. 用于多读少写、每个 goroutine 维护自己的 key的情况
@@ -17,7 +16,7 @@ draft: false
 
 ## 结构
 
-辅助理解
+![](pic/Sync.Map.png)
 
 ```go
 type Map struct {
@@ -39,10 +38,7 @@ type readOnly struct {
     m       map[any]*entry
     amended bool // 标记位：如果 dirty 里面有 read 没有的新 key，它就为 true
 }
-
 ```
-
-
 
 ### 2. `dirty` 层（脏数据写区）
 
@@ -66,9 +62,9 @@ type entry struct {
 
 ## 🔄 核心数据流转（增删改查）
 
-`sync.Map` 的精妙之处，在于数据在 `read` 和 `dirty` 之间的流动机制。
-
 ### 1. 查 (Load)
+
+![](pic/Sync.Map查找.png)
 
 * 优先去 `read` 层找，如果找到了，利用原子操作把数据读出来（无锁，极快）。
 * 如果 `read` 没找到，且 `read.amended == true`（说明 dirty 里面有新货），那就加锁，去 `dirty` 里找。
@@ -76,12 +72,12 @@ type entry struct {
 
 ### 2. 增/改 (Store)
 
+![](pic/Sync.Map修改.png)
+
 * 如果这个 Key 在 `read` 里**已经存在**了，且没有被标记为删除，直接通过 `atomic` 强行修改 `entry.p` 的指针（无锁更新）。
 * 如果 `read` 里没有，或者被删了，那就加锁进入 Slow Path：
 * 去 `dirty` 里找，找到了就修改 `dirty`。
 * 如果 `dirty` 里也没有，说明是**纯新增的 Key**，直接写入 `dirty`，并把 `read.amended` 设为 `true`。
-
-
 
 ### 3. 删 (Delete)
 
@@ -89,4 +85,3 @@ type entry struct {
 * 如果 Key 在 `read` 里，它连锁都不加，直接用原子操作把 `entry.p` 指针置为 **`nil`**（或者是专门的删除标记 `expunged`）。
 * 真正的硬物理删除，会等到下一次 `dirty` 被晋升清空、或者重新从 `read` 复制构建 `dirty` 的时候才会彻底被刷掉。
 
----
