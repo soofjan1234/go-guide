@@ -87,6 +87,8 @@ MVCC:Multi-Version Concurrency Control。在不加锁或少加锁的情况下，
     - 主要角色是活跃事务IDs，最老的活跃事务ID，最新的事务ID
     - 总体规则是只能查看已提交的事务
 
+读取时先看最新版本的 trx_id 是否对当前事务可见，如果不可见，就沿着 undo log 版本链往前找，直到找到可见版本。
+
 ### 快照读和当前读在 MVCC 下分别怎么走？
 
 ![](pic/RC与RR-ReadView时机.时间线图.png)

@@ -46,10 +46,6 @@ draft: false
 2. 看告警面板：会不会并发大，成功率，错误码多少
 3. 按照时间线来排查：根据SN查整条链路，云端、服务端、穿透端
 
-## 设计核心在哪？
-
-对端发现（信令）、身份校验（三凭证 + 防重放）、NAT 穿透（SDK 打洞/中继）、可排查（全链路日志）
-
 # 二、加密
 ## 为什么要加密
 
@@ -74,7 +70,7 @@ draft: false
 
 7. Host端用**自己**的RSA私钥解密AES密钥，再解密响应
 
-## 云端、Host端私钥如何保存？
+### 云端、Host端私钥如何保存？
 
 云端：
 
@@ -84,7 +80,26 @@ draft: false
 Host：
 
 1. 存在磁盘上，但是被加密锁死的。采集 Host 端的硬件唯一指纹（如：CPU 序列号 + 主板 UUID + 网卡 MAC 地址）融合成一个解密 Key。
-2. Go 读取硬件指纹，解密到内存中，磁盘上永远没有私钥明文。
+2. 启动 Go 服务读取本机硬件指纹 -> 计算解密 key -> 读取磁盘上的私钥密文 -> 在内存中解密出私钥 -> 用私钥做签名/解密
+3. 磁盘上始终没有私钥明文
+
+### 公钥如何分发？什么时候分发？怎么存储？
+
+1. Host 首次启动，在本地生成 host 公私钥。
+2. Host 联网后把 host_public_key 上报给 Cloud。
+4. Cloud 验证通过后，保存 sn -> host_public_key。
+5. Cloud 把 cloud_public_key 或 cloud 证书链返回给 Host。
+6. Host 保存 cloud_public_key，用于后续验签或加密。
+
+## 初次验证
+
+1. 每台 Host 出厂时内置一个设备证书和设备私钥，Cloud 预先信任厂商 CA。
+2. 初次验证会发请求：SN、host_public_key、device_cert、signature
+3. Cloud 验证：
+    - device_cert 是不是厂商 CA 签发的
+    - cert 里的 SN 和上报 SN 是否一致
+    - signature 能不能用 device_cert 里的 public key 验过
+    - timestamp / nonce 防重放
 
 # 三、技术选型
 ## 为什么考虑用 STUN + TURN？而不是其它的
@@ -116,7 +131,7 @@ VPN 是网络层隧道，连上后设备相当于进了另一个网段，粒度�
 
 我们场景是「远程看 NAS 文件」，邀请码 + P2P 穿透更轻、对用户更友好。
 
-## 这个流程是如何想到的
+## 这个流程是如何想到的/设计核心
 
 ### 1. 先定要解决什么
 

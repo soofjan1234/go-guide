@@ -75,6 +75,12 @@ EXPLAIN查看：
 
 > 除了 `EXPLAIN`，还有慢查询日志查看，有个开关log_queries_not_using_indexes = ON可以看
 
+### Index Hint（索引提示）
+
+- FORCE INDEX（强制使用索引）
+- USE INDEX（建议使用）
+- IGNORE INDEX（忽略索引）
+
 ## 索引问题 +1
 
 ### 什么情况会设计索引 +1 
@@ -110,13 +116,6 @@ EXPLAIN查看：
 4. 返回结果集过大
 5. 统计信息不准
 
-### 慢查询怎么办 +1
-
-1. 首先看是否稳定出现
-2. 使用 `EXPLAIN` 看执行计划
-3. 没有就看能不能加
-4. 有就看是否用到
-5. 有没有锁竞争与事务影响等等
 
 ## changeBuffer +1
 
