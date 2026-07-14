@@ -104,20 +104,24 @@ draft: false
 
 用户范围 → CDN → DNS/TCP/SSL → 服务端 → 前端资源 → 链路丢包
 
-## CPU\内存高怎么排查？范围在MySQL的话呢？
+## CPU\内存高怎么排查？
+如果 CPU 或内存高，我会先用 top 看整体情况。
 
-通用排查：
-1. CPU 高：用 top/htop 看是哪个进程占 CPU，Go 服务抓 CPU profile 看热点函数。
-2. 内存高：看内存使用趋势，Go 服务抓 heap profile 看存活对象。
-3. 看日志：是否有死循环、正则/JSON 热点、大量 GC、锁竞争。
+如果是用户态高，通常是业务代码计算、死循环、JSON 编解码、正则、排序或者大量 GC，我会用 Go pprof 的 CPU profile 看热点函数。
 
-MySQL 范围：
-1. 看 processlist：是否有长时间运行的 SQL、锁等待。
-2. 看慢查询日志：定位具体慢 SQL，用 EXPLAIN 看执行计划。
-3. 看索引：是否有索引失效、缺失索引。
-4. 看连接数：是否连接数打满，活跃连接是否过多。
-5. 看系统资源：MySQL 所在机器的 CPU、磁盘 I/O、内存是否瓶颈。
-6. 看锁：是否有表锁、行锁等待，事务是否过长。
+如果是系统态高，通常是系统调用、网络 IO、文件 IO、上下文切换或者锁竞争比较多，我会结合连接数、日志、网络和 IO 指标看。
+
+如果是内存高，我不会只看 free 里的 used，而是看 available，同时用 heap profile 看哪些对象占内存，检查缓存、全局 map、大 slice、goroutine 泄漏、channel 阻塞这些问题。
+
+### 范围在MySQL的话呢？
+
+MySQL CPU 高一般说明数据库在做大量计算或扫描。我会先看 processlist 有没有正在跑的大 SQL，再看慢查询日志定位具体 SQL，用 EXPLAIN 看有没有走索引、扫描行数是不是很大。
+
+常见原因是全表扫描、索引失效、复杂 JOIN、order by/group by 走了临时表或文件排序，或者 QPS 突然升高
+
+MySQL 内存高要先判断是不是正常的 buffer pool 占用，因为 InnoDB 本来就会尽量用内存缓存数据页和索引页。
+
+如果是异常升高，我会看连接数是不是过多，以及有没有大排序、大 JOIN、大 GROUP BY。因为每个连接都有自己的 sort buffer、join buffer，复杂 SQL 并发一高，内存会被放大。再结合慢查询和 EXPLAIN，看有没有 Using temporary、Using filesort。
 
 ## 一部分用户出现下单失败的问题，让你去定位这个线上事故
 
