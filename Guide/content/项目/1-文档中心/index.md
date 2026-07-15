@@ -57,6 +57,12 @@ bleve的索引和搜索比es快大概10倍左右
 
 即使排除 JVM 和 HTTP 服务，ES 仍然会因为 DocValues、Aggregation 中间状态、Cluster Metadata 等数据结构占用远高于 Bleve 的内存。
 
+## 怎么没有用这个 AI 搜索 / 向量搜索？
+
+1. 需要精确搜索。RAG可能匹配到语义相似的
+2. 资源考虑。RAG 要做 embedding、向量索引
+3. 当前需求不需要生成答案。如果产品需求是“帮我总结这些文档”“根据资料回答问题”，那可以考虑 RAG。
+
 ## bleve的增删改查
 ### 存储
 
