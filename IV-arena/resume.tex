@@ -59,7 +59,7 @@
         \item 构建文档同步、解析、索引、检索一体化链路，支持 PDF、Word、Excel、PPT、Markdown、HTML、EPUB 等多类型文档的自动识别与内容抽取。
         \item 针对内存受限环境，完成了从 Elasticsearch 到 Bleve 的搜索引擎迁移，实现快速的全文与多维度检索，约 4 倍查询性能提升。
         \item 设计基于块的索引策略与搜索结果聚合算法，解决超长文档索引阶段内存占用过高问题，峰值 heapInuse 降幅约 76\%+。
-        \item 设计扩展名和 MIME 类型的类型校验机制，配套大文件限制、解析超时等保护，降低异常文档、伪装文件导致的解析失败与误索引风险。
+        \item 使用 CJDict 词典分词，并以压缩 Trie longest-match 替代 substring + map 查词，将 Trace 总耗时降低约 48\%、进程 user CPU 降低约 63\%。
     \end{itemize}
 
     \item \textbf{AI相册}：
@@ -118,7 +118,7 @@
     \begin{itemize}
         \item 熟悉计算机网络核心协议，掌握 HTTP/HTTPS、NAT、DNS、TCP/UDP 等基础机制。
         \item 熟悉 Docker 容器化部署技术，了解 k8s 架构。
-        \item 合理使用 superpowers 插件搭配 codex/cursor 等 AI 工具，优化工作效率。
+        \item 合理使用 codex/cursor 等 AI 工具，优化工作效率。
     \end{itemize}
 \end{itemize}
 
