@@ -36,6 +36,22 @@ draft: false
 1. 在原理中，是通过stun服务器获取的，设备向stun服务器注册内网地址，服务器会记录公网地址
 2. 在我们的实现中，客户端不需要得到公网地址，只需要知道对端是谁，然后调用穿透sdk封装了ConnectAdd即可
 
+## 穿透后的通信使用什么协议
+
+HTTP 请求跑在本地 TCP 映射端口上，底层由 Peergine PGTunnel SDK 负责穿透传输。
+
+## 手机上的 HTTP 请求如何找到 NAS 上的服务
+
+手机用这个 peerID 和 accessVerify 调 pgJniTunnel.ConnectAdd 建立映射
+
+映射成功后，手机访问 127.0.0.1:50080，PGTunnel SDK 把这个连接转到 NAS 端的 127.0.0.1:50080。
+
+## 穿透隧道底层是 tun/tap 还是第三端转发
+
+业务层是 TCP/HTTP 端口映射；隧道底层不是 tun/tap，而是 Peergine SDK 的 P2P/NAT 穿透，失败或条件不满足时可走 Peergine 节点/中继转发。
+
+源码没有暴露 SDK 内部到底用 UDP 还是 TCP，只能确认它对上层提供 TCP 会话/端口映射能力。
+
 ## 凭证有没有过期时间？过期、重复使用、被截获时怎么处理？
 
 验证码是7天自动轮换。防重放是timestamp + nonce。被截获后重新生成相关凭证，记录安全审计日志
