@@ -129,7 +129,7 @@ MySQL 内存高要先判断是不是正常的 buffer pool 占用，因为 InnoDB
 
 ## 慢查询怎么办
 
-1. 确认瓶颈是不是数据库。
+1. 确认是否稳定复现。
 2. 定位具体哪条 SQL 慢。
 3. 用 EXPLAIN / EXPLAIN ANALYZE 查看执行计划，重点关注 type、key、rows、Extra。
 4. 检查索引是否命中，有没有索引失效。
