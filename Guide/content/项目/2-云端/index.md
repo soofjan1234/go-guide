@@ -36,10 +36,6 @@ draft: false
 1. 在原理中，是通过stun服务器获取的，设备向stun服务器注册内网地址，服务器会记录公网地址
 2. 在我们的实现中，客户端不需要得到公网地址，只需要知道对端是谁，然后调用穿透sdk封装了ConnectAdd即可
 
-## 穿透后的通信使用什么协议
-
-HTTP 请求跑在本地 TCP 映射端口上，底层由 Peergine PGTunnel SDK 负责穿透传输。
-
 ## 手机上的 HTTP 请求如何找到 NAS 上的服务
 
 手机用这个 peerID 和 accessVerify 调 pgJniTunnel.ConnectAdd 建立映射
@@ -55,12 +51,6 @@ HTTP 请求跑在本地 TCP 映射端口上，底层由 Peergine PGTunnel SDK �
 ## 凭证有没有过期时间？过期、重复使用、被截获时怎么处理？
 
 验证码是7天自动轮换。防重放是timestamp + nonce。被截获后重新生成相关凭证，记录安全审计日志
-
-## 你们怎么排查“用户说连不上”的问题？会按哪些事件时间线定位？
-
-1. 确定现象：用户的操作，具体结果，网络，版本
-2. 看告警面板：会不会并发大，成功率，错误码多少
-3. 按照时间线来排查：根据SN查整条链路，云端、服务端、穿透端
 
 # 二、加密
 ## 为什么要加密
@@ -86,7 +76,7 @@ HTTP 请求跑在本地 TCP 映射端口上，底层由 Peergine PGTunnel SDK �
 
 7. Host端用**自己**的RSA私钥解密AES密钥，再解密响应
 
-### 云端、Host端私钥如何保存？
+## 云端、Host端私钥如何保存？
 
 云端：
 
@@ -99,7 +89,7 @@ Host：
 2. 启动 Go 服务读取本机硬件指纹 -> 计算解密 key -> 读取磁盘上的私钥密文 -> 在内存中解密出私钥 -> 用私钥做签名/解密
 3. 磁盘上始终没有私钥明文
 
-### 公钥如何分发？什么时候分发？怎么存储？
+## 公钥如何分发？
 
 1. Host 首次启动，在本地生成 host 公私钥。
 2. Host 联网后把 host_public_key 上报给 Cloud。
@@ -107,7 +97,7 @@ Host：
 5. Cloud 把 cloud_public_key 或 cloud 证书链返回给 Host。
 6. Host 保存 cloud_public_key，用于后续验签或加密。
 
-## 初次验证
+### 初次验证
 
 1. 每台 Host 出厂时内置一个设备证书和设备私钥，Cloud 预先信任厂商 CA。
 2. 初次验证会发请求：SN、host_public_key、device_cert、signature
