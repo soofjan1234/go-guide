@@ -16,16 +16,17 @@ draft: false
 
 ##  PDF、Word、Excel、PPT、Markdown、HTML、EPUB 分别怎么解析？
 
-我们会先根据扩展名、MIME 和文件结构判断文档类型，然后不同格式走不同解析器，最终都抽取成纯文本 content，写入统一的 Document 模型。
+- PDF：通过pdftotext解析
 
-PDF：通过pdftotext解析
-Word：docx 直接读取 docx 内部 XML，提取 w:t 文本节点；doc 会通过 antiword 解析。
-Excel：使用 excelize 打开 xlsx，遍历 sheet 和 row，把单元格内容拼成文本。
-PPT：pptx 本质是 zip 包，读取 ppt/slides/slide*.xml，按页码排序后提取 a:t 文本节点。
-Markdown：先用 Markdown parser 转成 HTML，再用 HTML 解析器提取纯文本。
-HTML：用 goquery 解析 DOM，然后提取 text。
-TXT：会先做编码检测，如果不是 UTF-8，就转换成 UTF-8 后再读取。
-EPUB：先解压 EPUB，再按 EPUB 内部章节顺序提取文本。
+- Word：docx 直接读取 docx 内部 XML，提取 w:t 文本节点；doc 会通过 antiword 解析。
+- Excel：使用 excelize 打开 xlsx，遍历 sheet 和 row，把单元格内容拼成文本。
+- PPT：pptx 本质是 zip 包，读取 ppt/slides/slide*.xml，按页码排序后提取 a:t 文本节点。
+
+- Markdown：先用 Markdown parser 转成 HTML，再用 HTML 解析器提取纯文本。
+- HTML：用 goquery 解析 DOM，然后提取 text。
+
+- TXT：会先做编码检测，如果不是 UTF-8，就转换成 UTF-8 后再读取。
+- EPUB：先解压 EPUB，再按 EPUB 内部章节顺序提取文本。
 
 ## 为什么不用其它方法
 
@@ -41,11 +42,11 @@ EPUB：先解压 EPUB，再按 EPUB 内部章节顺序提取文本。
 
 在搜索引擎选型中，我们优先考虑部署复杂度与空间占用。
 
-ES虽然功能强大，但更适用于大规模分布式场景，需要 Java 环境，默认消耗 1-2GB（现在的 ES 已经不是单纯的倒排索引了，它原生支持 Dense Vector（密集向量检索），可以非常方便地做“关键词 + 语义向量”的 Hybrid 混合检索。）；
+ES虽然功能强大，但更适用于大规模分布式场景，需要 Java 环境，默认消耗 1-2GB；
 
 Meilisearch\ZincSearch搜索比bleve快，建立比bleve慢；
 
-MySQL 的 FULLTEXT 索引能做简单全文检索，但文档中心需要更好的相关性排序、模糊/纠错、中文分词与高亮等，用 MySQL 要么能力不足要么要自己拼，维护成本高；且把「文档检索」和业务结构化数据分开，用嵌入式检索引擎更清晰
+MySQL 的 FULLTEXT 索引能做简单全文检索，但文档中心需要中文分词与高亮等，用 MySQL 要么要自己拼，维护成本高
 
 SQLite FTS5更适合单机、轻量、简单查询、数据和 SQLite 强绑定的场景
 
@@ -162,10 +163,9 @@ Bleve 默认 all=true 是为了让“无配置全文搜索”成立。偏向“�
 
 初版 tokenizer 的思路：
 
-1. 把词典加载为 map，记录词典最大词长 `maxRune`；
+1. 把词典加载为 map，记录词典最大词长；
 2. 对每个中文起点，从最大长度向短长度尝试；
-3. 每个候选片段都转成 string，然后查 map；
-4. 命中则取最长词，未命中则退化为单字。
+3. 命中则取最长词，未命中则退化为单字。
 
 CPU问题很明显：
 
@@ -184,6 +184,8 @@ CPU降低，但是RSS升高：
 - CG不断去扫，压力大
 
 为了解决运行期大 map 的内存问题，把 Trie 压成连续数组：
+
+![](pic/优化.png)
 
 - edges：存所有的“边”（字符是什么，指向哪个节点）。
 - nodes：存节点状态（是不是词尾、子节点的边在哪里）。
@@ -206,11 +208,11 @@ Trace 总耗时是每个文档的 `total_ms` 字段求和
 
 进程 user CPU 主要看：`/usr/bin/time -v` 里的 `User time (seconds)`，整个测试进程从启动到结束，一共在用户态 CPU 上花了多少秒。
 
-## 搜索效果
+## cjdict搜索效果好在哪
 
 1. 误报：默认的standard有误搜问题，比如搜索关键词 “华人”，当有一篇介绍“中华人民共和国”的新闻时会被搜出来，这被定义为误报
 2. 相关性：比如计算机，standard会拆成3个字，权重会很低；cjdict就会完整去搜，真正高相关的技术文章就到前面了
 	- TF：出现次数越多，得分越高
 	- IDF：一个词越罕见，它的权重就越高。
 	- BM25： 词频（TF）增高，得分快速饱和，有明确上限
-3. 效率：一长句，standard 必须去这 8 个单字的“倒排索引表”（极长，因为单字在成千上万篇文章里都有）里进行复杂的求交集计算，甚至还要计算它们之间的位置关系，看它们是不是挨在一起的
+3. 效率：一长句，standard 必须去每个单字的“倒排索引表”（极长，因为单字在成千上万篇文章里都有）里进行复杂的求交集计算，甚至还要计算它们之间的位置关系，看它们是不是挨在一起的
