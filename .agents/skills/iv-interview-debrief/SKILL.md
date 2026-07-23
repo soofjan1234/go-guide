@@ -47,8 +47,7 @@ IV-arena/
 **Windows（PowerShell）**：
 
 ```powershell
-pip install openai-whisper
-python IV-arena/conv/transcribe.py "IV-arena/battle/6-1/录音.m4a"
+uv run --with openai-whisper python IV-arena\conv\transcribe.py "IV-arena\battle\6-1\录音.m4a"
 ```
 
 **macOS（conda 推荐）**：

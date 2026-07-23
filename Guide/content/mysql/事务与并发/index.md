@@ -67,15 +67,7 @@ draft: false
    在业务表里自己多加一列 `version`（或时间戳）。
    每次读取带走这个 `version`，更新时附带条件：`UPDATE table SET balance = balance - 50, version = 2 WHERE id = 1 AND version = 1`。如果受影响行数为 0，说明在你犹豫的时候有人捷足先登了，你在业务层处理回滚重试即可。
 
-## 幻读 +2
-
-### InnoDB 在 RR 级别下如何防止幻读？
-![事务与并发.幻读](pic/事务与并发.幻读.png)
-
-1. 未修改情况下。MVCC下读的数据都是一开始快照读的数据，不会有幻读发生
-2. 修改情况下，会触发当前读，可能出现幻读；InnoDB 用 Next-Key / Gap Lock 把间隙锁住，防止别人插入，从而防幻读。
-
-## MVCC +1
+## MVCC +2
 
 ![事务与并发.MVCC](pic/事务与并发.MVCC.png)
 
@@ -96,5 +88,15 @@ MVCC:Multi-Version Concurrency Control。在不加锁或少加锁的情况下，
 1. 快照读，读的是“过去某一时刻的数据版本”
     - 在读已提交的情况下，每条 SQL 重新生成 ReadView
     - 在可重复读的情况下，第一次 SELECT 生成 ReadView
-2. 当前读，读的是最新的数据。命令有select ... for update，或者其它修改操作
+2. 当前读，读的是最新的数据。命令有select ... for update/lock in share mode，或者其它修改操作
+
+## InnoDB 在 RR 级别下还会有幻读吗？ +3
+
+![](pic/RR与幻读.png)
+
+MySQL InnoDB 的 RR 级别：
+- 如果全程使用快照读（普通 SELECT），无幻读。
+- 如果全程使用当前读（SELECT ... FOR UPDATE/lock in share mode），通过间隙锁，无幻读。
+- 如果混合使用快照读和当前读，或者先读后写再读，依然存在幻读。
+
 
