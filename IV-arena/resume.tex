@@ -41,6 +41,46 @@
 {\setlength{\fboxsep}{0pt}\fbox{\includegraphics[height=5cm,keepaspectratio]{photo.jpg}}}
 \end{minipage}
 
+\section{\faCogs\ 综合技术能力}
+\begin{itemize}
+    \item \textbf{编程语言}
+    \begin{itemize}
+        \item 深入理解 Go runtime GMP 模型，掌握调度循环、工作窃取、阻塞处理及 goroutine 抢占。
+        \item 掌握 Go 并发编程与源码机制，熟悉 channel、select、锁及 context 等组件的实现原理，能结合业务场景选择通信、加锁、并发编排和超时控制方案。
+        \item 掌握 Go 常用语法与底层结构，理解 slice、map、interface、defer 等核心特性的实现机制，熟悉 map 并发安全、哈希冲突、扩容迁移和 SwissTable 相关机制。
+        \item 深入理解 Go 内存管理与性能排查方法，掌握逃逸分析、栈/堆分配、内存分配器、三色标记、写屏障、GC 触发与 pprof 排查流程。
+        \item 拥有 Vue/React/Android 实战经验，具备多端适应能力。
+    \end{itemize}
+
+    \item \textbf{数据存储}
+    \begin{itemize}
+        \item 掌握 MySQL InnoDB 存储引擎的 Buffer Pool，事务，隔离性，MVCC，索引，内部日志底层的工作原理。
+        \item 熟悉 MySQL 性能优化与线上排查，掌握 EXPLAIN、慢查询日志、索引失效、CPU 高与内存高排查方法，能结合业务场景设计索引与缓存方案。
+        \item 掌握 Redis 数据结构与底层实现，熟悉过期删除、持久化等机制，掌握缓存三兄弟问题、双写一致性的解决方案。
+    \end{itemize}
+    
+    \item \textbf{中间件与工程基础}
+    \begin{itemize}
+        \item 熟悉 RabbitMQ 消息队列，理解消息重复、丢失处理方法；了解 Kafka、RocketMQ 相关选型。
+        \item 熟悉计算机网络核心协议，掌握 HTTP/HTTPS、NAT、DNS、TCP/UDP 等基础机制。
+        \item 熟悉 Docker 容器化部署技术，了解 k8s 架构。
+        \item 了解/关注 AI Agent 相关技术栈，包括 Transformer、Decoder-Only 架构、智能体范式、LangChain 与 LangGraph
+    \end{itemize}
+
+    \item \textbf{其他}
+    \begin{itemize}
+        \item 热爱编程与开源，熟练使用 Codex/Cursor 等 AI 工具优化工作效率。
+        \item 坚持技术分享与社区建设，发表教学视频与文章 200+，累计 1k+ 点赞收藏。
+    \end{itemize}
+\end{itemize}
+
+\section{\faGraduationCap\ 教育背景}
+\datedsubsection{\textbf{广州大学} \quad 学士，计算机科学与技术}{2019.09 -- 2023.06}
+\begin{itemize}
+\item CET-4 英语四级（610分），CET-6 英语六级（602分）
+\item 全国大学生算法设计与编程挑战赛（银奖）
+\end{itemize}
+
 \section{\faSuitcase\ 工作经历}
 \datedsubsection{\textbf{软件工程师 @ 慧为智能科技有限公司}}{2023.05 - 至今}
 
@@ -75,57 +115,27 @@
         \item 采用应用层 AES+RSA 和传输层 TLS 的双层加密方案，保障凭证与敏感字段在复杂网络下的传输安全。
     \end{itemize}
 
-    \item \textbf{文件索引同步系统}：
-    \begin{itemize}
-        \item 自研 BFS+Queue 架构替代 fsnotify 监听，在海量文件场景下内存开销降低 87\% 以上。
-        \item 设计任务状态机与断点恢复机制，支持异常中断后自动重试未完成索引任务，保障大规模同步任务可靠完成
-    \end{itemize}
-
     \item \textbf{其他}：
     \begin{itemize}
-        \item 参与 Docker 管理服务开发，封装 Docker Engine API 实现镜像、容器、网络、挂载和运行状态管理，并基于 SSE 支持镜像拉取进度实时推送与任务取消。
+        \item 文件索引同步系统：自研 BFS+Queue 架构替代 fsnotify 监听，在海量文件场景下内存开销降低 87\% 以上。
+        \item Docker：封装 Docker Engine API 实现镜像、容器、网络、挂载和运行状态管理。
         \item 通过 rate 限流与 Ristretto 缓存库有效缓解并发流量冲击，响应时间缩短 90ms。
     \end{itemize}
 
 \end{itemize}
 
-\section{\faCogs\ 技术能力}
-\begin{itemize}
-    \item \textbf{编程语言}
-    \begin{itemize}
-        \item 深入理解 Go runtime GMP 模型，掌握调度循环、工作窃取、阻塞处理及 goroutine 抢占。
-        \item 掌握 Go 并发编程与源码机制，熟悉 channel、select、锁及 context 等组件的实现原理，能结合业务场景选择通信、加锁、并发编排和超时控制方案。
-        \item 掌握 Go 常用语法与底层结构，理解 slice、map、interface、defer 等核心特性的实现机制，熟悉 map 并发安全、哈希冲突、扩容迁移和 SwissTable 相关机制。
-        \item 深入理解 Go 内存管理与性能排查方法，掌握逃逸分析、栈/堆分配、内存分配器、三色标记、写屏障、GC 触发与 pprof 排查流程。
-        \item 拥有 Vue/React/Android 实战经验，具备多端适应能力。
-    \end{itemize}
+\section{\faCode\ 个人项目}
+\paragraph*{视频 Feed 流系统}\mbox{}\\
+{\small
+\noindent 基于 Go 开发的分布式 Feed 流服务，实现用户动态发布、关注关系、时间线查询等功能，采用缓存、异步消息和 Feed 分发策略提升系统吞吐能力。\\
+\noindent\textcolor{gray}{\textbf{技术栈：} Go, React, Redis, RabbitMQ, MySQL}
+}
+\vspace{0.3ex}
 
-    \item \textbf{数据存储}
-    \begin{itemize}
-        \item 掌握 MySQL InnoDB 存储引擎的 Buffer Pool，事务，隔离性，MVCC，索引，内部日志底层的工作原理。
-        \item 熟悉 MySQL 性能优化与线上排查，掌握 EXPLAIN、慢查询日志、索引失效、CPU 高与内存高排查方法，能结合业务场景设计索引与缓存方案。
-        \item 掌握 Redis 数据结构与底层实现，熟悉过期删除、持久化等机制，掌握缓存三兄弟问题、双写一致性的解决方案。
-    \end{itemize}
-    
-    \item \textbf{网络与运维}
-    \begin{itemize}
-        \item 熟悉计算机网络核心协议，掌握 HTTP/HTTPS、NAT、DNS、TCP/UDP 等基础机制。
-        \item 熟悉 Docker 容器化部署技术，了解 k8s 架构。
-    \end{itemize}
-\end{itemize}
-
-\section{\faGraduationCap\ 教育背景}
-\datedsubsection{\textbf{广州大学} \quad 学士，计算机科学与技术}{2019.09 -- 2023.06}
 \begin{itemize}
-\item CET-4 英语四级（610分），CET-6 英语六级（602分）
-\item 全国大学生算法设计与编程挑战赛（银奖）
-\end{itemize}
-
-\section{\faStar\ 其他}
-\begin{itemize}
-    \item 热爱编程与开源，熟练使用 Codex/Cursor 等 AI 工具优化工作效率。
-    \item 正在系统学习 AI Agent 相关技术栈，包括 Transformer、Decoder-Only、智能体范式、LangChain 与 LangGraph
-    \item 坚持技术分享与社区建设，发表教学视频与文章 200+，累计 1k+ 点赞收藏。
+    \item \textbf{Feed 性能优化}：实现时间线、关注流、推荐流、热榜流，使用游标分页、缓存和批量查询提升 Feed 读取速度。
+    \item \textbf{推拉结合视频分发}：普通作者发布走粉丝推送，大 V 作者发布走拉取合并，解决大 V 发布带来的海量 fanout 压力。
+    \item \textbf{异步化}：引入 RabbitMQ 消息队列解耦动态发布和 Feed 扩散流程，提升写入接口响应速度，并通过消费者幂等机制避免重复消费。
 \end{itemize}
 
 \end{document}
