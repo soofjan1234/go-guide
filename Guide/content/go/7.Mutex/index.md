@@ -1,6 +1,6 @@
 ---
 title: Mutex
-weight: 7
+weight: 70
 date: 2026-05-18
 draft: false
 ---

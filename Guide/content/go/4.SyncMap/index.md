@@ -1,6 +1,6 @@
 ---
 title: sync.Map
-weight: 13
+weight: 40
 date: 2026-05-25
 draft: false
 ---
