@@ -1,6 +1,6 @@
 ---
 title: goroutine / context / WaitGroup
-weight: 7
+weight: 5
 date: 2026-06-19
 draft: false
 ---
@@ -266,84 +266,7 @@ panic: boom
 
 ---
 
-## 8. goroutine 内部 recover
-
-题目：
-
-```go
-func main() {
-	done := make(chan struct{})
-	go func() {
-		defer close(done)
-		defer func() {
-			if r := recover(); r != nil {
-				fmt.Println("recover", r)
-			}
-		}()
-		panic("boom")
-	}()
-	<-done
-	fmt.Println("main")
-}
-```
-
-答案：
-
-```text
-recover boom
-main
-```
-
-推演：
-
-panic 发生在子 goroutine，recover 也在同一个 goroutine 的 defer 中，因此可以接住。`close(done)` 通知 main 继续执行。
-
-模型：
-
-```text
-保护 goroutine，要在 goroutine 内部 defer recover。
-```
-
----
-
-## 9. context cancel 不会自动停止 goroutine
-
-题目：
-
-```go
-func main() {
-	ctx, cancel := context.WithCancel(context.Background())
-	go func() {
-		for {
-			fmt.Println("work")
-			time.Sleep(time.Second)
-		}
-	}()
-	cancel()
-	_ = ctx
-	time.Sleep(2 * time.Second)
-}
-```
-
-答案：
-
-```text
-goroutine 仍然继续打印 work，直到 main 退出
-```
-
-推演：
-
-`cancel()` 只是关闭 `ctx.Done()`，发送取消信号。子 goroutine 没有监听这个信号，所以不会停止。
-
-模型：
-
-```text
-context 取消是协作式取消，goroutine 必须主动监听。
-```
-
----
-
-## 10. 正确监听 ctx.Done
+## 8. 正确监听 ctx.Done
 
 题目：
 
@@ -388,7 +311,7 @@ goroutine 要退出，必须在循环里监听 ctx.Done。
 
 ---
 
-## 11. context timeout
+## 9. context timeout
 
 题目：
 
@@ -424,7 +347,7 @@ WithTimeout 超时后 Done 关闭，Err 为 deadline exceeded。
 
 ---
 
-## 12. 手动 cancel 优先于 timeout
+## 10. 手动 cancel 优先于 timeout
 
 题目：
 
@@ -455,77 +378,7 @@ context canceled
 
 ---
 
-## 13. 子 context 随父 context 取消
-
-题目：
-
-```go
-func main() {
-	parent, cancel := context.WithCancel(context.Background())
-	child, _ := context.WithCancel(parent)
-
-	cancel()
-	<-child.Done()
-	fmt.Println(child.Err())
-}
-```
-
-答案：
-
-```text
-context canceled
-```
-
-推演：
-
-child context 派生自 parent。parent 被取消后，child 也会被取消。
-
-模型：
-
-```text
-context 取消会从父节点传播到子节点。
-```
-
----
-
-## 14. 子 context 取消不影响父 context
-
-题目：
-
-```go
-func main() {
-	parent := context.Background()
-	child, cancel := context.WithCancel(parent)
-	cancel()
-
-	select {
-	case <-parent.Done():
-		fmt.Println("parent canceled")
-	default:
-		fmt.Println(child.Err())
-	}
-}
-```
-
-答案：
-
-```text
-context canceled
-```
-
-推演：
-
-取消 child 不会反向取消 parent。`context.Background()` 的 Done 是 nil，不会 ready，所以走 default。
-
-模型：
-
-```text
-context 取消只向下传播，不向上传播。
-```
-
----
-
-## 15. 忘记 cancel 的风险
+## 11. 忘记 cancel 的风险
 
 题目：
 
@@ -554,7 +407,7 @@ WithCancel/WithTimeout/WithDeadline 返回的 cancel 应该被调用。
 
 ---
 
-## 16. 阻塞发送导致 goroutine 泄漏
+## 12. 阻塞发送导致 goroutine 泄漏
 
 题目：
 
@@ -588,7 +441,7 @@ main
 
 ---
 
-## 17. 用 ctx 避免阻塞发送泄漏
+## 13. 用 ctx 避免阻塞发送泄漏
 
 题目：
 
@@ -628,7 +481,7 @@ canceled
 
 ---
 
-## 18. 阻塞接收导致 goroutine 泄漏
+## 14. 阻塞接收导致 goroutine 泄漏
 
 题目：
 
@@ -662,7 +515,7 @@ main
 
 ---
 
-## 19. close channel 唤醒接收方
+## 15. close channel 唤醒接收方
 
 题目：
 
@@ -700,7 +553,7 @@ close channel 可以广播通知所有接收方退出。
 
 ---
 
-## 20. for select 忘记 return
+## 16. for select 忘记 return
 
 题目：
 
@@ -735,7 +588,7 @@ ctx 取消后仍不会退出
 
 ---
 
-## 21. break 只跳出 select
+## 17. break 只跳出 select
 
 题目：
 
@@ -771,7 +624,7 @@ for-select 中退出 goroutine 通常用 return。
 
 ---
 
-## 22. WaitGroup 复制的风险
+## 18. WaitGroup 复制的风险
 
 题目：
 
@@ -809,7 +662,7 @@ WaitGroup 使用后不能复制，传参要传指针。
 
 ---
 
-## 23. 正确传递 WaitGroup 指针
+## 19. 正确传递 WaitGroup 指针
 
 题目：
 
