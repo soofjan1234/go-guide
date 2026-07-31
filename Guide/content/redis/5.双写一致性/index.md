@@ -1,6 +1,6 @@
 ---
 title: 双写一致性
-weight: 5
+weight: 50
 date: 2026-06-02
 draft: false
 ---

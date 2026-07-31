@@ -1,6 +1,6 @@
 ---
 title: 缓存三兄弟
-weight: 1
+weight: 30
 date: 2026-05-27
 draft: false
 ---

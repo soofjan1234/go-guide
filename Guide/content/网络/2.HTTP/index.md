@@ -1,13 +1,13 @@
 ---
 title: HTTP、HTTPS
-weight: 3
+weight: 20
 date: 2026-05-27
 draft: false
 ---
 
 ## HTTP 1.0/1.1的区别 +1
 
-![](pic/HTTP1.0与1.1对比.png)
+![](Guide/content/网络/2.HTTP/pic/HTTP1.0与1.1对比.png)
 
 1. 响应码多了
 2. 缓存控制策略更精细
@@ -17,7 +17,7 @@ draft: false
 
 ## HTTP 各版本的区别 +1
 
-![](pic/HTTP版本演进1.0到3.png)
+![](Guide/content/网络/2.HTTP/pic/HTTP版本演进1.0到3.png)
 
 1. **1.0 / 1.1**：一条 TCP 上请求基本按序走（A→B→C），前面卡住后面都得等 → **队头阻塞**
 2. **2**：二进制分帧 + 多路复用，A1、B1 可交错发；但底层仍是 **一条 TCP 字节流**，丢一个包整条连接上的流都可能被拖住 → **TCP 层队头阻塞**
@@ -33,7 +33,7 @@ draft: false
 
 **HTTPS = HTTP + TLS**。TCP 建连后先做 TLS 握手，再在同一连接上传 HTTP（线路上是密文）。
 
-![](pic/TLS混合加密.png)
+![](Guide/content/网络/2.HTTP/pic/TLS混合加密.png)
 
 ### 典型顺序
 
@@ -60,7 +60,7 @@ TLS 不用「全程非对称」，而是**握手非对称 + 传数据对称**：
 
 ### 证书（防中间人）
 
-![](pic/CA信任体系.png)
+![](Guide/content/网络/2.HTTP/pic/CA信任体系.png)
 
 只交换公钥不够：中间人可截获并换成自己的公钥，分别与两端建会话。
 

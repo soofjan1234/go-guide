@@ -1,6 +1,6 @@
 ---
 title: 数据结构
-weight: 2
+weight: 10
 date: 2026-05-27
 draft: false
 ---
@@ -49,6 +49,6 @@ draft: false
 
 1. 数据少的时候是ListPack
 2. 数据多的时候是Dict+SkipList
-    - Dict方便快速查询
+    - Dict方便快速查询、数据唯一
     - SkipList方便排序、范围查询
     - 两个结构指向相同的底层数据
