@@ -311,6 +311,25 @@
       article details.section-fold > summary::before { color: #777; }
       article details.section-fold .section-plus { color: #777; }
     }
+    pre.mermaid {
+      margin: 1rem 0;
+      padding: 1rem;
+      overflow-x: auto;
+      text-align: center;
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 8px;
+    }
+    pre.mermaid svg {
+      max-width: 100%;
+      height: auto;
+    }
+    @media (prefers-color-scheme: dark) {
+      pre.mermaid {
+        background: #1a1a1a;
+        border-color: #333;
+      }
+    }
     time { color: #666; font-size: 0.9rem; }
     .muted { color: #666; font-size: 0.875rem; line-height: 1.5; }
     @media (max-width: 56rem) {
@@ -345,5 +364,18 @@
   </div>
   {{ partial "article-sections.html" . }}
   {{ partial "code-copy.html" . }}
+  {{ if .Store.Get "hasMermaid" }}
+  <script src="{{ "js/mermaid.min.js" | relURL }}"></script>
+  <script>
+    (function () {
+      var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      mermaid.initialize({
+        startOnLoad: true,
+        securityLevel: "strict",
+        theme: prefersDark ? "dark" : "default"
+      });
+    })();
+  </script>
+  {{ end }}
 </body>
 </html>

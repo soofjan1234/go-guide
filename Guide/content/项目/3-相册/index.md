@@ -1,6 +1,6 @@
 ---
 title: 相册
-weight: 3
+weight: 30
 date: 2026-06-12
 draft: false
 ---

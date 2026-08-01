@@ -1,6 +1,6 @@
 ---
 title: 文档中心
-weight: 1
+weight: 10
 date: 2026-06-12
 draft: false
 ---
