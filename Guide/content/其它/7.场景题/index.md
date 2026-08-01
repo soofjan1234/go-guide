@@ -1,6 +1,6 @@
 ---
 title: 场景题
-weight: 7
+weight: 70
 date: 2026-06-09
 draft: false
 ---

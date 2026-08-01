@@ -1,6 +1,6 @@
 # Kubernetes
 
-![](pic/k8s/k8s架构.png)
+![](k8s/k8s架构.png)
 
 ## Master 有哪些组件？
 
@@ -49,7 +49,7 @@
     3. Docker（在新版 K8s 中已移除直接支持，但 Docker 也是基于 Containerd 的，目前通过 cri-dockerd 适配器依然可以使用）
 
 ## 资源对象
-![](pic/k8s/k8s资源对象.png)
+![](k8s/k8s资源对象.png)
 
 ### 1. Pod（容器组）
 

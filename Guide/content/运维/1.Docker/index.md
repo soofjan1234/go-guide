@@ -2,7 +2,7 @@
 
 ## Docker 为什么比虚拟机快？
 
-![](pic/docker/Docker和虚拟机.png)
+![](docker/Docker和虚拟机.png)
 
 Docker 不是虚拟机。容器共享宿主机内核，虚拟机则有完整 Guest OS 和独立内核。
 
@@ -27,11 +27,11 @@ Docker 不是虚拟机。容器共享宿主机内核，虚拟机则有完整 Gue
 
 ### Container 为什么可以写？
 
-![](pic/docker/OverlayFS.png)
+![](docker/OverlayFS.png)
 
 为了满足程序运行时的写需求，并通过 OverlayFS 的 Copy-on-Write 技术，在不破坏只读镜像的前提下，为每个容器提供独立的写入沙盒
 
-![](pic/docker/COW.png)
+![](docker/COW.png)
 
 ## Docker 为什么镜像这么小？
 
@@ -99,7 +99,7 @@ scratch 是一个虚拟的、完全空白的镜像。
 
 Docker 默认网络是什么？ bridge
 
-![](pic/docker/Docker网络.png)
+![](docker/Docker网络.png)
 
 ## host 网络和 bridge 网络区别？
 
