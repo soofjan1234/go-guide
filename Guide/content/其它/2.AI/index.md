@@ -1,6 +1,6 @@
 ---
 title: AI
-weight: 2
+weight: 20
 date: 2026-05-27
 draft: false
 ---
@@ -47,14 +47,6 @@ draft: false
 # 工程化
 
 ## 用了哪些skill？ +2
-
-superpowers的插件：
-1. brainstorm：头脑风暴、需求澄清、方案取舍
-2. test-driven-development：测试驱动开发
-3. requesting-code-review/receiving-code-review
-4. systematic-debugging: 系统化测试，先找根因再修，不直接猜
-5. writing-plans/executing-plans
-6. verification-before-completion:完成前必须跑验证命令
 
 ## 如何确定skill被使用 +1
 

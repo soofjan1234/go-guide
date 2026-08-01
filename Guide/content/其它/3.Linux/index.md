@@ -1,6 +1,6 @@
 ---
 title: Linux
-weight: 1
+weight: 30
 date: 2026-05-27
 draft: false
 ---
