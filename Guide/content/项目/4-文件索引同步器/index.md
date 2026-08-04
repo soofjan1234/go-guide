@@ -1,6 +1,6 @@
 ---
 title: 文件索引同步器
-weight: 4
+weight: 40
 date: 2026-06-12
 draft: false
 ---
@@ -19,6 +19,13 @@ draft: false
     - 每个 watch 会消耗：内核内存、fsnotify mark、路径相关结构和 event 队列空间
 2. 内核记录这个路径上发生的变化，通知这个 inotify 实例，把事件写到对应 fd 的事件队列
 4. fsnotify 从 fd 里读事件，转成 Go 里的 Event
+
+## Window、MacOS的监听
+
+1. FSEvents (File System Events) ：Apple 专为 macOS 设计的、极其优秀的文件监听系统
+    - 以“目录”为单位在内核中记录变化（利用了文件系统的日志）
+2. ReadDirectoryChangesW ：Window 标准的目录监控 API
+    - 它会向内核申请一个缓冲区（Buffer）。当文件发生变化时，Windows 内核把事件写入这个缓冲区，用户态程序通过异步 I/O（IOCP 或 Overlapped）去读取。
 
 ## 为什么是BFS而不是DFS
 

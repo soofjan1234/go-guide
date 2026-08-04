@@ -18,9 +18,9 @@ draft: false
 
 ---
 
-## 1. 数组赋值会复制
+## 1. 数组赋值和 slice 赋值
 
-题目：
+题目 1：
 
 ```go
 func main() {
@@ -39,21 +39,7 @@ func main() {
 [9 2 3]
 ```
 
-推演：
-
-数组是值类型，`b := a` 会复制整个数组。`a` 和 `b` 是两个不同数组，修改 `b[0]` 不影响 `a[0]`。
-
-模型：
-
-```text
-数组赋值 = 复制整个数组。
-```
-
----
-
-## 2. slice 赋值共享底层数组
-
-题目：
+题目 2：
 
 ```go
 func main() {
@@ -74,17 +60,20 @@ func main() {
 
 推演：
 
+数组是值类型，`b := a` 会复制整个数组。`a` 和 `b` 是两个不同数组，修改 `b[0]` 不影响 `a[0]`。
+
 `b := a` 复制的是 slice header。两个 header 的 ptr 指向同一个底层数组，所以通过 `b[0]` 修改元素，会影响 `a` 看到的内容。
 
 模型：
 
 ```text
+数组赋值 = 复制整个数组。
 slice 赋值 = 复制 header，共享底层数组。
 ```
 
 ---
 
-## 3. 截断不会改变另一个 slice 的 len
+## 2. 截断不会改变另一个 slice 的 len
 
 题目：
 
@@ -117,7 +106,7 @@ func main() {
 
 ---
 
-## 4. 截断后修改元素仍会影响另一个 slice
+## 3. 截断后修改元素仍会影响另一个 slice
 
 题目：
 
@@ -151,7 +140,7 @@ len 变短不代表底层数组断开。
 
 ---
 
-## 5. append 不扩容时会改底层数组
+## 4. append 不扩容时会改底层数组
 
 题目：
 
@@ -187,7 +176,7 @@ append 不扩容 = 写回共享底层数组。
 
 ---
 
-## 6. append 不扩容但另一个 slice 的 len 不变
+## 5. append 不扩容但另一个 slice 的 len 不变
 
 题目：
 
@@ -223,7 +212,7 @@ func main() {
 
 ---
 
-## 7. append 扩容后与旧数组分离
+## 6. append 扩容后与旧数组分离
 
 题目：
 
@@ -257,7 +246,7 @@ append 扩容 = 新数组，旧 slice 不受后续元素修改影响。
 
 ---
 
-## 8. make 指定 len 和 cap
+## 7. make 指定 len 和 cap
 
 题目：
 
@@ -294,7 +283,7 @@ func main() {
 
 ---
 
-## 9. append 返回值必须接住
+## 8. append 返回值必须接住
 
 题目：
 
@@ -324,7 +313,7 @@ append 会返回新的 slice header，必须接住。
 
 ---
 
-## 10. 函数内修改 slice 元素
+## 9. 函数内修改 slice 元素
 
 题目：
 
@@ -358,7 +347,7 @@ func main() {
 
 ---
 
-## 11. 函数内 append 不接返回值
+## 10. 函数内 append 不接返回值
 
 题目：
 
@@ -392,7 +381,7 @@ func main() {
 
 ---
 
-## 12. 函数内 append 并返回
+## 11. 函数内 append 并返回
 
 题目：
 
@@ -427,7 +416,7 @@ append 返回新的 slice header。外部用 `a = add(a)` 接住这个 header，
 
 ---
 
-## 13. full slice expression 限制 cap
+## 12. full slice expression 限制 cap
 
 题目：
 
@@ -463,7 +452,7 @@ s[i:j:k] 可以限制 cap，让 append 更容易扩容隔离。
 
 ---
 
-## 14. 子切片的 cap 从起点算到原数组末尾
+## 13. 子切片的 cap 从起点算到原数组末尾
 
 题目：
 
@@ -493,7 +482,7 @@ func main() {
 
 ---
 
-## 15. nil slice 可以 append
+## 14. nil slice 可以 append
 
 题目：
 
@@ -525,7 +514,7 @@ nil slice 可读 len/cap，也可以 append。
 
 ---
 
-## 16. 空 slice 和 nil slice 不一样
+## 15. 空 slice 和 nil slice 不一样
 
 题目：
 
@@ -557,7 +546,7 @@ nil slice 和空 slice 长度一样，但 nil 状态不同。
 
 ---
 
-## 17. range 中修改元素
+## 16. range 中修改元素
 
 题目：
 
@@ -589,7 +578,7 @@ range value 是拷贝，改 v 不改原元素。
 
 ---
 
-## 18. range 中用下标修改元素
+## 17. range 中用下标修改元素
 
 题目：
 
@@ -621,7 +610,7 @@ func main() {
 
 ---
 
-## 19. 对 slice range 时 append
+## 18. 对 slice range 时 append
 
 题目：
 
@@ -653,7 +642,7 @@ range slice 的遍历次数由开始时的 len 决定。
 
 ---
 
-## 20. 对数组 range 会复制数组
+## 19. 对数组 range 会复制数组
 
 题目：
 

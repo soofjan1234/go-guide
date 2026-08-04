@@ -27,7 +27,7 @@
 \begin{itemize}[label=,leftmargin=*]
 \large
 \item \textbf{当前状态：}\textbf{深圳在职}
-\item \textbf{到岗时间：}\textbf{2-4周}
+\item \textbf{到岗时间：}\textbf{1-2周}
 \item \textbf{学历：}\textbf{本科全日制（学信网可查）}
 \item \textbf{求职偏好：}不外包 / 不驻场
 \item \textbf{微信：}1489938120
@@ -46,9 +46,8 @@
     \item \textbf{编程语言}
     \begin{itemize}
         \item 深入理解 Go runtime GMP 模型，掌握调度循环、工作窃取、阻塞处理及 goroutine 抢占。
-        \item 掌握 Go 并发编程与源码机制，熟悉 channel、select、锁及 context 等组件的实现原理，能结合业务场景选择通信、加锁、并发编排和超时控制方案。
-        \item 掌握 Go 常用语法与底层结构，理解 slice、map、interface、defer 等核心特性的实现机制，熟悉 map 并发安全、哈希冲突、扩容迁移和 SwissTable 相关机制。
-        \item 深入理解 Go 内存管理与性能排查方法，掌握逃逸分析、栈/堆分配、内存分配器、三色标记、写屏障、GC 触发与 pprof 排查流程。
+        \item 掌握 Go 并发编程与源码机制，熟悉 channel、slice、map等组件的实现原理，理解 select、锁及 context 等核心特性。
+        \item 深入理解 Go 内存管理与性能排查方法，掌握逃逸分析、栈/堆分配、内存分配器、三色标记、写屏障与 GC。
         \item 拥有 Vue/React/Android 实战经验，具备多端适应能力。
     \end{itemize}
 
@@ -64,7 +63,7 @@
         \item 熟悉 RabbitMQ 消息队列，理解消息重复、丢失处理方法；了解 Kafka、RocketMQ 相关选型。
         \item 熟悉计算机网络核心协议，掌握 HTTP/HTTPS、NAT、DNS、TCP/UDP 等基础机制。
         \item 熟悉 Docker 容器化部署技术，了解 k8s 架构。
-        \item 了解/关注 AI Agent 相关技术栈，包括 Transformer、Decoder-Only 架构、智能体范式、LangChain 与 LangGraph
+        \item 了解 AI Agent 相关技术栈，包括 Transformer、Decoder-Only 架构、智能体范式、LangChain 与 LangGraph
     \end{itemize}
 
     \item \textbf{其他}
@@ -97,14 +96,14 @@
     \item \textbf{文档中心}：
     \begin{itemize}
         \item 构建文档同步、解析、索引、检索一体化链路，支持 PDF、Word、Excel、PPT、Markdown、HTML、EPUB 等多类型文档的自动识别与内容抽取。
-        \item 针对内存受限环境，完成了从 Elasticsearch 到 Bleve 的搜索引擎迁移，实现快速的全文与多维度检索，约 4 倍查询性能提升。
+        \item 针对内存受限环境，基于 Bleve 构建轻量级搜索能力，实现快速的全文检索与多维度筛选。
         \item 设计基于块的索引策略与搜索结果聚合算法，解决超长文档索引阶段内存占用过高问题，峰值 heapInuse 降幅约 76\%+。
          \item 使用 CJDict 词典分词，并以压缩 Trie longest-match 替代 substring + map 查词，将 Trace 总耗时降低约 48\%、进程 user CPU 降低约 63\%。
     \end{itemize}
 
     \item \textbf{AI相册}：
     \begin{itemize}
-        \item 在 RKNN 平台上基于 JNI 封装实现标签分类；通过 DBSCAN 聚类算法实现人脸无监督聚类，支持动态聚类中心更新，识别准确率达 98.3\%。
+        \item 基于 JNI 封装实现标签分类；通过 DBSCAN 聚类算法实现人脸无监督聚类，基于 LFW/WIDER Face 验证模型效果，实现不同人误合并率 0\%、同人归类准确率 89\%。
         \item 通过拉普拉斯方差算法检测模糊照片；通过 dHash+qHash 算法检测重复照片。
         \item 通过增量扫描、特征缓存和批量处理优化大规模照片分析流程，提升相册导入与检索效率。
     \end{itemize}

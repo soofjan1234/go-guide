@@ -1,4 +1,8 @@
 {{- $lang := .Type | default "text" -}}
+{{- if eq $lang "mermaid" -}}
+  {{- .Page.Store.Set "hasMermaid" true -}}
+  <pre class="mermaid">{{ .Inner | htmlEscape | safeHTML }}</pre>
+{{- else -}}
 <div class="code-block">
   <div class="code-block-header">
     <span class="code-block-lang">{{ $lang }}</span>
@@ -6,3 +10,4 @@
   </div>
   {{- highlight .Inner $lang "linenos=false,noClasses=false" -}}
 </div>
+{{- end -}}

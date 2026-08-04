@@ -27,71 +27,7 @@ range 的对象是什么：slice、array、map、channel、string？
 
 ---
 
-## 1. range value 是拷贝
-
-题目：
-
-```go
-func main() {
-	a := []int{1, 2, 3}
-	for _, v := range a {
-		v *= 10
-	}
-	fmt.Println(a)
-}
-```
-
-答案：
-
-```text
-[1 2 3]
-```
-
-推演：
-
-`v` 是元素值的拷贝。修改 `v` 只改这个临时变量，不会修改底层数组里的真实元素。
-
-模型：
-
-```text
-range 的 value 是拷贝。
-```
-
----
-
-## 2. 用下标修改元素
-
-题目：
-
-```go
-func main() {
-	a := []int{1, 2, 3}
-	for i := range a {
-		a[i] *= 10
-	}
-	fmt.Println(a)
-}
-```
-
-答案：
-
-```text
-[10 20 30]
-```
-
-推演：
-
-`a[i]` 访问的是底层数组里的真实元素，所以可以修改 slice 内容。
-
-模型：
-
-```text
-修改 slice 元素，用下标，不要改 range value。
-```
-
----
-
-## 3. range value 取地址
+## 1. range value 取地址
 
 题目：
 
@@ -129,7 +65,7 @@ Go 1.22 起，range 循环变量每轮迭代都会创建新变量，所以 `&v` 
 
 ---
 
-## 4. 想取元素地址，要取下标
+## 2. 想取元素地址，要取下标
 
 题目：
 
@@ -163,7 +99,7 @@ func main() {
 
 ---
 
-## 5. 闭包捕获 range 变量
+## 3. 闭包捕获 range 变量
 
 题目：
 
@@ -203,7 +139,7 @@ Go 1.22 起，每轮迭代有新的 `v`，闭包捕获的是每轮自己的变�
 
 ---
 
-## 6. 兼容旧版本的写法
+## 4. 兼容旧版本的写法
 
 题目：
 
@@ -243,7 +179,7 @@ func main() {
 
 ---
 
-## 7. goroutine 捕获 range 变量
+## 5. goroutine 捕获 range 变量
 
 题目：
 
@@ -281,7 +217,7 @@ goroutine + 循环变量，本质仍是闭包捕获问题。
 
 ---
 
-## 8. 用参数传入 goroutine
+## 6. 用参数传入 goroutine
 
 题目：
 
@@ -318,115 +254,7 @@ goroutine 中使用循环变量，推荐通过参数传入。
 
 ---
 
-## 9. range slice 时 append
-
-题目：
-
-```go
-func main() {
-	a := []int{1, 2, 3}
-	for _, v := range a {
-		a = append(a, v)
-	}
-	fmt.Println(a)
-}
-```
-
-答案：
-
-```text
-[1 2 3 1 2 3]
-```
-
-推演：
-
-range 开始时会确定遍历次数，初始 len 是 3。循环中 append 会让 `a` 变长，但本次 range 只跑 3 轮。
-
-模型：
-
-```text
-range slice 的遍历次数由开始时的 len 决定。
-```
-
----
-
-## 10. range slice 时修改后续元素
-
-题目：
-
-```go
-func main() {
-	a := []int{1, 2, 3}
-	for i, v := range a {
-		if i == 0 {
-			a[1] = 9
-		}
-		fmt.Println(i, v)
-	}
-	fmt.Println(a)
-}
-```
-
-答案：
-
-```text
-0 1
-1 9
-2 3
-[1 9 3]
-```
-
-推演：
-
-range slice 不会复制底层数组。第一轮把 `a[1]` 改成 9，第二轮取 value 时会从底层数组读取最新的 `a[1]`，所以 `v` 是 9。
-
-模型：
-
-```text
-range slice 不复制底层数组，后续元素修改可能被后续迭代看到。
-```
-
----
-
-## 11. range 数组时修改后续元素
-
-题目：
-
-```go
-func main() {
-	a := [3]int{1, 2, 3}
-	for i, v := range a {
-		if i == 0 {
-			a[1] = 9
-		}
-		fmt.Println(i, v)
-	}
-	fmt.Println(a)
-}
-```
-
-答案：
-
-```text
-0 1
-1 2
-2 3
-[1 9 3]
-```
-
-推演：
-
-range 数组时，range 表达式会复制整个数组。循环中的 `v` 来自复制数组，所以第二轮仍打印 2。原数组 `a` 确实被改成 `[1 9 3]`。
-
-模型：
-
-```text
-range 数组会复制数组。
-```
-
----
-
-## 12. range 数组指针
+## 7. range 数组指针
 
 题目：
 
@@ -464,7 +292,7 @@ range 数组会复制，range 数组指针不会复制数组。
 
 ---
 
-## 13. range map 顺序不固定
+## 8. range map 顺序不固定
 
 题目：
 
@@ -499,7 +327,7 @@ Go 语言不保证 map 的遍历顺序。同一段代码多次运行，输出顺
 
 ---
 
-## 14. range map 时删除当前 key
+## 9. range map 时删除当前 key
 
 题目：
 
@@ -531,7 +359,7 @@ range map 时可以删除当前 key。
 
 ---
 
-## 15. range map 时新增 key
+## 10. range map 时新增 key
 
 题目：
 
@@ -563,7 +391,7 @@ range map 时新增 key，不保证本轮是否遍历到。
 
 ---
 
-## 16. range string 按 rune 遍历
+## 11. range string 按 rune 遍历
 
 题目：
 
@@ -596,9 +424,9 @@ range string：i 是字节下标，r 是 rune。
 
 ---
 
-## 17. range nil slice
+## 12. range nil slice / nil map
 
-题目：
+题目 1：
 
 ```go
 func main() {
@@ -616,21 +444,7 @@ func main() {
 done
 ```
 
-推演：
-
-nil slice 的 len 是 0，对 nil slice range 不会 panic，只是循环 0 次。
-
-模型：
-
-```text
-range nil slice 安全，循环 0 次。
-```
-
----
-
-## 18. range nil map
-
-题目：
+题目 2：
 
 ```go
 func main() {
@@ -650,17 +464,20 @@ done
 
 推演：
 
+nil slice 的 len 是 0，对 nil slice range 不会 panic，只是循环 0 次。
+
 nil map 可以 range，循环 0 次。注意：nil map 可以读、可以 range，但不能写入。
 
 模型：
 
 ```text
+range nil slice 安全，循环 0 次。
 range nil map 安全，循环 0 次。
 ```
 
 ---
 
-## 19. range nil channel
+## 13. range nil channel
 
 题目：
 
@@ -692,7 +509,7 @@ range nil channel 会永久阻塞。
 
 ---
 
-## 20. range closed channel
+## 14. range closed channel
 
 题目：
 

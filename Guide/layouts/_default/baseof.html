@@ -81,13 +81,12 @@
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      gap: 0.25rem 0.15rem;
+      gap: 0.35rem;
       font-size: 0.9rem;
     }
-    .top-index-sep {
-      color: #999;
-      user-select: none;
-      padding: 0 0.1rem;
+    .top-index-group {
+      position: relative;
+      display: inline-flex;
     }
     .top-index-link {
       color: inherit;
@@ -95,6 +94,7 @@
       padding: 0.28rem 0.55rem;
       border-radius: 6px;
       border: 1px solid transparent;
+      line-height: 1.35;
     }
     .top-index-link:hover {
       background: rgba(0, 0, 0, 0.06);
@@ -105,8 +105,47 @@
       background: rgba(11, 87, 208, 0.12);
       border-color: rgba(11, 87, 208, 0.35);
     }
+    .top-index-dropdown {
+      position: absolute;
+      top: calc(100% + 0.35rem);
+      left: 50%;
+      z-index: 20;
+      display: none;
+      min-width: 8.5rem;
+      padding: 0.35rem;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 0.65rem 1.6rem rgba(0, 0, 0, 0.12);
+      transform: translateX(-50%);
+    }
+    .top-index-dropdown::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 100%;
+      height: 0.4rem;
+    }
+    .top-index-group:hover .top-index-dropdown,
+    .top-index-group:focus-within .top-index-dropdown {
+      display: grid;
+      gap: 0.1rem;
+    }
+    .top-index-dropdown a {
+      display: block;
+      padding: 0.35rem 0.55rem;
+      color: inherit;
+      text-decoration: none;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .top-index-dropdown a:hover,
+    .top-index-dropdown a:focus {
+      background: rgba(0, 0, 0, 0.06);
+      outline: none;
+    }
     @media (prefers-color-scheme: dark) {
-      .top-index-sep { color: #666; }
       .top-index-link:hover {
         background: rgba(255, 255, 255, 0.06);
         border-color: #444;
@@ -114,6 +153,25 @@
       .top-index-link.is-active {
         background: rgba(138, 180, 248, 0.15);
         border-color: rgba(138, 180, 248, 0.4);
+      }
+      .top-index-dropdown {
+        background: #1f1f1f;
+        border-color: #3a3a3a;
+        box-shadow: 0 0.65rem 1.6rem rgba(0, 0, 0, 0.35);
+      }
+      .top-index-dropdown a:hover,
+      .top-index-dropdown a:focus {
+        background: rgba(255, 255, 255, 0.07);
+      }
+    }
+    @media (max-width: 36rem) {
+      .top-index {
+        justify-content: center;
+      }
+      .top-index-dropdown {
+        left: auto;
+        right: 0;
+        transform: none;
       }
     }
     .shell {
@@ -253,6 +311,25 @@
       article details.section-fold > summary::before { color: #777; }
       article details.section-fold .section-plus { color: #777; }
     }
+    pre.mermaid {
+      margin: 1rem 0;
+      padding: 1rem;
+      overflow-x: auto;
+      text-align: center;
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 8px;
+    }
+    pre.mermaid svg {
+      max-width: 100%;
+      height: auto;
+    }
+    @media (prefers-color-scheme: dark) {
+      pre.mermaid {
+        background: #1a1a1a;
+        border-color: #333;
+      }
+    }
     time { color: #666; font-size: 0.9rem; }
     .muted { color: #666; font-size: 0.875rem; line-height: 1.5; }
     @media (max-width: 56rem) {
@@ -287,5 +364,18 @@
   </div>
   {{ partial "article-sections.html" . }}
   {{ partial "code-copy.html" . }}
+  {{ if .Store.Get "hasMermaid" }}
+  <script src="{{ "js/mermaid.min.js" | relURL }}"></script>
+  <script>
+    (function () {
+      var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      mermaid.initialize({
+        startOnLoad: true,
+        securityLevel: "strict",
+        theme: prefersDark ? "dark" : "default"
+      });
+    })();
+  </script>
+  {{ end }}
 </body>
 </html>

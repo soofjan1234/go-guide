@@ -286,72 +286,7 @@ panic 会触发本 goroutine 已注册的 defer。
 
 ---
 
-## 9. recover 接住 panic
-
-题目：
-
-```go
-func main() {
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println("recover", r)
-		}
-	}()
-	panic("boom")
-	fmt.Println("after")
-}
-```
-
-答案：
-
-```text
-recover boom
-```
-
-推演：
-
-`panic("boom")` 后开始执行 defer。defer 中直接调用 `recover()`，成功接住 panic。`panic` 之后的 `fmt.Println("after")` 不会回去执行。
-
-模型：
-
-```text
-recover 接住 panic 后，函数不会回到 panic 后的位置继续执行。
-```
-
----
-
-## 10. recover 不在 defer 中无效
-
-题目：
-
-```go
-func main() {
-	if r := recover(); r != nil {
-		fmt.Println("recover", r)
-	}
-	panic("boom")
-}
-```
-
-答案：
-
-```text
-panic: boom
-```
-
-推演：
-
-`recover` 只有在 panic 发生后的 defer 调用链中才有效。这里 `recover()` 执行时还没有 panic，所以返回 nil。后面的 panic 没有被接住。
-
-模型：
-
-```text
-recover 不是 try-catch，平时调用没有效果。
-```
-
----
-
-## 11. recover 间接调用无效
+## 9. recover 间接调用无效
 
 题目：
 
@@ -388,7 +323,7 @@ recover 必须在 defer 函数中直接调用。
 
 ---
 
-## 12. 同一个 goroutine 中多层函数 recover
+## 10. 同一个 goroutine 中多层函数 recover
 
 题目：
 
@@ -432,45 +367,7 @@ recover 可以接住同一个 goroutine 调用栈下层函数的 panic。
 
 ---
 
-## 13. recover 不能跨 goroutine
-
-题目：
-
-```go
-func main() {
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println("recover", r)
-		}
-	}()
-
-	go func() {
-		panic("boom")
-	}()
-
-	time.Sleep(time.Second)
-}
-```
-
-答案：
-
-```text
-panic: boom
-```
-
-推演：
-
-`main` goroutine 中的 defer recover 只能接住 `main` goroutine 自己调用栈里的 panic。新 goroutine 中发生的 panic 只能由新 goroutine 自己的 defer recover 接住。这里新 goroutine 没有 recover，所以程序崩溃。
-
-模型：
-
-```text
-recover 不能跨 goroutine。
-```
-
----
-
-## 14. 在 goroutine 内部 recover
+## 11. 在 goroutine 内部 recover
 
 题目：
 
@@ -512,7 +409,7 @@ goroutine 内部自己 defer recover，才能保护这个 goroutine。
 
 ---
 
-## 15. defer 中再次 panic
+## 12. defer 中再次 panic
 
 题目：
 

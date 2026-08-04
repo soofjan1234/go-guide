@@ -1,17 +1,42 @@
+{{ $section := .Section }}
+{{ $goActive := in (slice "go" "go实战") $section }}
+{{ $middlewareActive := in (slice "mysql" "redis" "RabbitMQ" "rabbitmq" "bleve") $section }}
+{{ $otherActive := in (slice "其它" "网络" "运维" "Agent" "agent") $section }}
+{{ $projectActive := eq $section "项目" }}
+
 <nav class="top-index" aria-label="技术索引">
-  <a href="{{ "/go/" | relLangURL }}" class="top-index-link{{ if eq .Section "go" }} is-active{{ end }}">Go</a>
-  <span class="top-index-sep" aria-hidden="true">·</span>
-  <a href="{{ "/go实战/" | relLangURL }}" class="top-index-link{{ if eq .Section "go实战" }} is-active{{ end }}">Go 实战</a>
-  <span class="top-index-sep" aria-hidden="true">·</span>
-  <a href="{{ "/mysql/" | relLangURL }}" class="top-index-link{{ if eq .Section "mysql" }} is-active{{ end }}">MySQL</a>
-  <span class="top-index-sep" aria-hidden="true">·</span>
-  <a href="{{ "/redis/" | relLangURL }}" class="top-index-link{{ if eq .Section "redis" }} is-active{{ end }}">Redis</a>
-  <span class="top-index-sep" aria-hidden="true">·</span>
-  <a href="{{ "/网络/" | relLangURL }}" class="top-index-link{{ if eq .Section "网络" }} is-active{{ end }}">网络</a>
-  <span class="top-index-sep" aria-hidden="true">·</span>
-  <a href="{{ "/其它/" | relLangURL }}" class="top-index-link{{ if eq .Section "其它" }} is-active{{ end }}">其它</a>
-  {{ if site.Params.showPrivate }}
-  <span class="top-index-sep" aria-hidden="true">·</span>
-  <a href="{{ "/项目/" | relLangURL }}" class="top-index-link{{ if eq .Section "项目" }} is-active{{ end }}">项目</a>
-  {{ end }}
+  <div class="top-index-group">
+    <a href="{{ "/go/" | relLangURL }}" class="top-index-link{{ if $goActive }} is-active{{ end }}">Go</a>
+    <div class="top-index-dropdown">
+      <a href="{{ "/go/" | relLangURL }}">Go</a>
+      <a href="{{ "/go实战/" | relLangURL }}">Go 实战</a>
+    </div>
+  </div>
+
+  <div class="top-index-group">
+    <a href="{{ "/mysql/" | relLangURL }}" class="top-index-link{{ if $middlewareActive }} is-active{{ end }}">中间件</a>
+    <div class="top-index-dropdown">
+      <a href="{{ "/mysql/" | relLangURL }}">MySQL</a>
+      <a href="{{ "/redis/" | relLangURL }}">Redis</a>
+      <a href="{{ "/rabbitmq/" | relLangURL }}">RabbitMQ</a>
+      <a href="{{ "/bleve/" | relLangURL }}">Bleve</a>
+    </div>
+  </div>
+
+  <div class="top-index-group">
+    <a href="{{ "/其它/" | relLangURL }}" class="top-index-link{{ if $otherActive }} is-active{{ end }}">其它</a>
+    <div class="top-index-dropdown">
+      <a href="{{ "/其它/" | relLangURL }}">其它</a>
+      <a href="{{ "/网络/" | relLangURL }}">网络</a>
+      <a href="{{ "/运维/" | relLangURL }}">运维</a>
+      <a href="{{ "/agent/" | relLangURL }}">Agent</a>
+    </div>
+  </div>
+
+  <div class="top-index-group">
+    <a href="{{ "/项目/" | relLangURL }}" class="top-index-link{{ if $projectActive }} is-active{{ end }}">项目</a>
+    <div class="top-index-dropdown">
+      <a href="{{ "/项目/" | relLangURL }}">项目</a>
+    </div>
+  </div>
 </nav>
