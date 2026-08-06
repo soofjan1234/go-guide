@@ -3,13 +3,15 @@
 % !Mode:: "TeX:UTF-8"
 
 \documentclass{resume}
-\usepackage{zh_CN-Adobefonts_external} % 中英双语版，需要中文字体支持
+\usepackage{zh_CN-Adobefonts_external}
 \usepackage{linespacing_fix}
 \usepackage{cite}
 \usepackage{titlesec}
 \usepackage{enumitem}
 \usepackage{graphicx}
+% Adjust \section spacing: {left indent}{before title}{after title}
 \titlespacing*{\section}{0pt}{3ex plus 1ex minus .2ex}{1ex plus .2ex}
+% Adjust itemize spacing: itemsep between items, parsep within an item, topsep around lists
 \setlist[itemize,1]{itemsep=0.8ex, parsep=0.2ex, topsep=0.3ex}
 \setlist[itemize,2]{itemsep=0.4ex, parsep=0.1ex, topsep=0.2ex}
 \renewcommand{\CJKglue}{\hskip 0.06em}
@@ -17,23 +19,21 @@
 \begin{document}
 \pagenumbering{gobble}
 
-% ===================== 第一页：中文简历 =====================
+\name{Wenzheng Hou | Go Backend Engineer}
 
-\name{侯汶政｜Go后端工程师}
-
-\section{\faInfoCircle\ 基本信息}
+\section{\faInfoCircle\ Basic Information}
 \vspace{0.5ex}
 \begin{minipage}{0.72\textwidth}
 \begin{itemize}[label=,leftmargin=*]
 \large
-\item \textbf{当前状态：}\textbf{深圳在职}
-\item \textbf{到岗时间：}\textbf{2-4周}
-\item \textbf{学历：}\textbf{本科全日制（学信网可查）}
-\item \textbf{求职偏好：}不外包 / 不驻场
-\item \textbf{微信：}1489938120
-\item \textbf{邮箱：}\href{mailto:Soofjan1489938120@gmail.com}{Soofjan1489938120@gmail.com}
-\item \textbf{个人网站：}\href{https://Soofjan.com}{Soofjan.com}
-\item \textbf{博客：}\href{https://juejin.cn/user/4074147977125020}{技术博客}
+\item \textbf{Current Status: }\textbf{Employed in Shenzhen}
+\item \textbf{Availability: }\textbf{1--2 weeks}
+\item \textbf{Education: }\textbf{Full-time Bachelor's Degree (CHSI-verifiable)}
+\item \textbf{Job Preference: }No outsourcing / No on-site staffing
+\item \textbf{WeChat: }1489938120
+\item \textbf{Email: }\href{mailto:Soofjan1489938120@gmail.com}{Soofjan1489938120@gmail.com}
+\item \textbf{Personal Website: }\href{https://Soofjan.com}{Soofjan.com}
+\item \textbf{Blog: }\href{https://juejin.cn/user/4074147977125020}{Technical Blog}
 \end{itemize}
 \end{minipage}
 \begin{minipage}{0.25\textwidth}
@@ -41,201 +41,100 @@
 {\setlength{\fboxsep}{0pt}\fbox{\includegraphics[height=5cm,keepaspectratio]{photo.jpg}}}
 \end{minipage}
 
-\section{\faCogs\ 技术能力}
-\begin{itemize}
-    \item \textbf{编程语言}
-    \begin{itemize}
-        \item 深入理解 Go runtime GMP 模型，掌握调度循环、工作窃取、阻塞处理及 goroutine 抢占。
-        \item 掌握 Go 并发编程与源码机制，熟悉 channel、select、锁及 context 等组件的实现原理，理解 slice、map、defer 等核心特性的实现机制。
-        \item 深入理解 Go 内存管理与性能排查方法，掌握逃逸分析、栈/堆分配、内存分配器、三色标记、写屏障、GC 触发与 pprof 排查流程。
-        \item 拥有 Vue/React/Android 实战经验，具备多端适应能力。
-    \end{itemize}
-
-    \item \textbf{数据存储}
-    \begin{itemize}
-        \item 掌握 MySQL InnoDB 存储引擎的 Buffer Pool，事务，隔离性，MVCC，索引，内部日志底层的工作原理。
-        \item 熟悉 MySQL 性能优化与线上排查，掌握 EXPLAIN、慢查询日志、索引失效、CPU 高与内存高排查方法，能结合业务场景设计索引与缓存方案。
-        \item 掌握 Redis 数据结构与底层实现，熟悉过期删除、持久化等机制，掌握缓存三兄弟问题、双写一致性的解决方案。
-    \end{itemize}
-
-    \item \textbf{计算机网络}
-    \begin{itemize}
-        \item 熟悉计算机网络核心协议，掌握 HTTP/HTTPS、NAT、DNS、TCP/UDP 等基础机制。
-    \end{itemize}
-
-    \item \textbf{中间件}
-    \begin{itemize}
-        \item 掌握消息队列与生产者消费者模型，熟悉 NSQ 架构，能处理消息丢失与重复消费；了解 Kafka、RocketMQ 等消息队列在不同场景下的使用选择。
-    \end{itemize}
-
-    \item \textbf{开发工具}
-    \begin{itemize}
-        \item 熟悉 Docker 容器化部署技术，了解 k8s 架构。
-        \item 合理使用 superpowers 插件搭配 codex/cursor 等 AI 工具，优化工作效率。
-    \end{itemize}
-\end{itemize}
-
-\section{\faGraduationCap\ 教育背景}
-\datedsubsection{\textbf{广州大学} \quad 学士，计算机科学与技术}{2019.09 -- 2023.06}
-\begin{itemize}
-\item CET-4 英语四级（610分），CET-6 英语六级（602分）
-\item 全国大学生算法设计与编程挑战赛（银奖）
-\end{itemize}
-
-\section{\faSuitcase\ 工作经历}
-\datedsubsection{\textbf{软件工程师 @ 慧为智能科技有限公司}}{2023.05 - 至今}
-
-\paragraph*{私有云存储系统（NAS）开发}\mbox{}\\
-{\small
-\noindent NAS（Network Attached Storage，网络附加存储）是部署于局域网内的私有云存储设备，为用户提供文件存储、备份及远程访问等能力。\\
-\noindent\textcolor{gray}{\textbf{技术栈：} Go, Gin, Gorm, MySQL, SQLite, Redis, NSQ, Bleve, Docker, Vue, RKNN, OpenCV}
-}
-\vspace{0.3ex}
-\vspace{0.3ex}
-
-\begin{itemize}
-
-    \item \textbf{智能文档中心}：
-    \begin{itemize}
-        \item 构建文档同步、解析、索引、检索一体化链路，支持 PDF、Word、Excel、PPT、Markdown、HTML、EPUB 等多类型文档的自动识别与内容抽取。
-        \item 针对内存受限环境，完成了从 Elasticsearch 到 Bleve 的搜索引擎迁移，实现快速的全文与多维度检索。
-        \item 设计基于块的索引策略与搜索结果聚合算法，解决超长文档索引阶段内存占用过高问题，峰值 heapInuse 降幅约 76\%+。
-        \item 设计扩展名、MIME 类型、文件头与文件结构结合的类型校验机制，降低异常文档、伪装文件导致的解析失败与误索引风险。
-    \end{itemize}
-
-    \item \textbf{云端}：
-    \begin{itemize}
-        \item 主导设计 NAT 穿透交互架构，规范客户端、服务端、云端及穿透端的通信流程，实现复杂网络下稳定高效访问。
-        \item 引入 NSQ 消息队列，实现事件异步解耦，提升吞吐1.6倍，高并发平均延迟降低约 50\%。
-        \item 采用应用层 AES+RSA 和传输层 TLS 的双层加密方案，保障凭证与敏感字段在复杂网络下的传输安全。
-    \end{itemize}
-
-    \item \textbf{AI相册}：
-    \begin{itemize}
-        \item 在 RKNN 平台上基于 JNI 封装实现标签分类；通过 DBSCAN 聚类算法实现万级人脸库的无监督聚类，支持动态聚类中心更新，识别准确率达 97.3\%。
-        \item 通过拉普拉斯方差算法检测模糊照片；通过 dHash+qHash 算法检测重复照片。
-        \item 通过增量扫描、特征缓存和批量处理优化大规模照片分析流程，提升相册导入与检索效率。
-    \end{itemize}
-
-    \item \textbf{文件索引同步系统}：
-    \begin{itemize}
-        \item 自研 BFS+Queue 架构替代 fsnotify 监听，在海量文件场景下内存开销降低 87\% 以上。
-        \item 设计任务状态机与断点恢复机制，支持异常中断后自动重试未完成索引任务，保障大规模同步任务可靠完成
-    \end{itemize}
-
-    \item \textbf{其他}：
-    \begin{itemize}
-        \item 参与 Docker 管理服务开发，封装 Docker Engine API 实现镜像、容器、网络、挂载和运行状态管理，并基于 SSE 支持镜像拉取进度实时推送与任务取消。
-        \item 通过 rate 限流与 Ristretto 缓存库有效缓解并发流量冲击，响应时间缩短 90ms。
-    \end{itemize}
-
-\end{itemize}
-
-% ===================== 第二页：英文简历 =====================
-\newpage
-
-\name{Wenzheng Hou | Go Backend Engineer}
-
-\section{\faInfoCircle\ Basic Information}
-\vspace{0.5ex}
-\begin{itemize}[label=,leftmargin=*]
-\large
-\item \textbf{Status: }\textbf{Employed in Shenzhen}
-\item \textbf{Availability: }\textbf{2--4 Weeks}
-\item \textbf{Education: }Bachelor's Degree (Full-time, CHSI-verifiable)
-\item \textbf{WeChat: }1489938120
-\item \textbf{Email: }\href{mailto:Soofjan1489938120@gmail.com}{Soofjan1489938120@gmail.com}
-\item \textbf{Website: }\href{https://Soofjan.com}{Soofjan.com}
-\end{itemize}
-
-\section{\faCogs\ Technical Skills}
+\section{\faCogs\ Comprehensive Technical Skills}
 \begin{itemize}
     \item \textbf{Programming Languages}
     \begin{itemize}
         \item Deep understanding of the Go runtime GMP model, including the scheduling loop, work stealing, blocking handling, and goroutine preemption.
-        \item Proficient in Go concurrency and source-level mechanisms; familiar with implementation principles of channel, select, locks, context, and core features such as slice, map, and defer.
-        \item Deep understanding of Go memory management and performance troubleshooting; proficient in escape analysis, stack/heap allocation, memory allocator, tri-color marking, write barriers, GC triggers, and pprof workflows.
-        \item Hands-on experience with Vue/React/Android; adaptable across multiple platforms.
+        \item Proficient in Go concurrent programming and source-level mechanisms; familiar with the implementation principles of channel, slice, map, and other components, and understand core features such as select, locks, and context.
+        \item Deep understanding of Go memory management and performance troubleshooting; proficient in escape analysis, stack/heap allocation, memory allocator, tri-color marking, write barriers, and GC.
+        \item Hands-on experience with Vue, React, and Android; adaptable across multiple platforms.
     \end{itemize}
 
     \item \textbf{Data Storage}
     \begin{itemize}
-        \item Proficient in MySQL InnoDB internals: Buffer Pool, transactions, isolation, MVCC, indexes, and internal logging mechanisms.
-        \item Familiar with MySQL performance optimization and production troubleshooting; proficient in EXPLAIN, slow query logs, index invalidation analysis, high CPU/memory diagnosis; capable of designing indexes and caching strategies for business scenarios.
-        \item Proficient in Redis data structures and underlying implementations; familiar with expiration/eviction and persistence; capable of solving cache penetration/breakdown/avalanche and dual-write consistency issues.
+        \item Proficient in the underlying mechanisms of MySQL InnoDB, including Buffer Pool, transactions, isolation, MVCC, indexes, and internal logs.
+        \item Familiar with MySQL performance optimization and production troubleshooting; proficient in EXPLAIN, slow query logs, index invalidation analysis, and high CPU/memory diagnosis; able to design indexes and caching solutions based on business scenarios.
+        \item Proficient in Redis data structures and underlying implementations; familiar with expiration deletion, persistence, and other mechanisms; able to solve cache penetration, cache breakdown, cache avalanche, and dual-write consistency issues.
     \end{itemize}
 
-    \item \textbf{Computer Networks}
+    \item \textbf{Middleware and Engineering Fundamentals}
     \begin{itemize}
-        \item Familiar with core network protocols; Solid grasp of HTTP/HTTPS, NAT, DNS, and TCP/UDP.
+        \item Familiar with RabbitMQ message queues; understand handling methods for duplicate and lost messages; knowledgeable about Kafka and RocketMQ selection.
+        \item Familiar with core computer network protocols; solid grasp of HTTP/HTTPS, NAT, DNS, TCP/UDP, and related fundamentals.
+        \item Familiar with Docker containerized deployment; basic knowledge of Kubernetes architecture.
+        \item Understand AI Agent technology stacks, including Transformer, Decoder-Only architecture, agent paradigms, LangChain, and LangGraph.
     \end{itemize}
 
-    \item \textbf{Middleware}
+    \item \textbf{Other}
     \begin{itemize}
-        \item Proficient in message queues and producer-consumer models; familiar with NSQ architecture and handling message loss and duplicate consumption; knowledgeable about selecting Kafka, RocketMQ, and similar queues for different scenarios.
-    \end{itemize}
-
-    \item \textbf{Development Tools}
-    \begin{itemize}
-        \item Familiar with Docker containerization; basic knowledge of Kubernetes architecture.
-        \item Effectively leverage the superpowers plugin with Codex/Cursor and other AI tools to optimize workflow efficiency.
+        \item Passionate about programming and open source; proficient in using AI tools such as Codex and Cursor to improve work efficiency.
+        \item Committed to technical sharing and community building; published 200+ tutorial videos and articles, with 1K+ likes and bookmarks in total.
     \end{itemize}
 \end{itemize}
 
 \section{\faGraduationCap\ Education}
-\datedsubsection{\textbf{Guangzhou University} \quad B.Eng. in Computer Science and Technology}{Sep 2019 -- Jun 2023}
+\datedsubsection{\textbf{Guangzhou University} \quad Bachelor's Degree, Computer Science and Technology}{Sep 2019 -- Jun 2023}
 \begin{itemize}
 \item CET-4 (Score: 610), CET-6 (Score: 602)
 \item Silver Medal, National Undergraduate Algorithm Design and Programming Challenge
 \end{itemize}
 
 \section{\faSuitcase\ Work Experience}
-\datedsubsection{\textbf{Software Engineer @ Huiwei Intelligence Technology Co., Ltd.}}{May 2023 -- Present}
+\datedsubsection{\textbf{Software Engineer @ Huiwei Intelligent Technology Co., Ltd.}}{May 2023 -- Present}
 
 \paragraph*{Private Cloud Storage System (NAS) Development}\mbox{}\\
 {\small
-\noindent NAS (Network Attached Storage) is a private cloud storage device deployed on a local area network, providing file storage, backup, and remote access capabilities.\\
-\noindent\textcolor{gray}{\textbf{Tech Stack:} Go, Gin, Gorm, MySQL, SQLite, Redis, NSQ, Bleve, Docker, Vue, RKNN, OpenCV}
+\noindent NAS (Network Attached Storage) is a private cloud storage device deployed in a local area network, providing users with file storage, backup, and remote access capabilities.\\
+\noindent\textcolor{gray}{\textbf{Tech Stack:} Go, Gin, Gorm, MySQL, SQLite, Bleve, P2P, Docker, Vue, RKNN, OpenCV}
 }
 \vspace{0.3ex}
 \vspace{0.3ex}
 
 \begin{itemize}
 
-    \item \textbf{Intelligent Document Center}:
+    \item \textbf{Document Center}:
     \begin{itemize}
-        \item Built an end-to-end pipeline for document sync, parsing, indexing, and search; supports automatic recognition and content extraction for PDF, Word, Excel, PPT, Markdown, HTML, EPUB, and other formats.
-        \item Migrated the search engine from Elasticsearch to Bleve for memory-constrained environments, enabling fast full-text and multi-dimensional retrieval.
-        \item Designed a block-based indexing strategy and search result aggregation algorithm to address excessive memory usage during indexing of extra-long documents, reducing peak heapInuse by over 76\%.
-        \item Designed a type validation mechanism combining file extensions, MIME types, file headers, and file structure to reduce parsing failures and mis-indexing caused by malformed or disguised files.
-    \end{itemize}
-
-    \item \textbf{Cloud Infrastructure}:
-    \begin{itemize}
-        \item Led the design of NAT traversal architecture, standardizing communication flows among clients, servers, cloud, and traversal nodes for stable and efficient access in complex network environments.
-        \item Integrated NSQ message queue for asynchronous event decoupling, increasing throughput by 1.6x and reducing average latency under high concurrency by approximately 50\%.
-        \item Implemented dual-layer encryption (AES+RSA at the application layer, TLS at the transport layer) to secure credentials and sensitive fields in transit across complex networks.
+        \item Built an end-to-end document synchronization, parsing, indexing, and retrieval pipeline, supporting automatic recognition and content extraction for PDF, Word, Excel, PPT, Markdown, HTML, EPUB, and other document formats.
+        \item Built lightweight search capabilities with Bleve for memory-constrained environments, enabling fast full-text search and multi-dimensional filtering.
+        \item Designed a block-based indexing strategy and search result aggregation algorithm to solve excessive memory usage during indexing of very long documents, reducing peak heapInuse by approximately 76\%+.
+        \item Used CJDict dictionary-based tokenization and replaced substring + map lookup with compressed Trie longest-match, reducing total trace time by approximately 48\% and process user CPU by approximately 63\%.
     \end{itemize}
 
     \item \textbf{AI Photo Album}:
     \begin{itemize}
-        \item Implemented tag classification via JNI on the RKNN platform; applied DBSCAN clustering for unsupervised clustering of 10K+ face libraries with dynamic cluster center updates, achieving 97.3\% recognition accuracy.
-        \item Detected blurry photos using Laplacian variance; detected duplicate photos using dHash and qHash algorithms.
-        \item Optimized large-scale photo analysis through incremental scanning, feature caching, and batch processing, improving album import and search efficiency.
+        \item Implemented tag classification through JNI wrappers; used the DBSCAN clustering algorithm for unsupervised face clustering, and validated model performance with LFW/WIDER Face, achieving 0\% false merge rate across different people and 89\% same-person clustering accuracy.
+        \item Detected blurry photos using the Laplacian variance algorithm; detected duplicate photos using dHash + qHash algorithms.
+        \item Optimized large-scale photo analysis through incremental scanning, feature caching, and batch processing, improving album import and retrieval efficiency.
     \end{itemize}
 
-    \item \textbf{File Indexing \& Sync System}:
+    \item \textbf{Cloud}
     \begin{itemize}
-        \item Developed a custom BFS+Queue architecture to replace fsnotify-based monitoring, reducing memory overhead by over 87\% in massive file scenarios.
-        \item Designed a task state machine with checkpoint recovery, enabling automatic retry of unfinished indexing tasks after abnormal interruption to ensure reliable completion of large-scale sync jobs.
+        \item Led the design of the NAT traversal interaction architecture, standardizing communication flows among client, server, cloud, and traversal components to achieve stable and efficient access under complex networks.
+        \item Adopted dual-layer encryption with application-layer AES+RSA and transport-layer TLS to protect credentials and sensitive fields during transmission under complex networks.
     \end{itemize}
 
-    \item \textbf{Other}:
+    \item \textbf{Other}
     \begin{itemize}
-        \item Contributed to Docker management service development; wrapped Docker Engine API for image, container, network, volume, and runtime state management, with SSE-based real-time image pull progress streaming and task cancellation.
-        \item Mitigated high-concurrency traffic impact using rate limiting and the Ristretto caching library, reducing response time by 90ms.
+        \item File Indexing and Synchronization System: developed a custom BFS+Queue architecture to replace fsnotify-based monitoring, reducing memory overhead by more than 87\% in massive-file scenarios.
+        \item Docker: wrapped the Docker Engine API to manage images, containers, networks, mounts, and runtime states.
+        \item Effectively mitigated concurrent traffic spikes with rate limiting and the Ristretto caching library, reducing response time by 90ms.
     \end{itemize}
 
+\end{itemize}
+
+\section{\faCode\ Personal Projects}
+\paragraph*{Video Feed System}\mbox{}\\
+{\small
+\noindent A distributed Feed service developed in Go, supporting user post publishing, follow relationships, timeline queries, and other features. It improves system throughput through caching, asynchronous messaging, and Feed distribution strategies.\\
+\noindent\textcolor{gray}{\textbf{Tech Stack:} Go, React, Redis, RabbitMQ, MySQL}
+}
+\vspace{0.3ex}
+
+\begin{itemize}
+    \item \textbf{Feed Performance Optimization}: Implemented timeline, following feed, recommendation feed, and trending feed; improved Feed read performance with cursor pagination, caching, and batch queries.
+    \item \textbf{Push-Pull Video Distribution}: Used fanout-on-write for regular creators and pull-based merging for major creators, solving massive fanout pressure caused by posts from major creators.
+    \item \textbf{Asynchronous Processing}: Introduced RabbitMQ to decouple post publishing and Feed fanout, improving write API response speed and preventing duplicate consumption through consumer idempotency.
 \end{itemize}
 
 \end{document}
