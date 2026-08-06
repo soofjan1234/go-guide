@@ -19,9 +19,17 @@ draft: false
 
 Gin简洁，性能好，按需引入工具
 
-Beego是一个 MVC 框架，自带 ORM、日志、缓存等，适合中大型系统
+Beego是一个 MVC 框架，自带 ORM、日志、缓存等，适合中大型系统，新项目很少选 Beego
 
-Echo和Gin差不多，但社区活跃度少
+Echo和Gin差不多，在设计上其实比 Gin 还要精致一些，API 设计更符合直觉，但社区活跃度少
+
+Fiber 是基于 Go 社区大名鼎鼎的 valyala/fasthttp 重新重写了底层的 HTTP 协议栈，舍弃了与标准库 net/http 的兼容性
+
+### 选择
+
+1. 写 API、写微服务、找工作、求稳： 闭眼选 Gin。它是行业的绝对标杆，面试出镜率 95% 以上。
+2. 写企业级中后台管理系统、喜欢全家桶、快速开发单体项目： 选 Beego（或 Go-Zero / Layotto）。
+3. 追求极致性能、想写高性能网关或高并发 API、且熟悉 Node.js： 尝试 Fiber。
 
 ## gin参数检验 +1
 

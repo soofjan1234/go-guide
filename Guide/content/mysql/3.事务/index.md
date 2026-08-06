@@ -40,11 +40,16 @@ draft: false
 
 ### MVCC 是什么？
 
-MVCC:Multi-Version Concurrency Control。在不加锁或少加锁的情况下，实现高并发读写，组成有Undo Log和ReadView：
-- UndoLog：有指针串成新旧数据链，方便回退。
-- ReadView：规定该事务哪些数据能看，哪些不能看。
-    - 主要角色是活跃事务IDs，最老的活跃事务ID，最新的事务ID
-    - 总体规则是只能查看已提交的事务
+MVCC（Multi-Version Concurrency Control）：多版本并发控制。在不加锁或少加锁的情况下，实现高并发读写，组成有Undo Log和ReadView：
+
+1. UndoLog：每次更新一行数据时，会生成新的记录版本，旧版本放在 undo log 里，通过 roll_pointer 串成版本链
+2. ReadView：规定该事务哪些数据能看，哪些不能看。
+- 主要角色
+    - 生成 ReadView 时，当前活跃事务 ID 列表
+    - 活跃事务里最小的事务 ID
+    - 下一个将要分配的事务 ID
+    - 创建这个 ReadView 的事务 ID
+- 总体规则只能查看**创建 ReadView 前已提交的事务**
 
 读取时先看最新版本的 trx_id 是否对当前事务可见，如果不可见，就沿着 undo log 版本链往前找，直到找到可见版本。
 
