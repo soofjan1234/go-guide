@@ -56,6 +56,20 @@ Tasks: 301 total,   1 running, 300 sleeping,   0 stopped,   0 zombie
   - sys (System)：内核占用的 CPU。如果太高，说明系统调用太频繁（如频繁的线程上下文切换）。
   - iow (I/O Wait)：重要！CPU 在等待磁盘读写。如果变高，说明磁盘是瓶颈。
 
+## vmstat
+
+```txt
+procs ------------memory------------ ----swap--- -----io---- ---system-- ----cpu----
+ r  b    swpd    free   buff   cache    si    so    bi    bo    in    cs us sy id wa
+ 2  0     512   41492 122524 2611056     0     1  1592   417     1  1858  7  9 82  2
+ 0  0     512   41492 122524 2611056     0     0     0     0     1  3188  1  4 95  0
+```
+
+和top的区别：
+1. vmstat只看全局指标，而top能定位到具体的进程
+2. vmstat是像打日志一样，top的交互式，占用终端
+3. vmstat可以看出 CPU 占用或 I/O 是在上升还是下降。
+
 ## 内存
 
 通过 free -h 命令查看

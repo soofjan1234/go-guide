@@ -3,10 +3,7 @@ title: 通信协议
 weight: 80
 ---
 
-## 目录
-
-
-## 通信协议（Communication Protocol）
+# 通信协议（Communication Protocol）
 
 通信协议（Communication Protocol）是指 Agent 与用户、工具、其他 Agent 或外部系统之间交换信息时遵循的规则和格式。
 
