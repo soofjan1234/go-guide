@@ -132,11 +132,17 @@ K8s 中最小的部署和调度单元。一个 Pod 里面可以包含一个或�
     - Diff（比对）：将实际状态与你声明的期望状态（Desired State）进行对比。
     - Act（做）：如果发现不一致，就调用底层 API 执行操作，直到实际状态逼近期望状态。
 
-### 既然 etcd 支持“毫秒级、无需重启”的配置更新，为什么实际运维中，我们还要用 Volume 挂载、环境变量或滚动重启等看似更慢、更重的方式来更新配置？
+### etcd 配置更新
 
-如果直连etcd，直接去 Watch etcd 中的 Key，那就是毫秒级更新，完全不重启。但是**代码侵入性极高**。
+在Go+MySQL的场景下，如果数据库地址改了：
 
-为了让应用不与 etcd 耦合，K8s 充当了“中介”：管理员把配置 **ConfigMap**（配置表）和 **Secret**（密码表写给 K8s（存在 etcd 里），K8s 再通过以下三种方式转交给应用：
-1. 以 Volume 挂载文件的方式（自动更新，但需要应用支持热重载）
-2. 以环境变量（Env）方式注入（无法自动更新）
-3. 手动触发滚动更新（最常用）：kubectl rollout restart deployment <my-app>
+1. 环境变量（Env）注入
+    - 你在 K8s 里修改了 ConfigMap 中的 MYSQL_DSN。但os.Getenv("MYSQL_DSN")在程序启动的时候就读取了
+    - 必须执行：kubectl rollout restart deployment my-go-app
+2. Volume 挂载文件
+    - 需要用开源库（比如 viper 或 fsnotify）去监听这个文件的修改。
+    - 修改了 K8s ConfigMap 后，Kubelet 组件覆盖更新容器里的
+    - Go监听到文件变更，执行回调
+3. 直连 etcd / 配置中心（Nacos/Apollo）
+    - 代码里引入 etcd 的 SDK，直接 Watch etcd 里的 Key
+    - 更新后会把新值给过来
