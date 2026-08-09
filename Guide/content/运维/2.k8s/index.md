@@ -1,4 +1,9 @@
-# Kubernetes
+---
+title: k8s
+weight: 20
+date: 2026-05-25
+draft: false
+---
 
 ![](k8s/k8s架构.png)
 
