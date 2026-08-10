@@ -55,7 +55,8 @@
     \begin{itemize}
         \item 掌握 MySQL InnoDB 存储引擎的 Buffer Pool，事务，隔离性，MVCC，索引，内部日志底层以及慢查询的工作原理。
         \item 掌握 Redis 数据结构与底层实现，熟悉过期删除、持久化等机制，掌握缓存三兄弟问题、双写一致性的解决方案。
-        \item 熟悉 RabbitMQ 消息队列，理解消息重复、丢失处理方法；了解 Kafka、RocketMQ 相关选型。
+        \item 具备基础 RabbitMQ 消息队列的知识，理解消息重复、丢失处理方法；了解 Kafka、RocketMQ 相关选型。
+        \item 基本掌握全文检索原理与 Bleve 搜索引擎，理解分词、倒排索引机制，具备索引内存与查询性能优化经验。
     \end{itemize}
     
     \item \textbf{工程基础}
@@ -97,7 +98,7 @@
         \item 构建文档同步、解析、索引、检索一体化链路，支持 PDF、Word、Excel、PPT、Markdown、HTML、EPUB 等多类型文档的自动识别与内容抽取。
         \item 针对内存受限环境，基于 Bleve 构建轻量级搜索能力，实现快速的全文检索与多维度筛选。
         \item 设计基于块的索引策略与搜索结果聚合算法，解决超长文档索引阶段内存占用过高问题，峰值 heapInuse 降幅约 76\%+。
-         \item 使用 CJDict 词典分词，并以压缩 Trie longest-match 替代 substring + map 查词，将 Trace 总耗时降低约 48\%、进程 user CPU 降低约 63\%。
+        \item 使用 CJDict 词典分词，并以压缩 Trie longest-match 替代 substring + map 查词，将 Trace 总耗时降低约 48\%、进程 user CPU 降低约 63\%。
     \end{itemize}
 
     \item \textbf{AI相册}：
