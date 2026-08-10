@@ -27,7 +27,7 @@
 \begin{itemize}[label=,leftmargin=*]
 \large
 \item \textbf{当前状态：}\textbf{深圳在职}
-\item \textbf{到岗时间：}\textbf{1-2周}
+\item \textbf{到岗时间：}\textbf{2周}
 \item \textbf{学历：}\textbf{本科全日制（学信网可查）}
 \item \textbf{求职偏好：}不外包 / 不驻场
 \item \textbf{微信：}1489938120
@@ -106,6 +106,12 @@
         \item 通过拉普拉斯方差算法检测模糊照片；通过 dHash+qHash 算法检测重复照片。
     \end{itemize}
 
+     \item \textbf{云端}：
+    \begin{itemize}
+        \item 主导设计 NAT 穿透交互架构，规范客户端、服务端、云端及穿透端的通信流程，实现复杂网络下稳定高效访问。
+        \item 采用应用层 AES+RSA 和传输层 TLS 的双层加密方案，保障凭证与敏感字段在复杂网络下的传输安全。
+    \end{itemize}
+
     \item \textbf{智能邮件处理系统}：
     \begin{itemize}
         \item 面向客服邮件处理场景，构建入站邮件审核、候选回复生成、人工编辑与发送闭环，提升历史回复与 FAQ 知识的复用效率。
@@ -114,25 +120,10 @@
 
     \item \textbf{其他}：
     \begin{itemize}
-        \item 云端：主导设计 NAT 穿透交互架构，规范客户端、服务端、云端及穿透端的通信流程；采用应用层 AES+RSA 和传输层 TLS 的双层加密方案，保障凭证与敏感字段在复杂网络下的传输安全
         \item 文件索引同步系统：自研 BFS+Queue 架构替代 fsnotify 监听，在海量文件场景下内存开销降低 87\% 以上。
         \item 通过 rate 限流与 Ristretto 缓存库有效缓解并发流量冲击，响应时间缩短 90ms。
     \end{itemize}
 
-\end{itemize}
-
-\section{\faCode\ 个人项目}
-\paragraph*{视频 Feed 流系统}\mbox{}\\
-{\small
-\noindent 基于 Go 开发的分布式 Feed 流服务，实现用户动态发布、关注关系、时间线查询等功能，采用缓存、异步消息和 Feed 分发策略提升系统吞吐能力。\\
-\noindent\textcolor{gray}{\textbf{技术栈：} Go, React, Redis, RabbitMQ, MySQL}
-}
-\vspace{0.3ex}
-
-\begin{itemize}
-    \item \textbf{Feed 性能优化}：实现时间线、关注流、推荐流、热榜流，使用游标分页、缓存和批量查询提升 Feed 读取速度。
-    \item \textbf{推拉结合视频分发}：普通作者发布走粉丝推送，大 V 作者发布走拉取合并，解决大 V 发布带来的海量 fanout 压力。
-    \item \textbf{异步化}：引入 RabbitMQ 消息队列解耦动态发布和 Feed 扩散流程，提升写入接口响应速度，并通过消费者幂等机制避免重复消费。
 \end{itemize}
 
 \end{document}
