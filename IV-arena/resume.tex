@@ -27,7 +27,7 @@
 \begin{itemize}[label=,leftmargin=*]
 \large
 \item \textbf{当前状态：}\textbf{深圳在职}
-\item \textbf{到岗时间：}\textbf{1-2周}
+\item \textbf{到岗时间：}\textbf{2周}
 \item \textbf{学历：}\textbf{本科全日制（学信网可查）}
 \item \textbf{求职偏好：}不外包 / 不驻场
 \item \textbf{微信：}1489938120
@@ -55,7 +55,8 @@
     \begin{itemize}
         \item 掌握 MySQL InnoDB 存储引擎的 Buffer Pool，事务，隔离性，MVCC，索引，内部日志底层以及慢查询的工作原理。
         \item 掌握 Redis 数据结构与底层实现，熟悉过期删除、持久化等机制，掌握缓存三兄弟问题、双写一致性的解决方案。
-        \item 熟悉 RabbitMQ 消息队列，理解消息重复、丢失处理方法；了解 Kafka、RocketMQ 相关选型。
+        \item 具备基础 RabbitMQ 消息队列的知识，理解消息重复、丢失处理方法；了解 Kafka、RocketMQ 相关选型。
+        \item 基本掌握全文检索原理与 Bleve 搜索引擎，理解分词、倒排索引机制，具备索引内存与查询性能优化经验。
     \end{itemize}
     
     \item \textbf{工程基础}
@@ -97,13 +98,19 @@
         \item 构建文档同步、解析、索引、检索一体化链路，支持 PDF、Word、Excel、PPT、Markdown、HTML、EPUB 等多类型文档的自动识别与内容抽取。
         \item 针对内存受限环境，基于 Bleve 构建轻量级搜索能力，实现快速的全文检索与多维度筛选。
         \item 设计基于块的索引策略与搜索结果聚合算法，解决超长文档索引阶段内存占用过高问题，峰值 heapInuse 降幅约 76\%+。
-         \item 使用 CJDict 词典分词，并以压缩 Trie longest-match 替代 substring + map 查词，将 Trace 总耗时降低约 48\%、进程 user CPU 降低约 63\%。
+        \item 使用 CJDict 词典分词，并以压缩 Trie longest-match 替代 substring + map 查词，将 Trace 总耗时降低约 48\%、进程 user CPU 降低约 63\%。
     \end{itemize}
 
     \item \textbf{AI相册}：
     \begin{itemize}
         \item 基于 JNI 封装实现标签分类；通过 DBSCAN 聚类算法实现人脸无监督聚类，基于 LFW/WIDER Face 验证模型效果，实现不同人误合并率 0\%、同人归类准确率 89\%。
         \item 通过拉普拉斯方差算法检测模糊照片；通过 dHash+qHash 算法检测重复照片。
+    \end{itemize}
+
+     \item \textbf{云端}：
+    \begin{itemize}
+        \item 主导设计 NAT 穿透交互架构，规范客户端、服务端、云端及穿透端的通信流程，实现复杂网络下稳定高效访问。
+        \item 采用应用层 AES+RSA 和传输层 TLS 的双层加密方案，保障凭证与敏感字段在复杂网络下的传输安全。
     \end{itemize}
 
     \item \textbf{智能邮件处理系统}：
@@ -114,25 +121,10 @@
 
     \item \textbf{其他}：
     \begin{itemize}
-        \item 云端：主导设计 NAT 穿透交互架构，规范客户端、服务端、云端及穿透端的通信流程；采用应用层 AES+RSA 和传输层 TLS 的双层加密方案，保障凭证与敏感字段在复杂网络下的传输安全
         \item 文件索引同步系统：自研 BFS+Queue 架构替代 fsnotify 监听，在海量文件场景下内存开销降低 87\% 以上。
         \item 通过 rate 限流与 Ristretto 缓存库有效缓解并发流量冲击，响应时间缩短 90ms。
     \end{itemize}
 
-\end{itemize}
-
-\section{\faCode\ 个人项目}
-\paragraph*{视频 Feed 流系统}\mbox{}\\
-{\small
-\noindent 基于 Go 开发的分布式 Feed 流服务，实现用户动态发布、关注关系、时间线查询等功能，采用缓存、异步消息和 Feed 分发策略提升系统吞吐能力。\\
-\noindent\textcolor{gray}{\textbf{技术栈：} Go, React, Redis, RabbitMQ, MySQL}
-}
-\vspace{0.3ex}
-
-\begin{itemize}
-    \item \textbf{Feed 性能优化}：实现时间线、关注流、推荐流、热榜流，使用游标分页、缓存和批量查询提升 Feed 读取速度。
-    \item \textbf{推拉结合视频分发}：普通作者发布走粉丝推送，大 V 作者发布走拉取合并，解决大 V 发布带来的海量 fanout 压力。
-    \item \textbf{异步化}：引入 RabbitMQ 消息队列解耦动态发布和 Feed 扩散流程，提升写入接口响应速度，并通过消费者幂等机制避免重复消费。
 \end{itemize}
 
 \end{document}
