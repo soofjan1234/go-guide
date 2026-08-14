@@ -1,6 +1,6 @@
 ---
 title: 泛问题
-weight: 50
+weight: 60
 date: 2026-06-12
 draft: false
 ---

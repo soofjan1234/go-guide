@@ -76,6 +76,55 @@ func makeAdder(base int) func(int) int {
     - 批量 IO：并发读多个文件、多条 DB/Redis 查询
 5. 带超时、可取消的长操作
 
+## 协程池
+
+协程池的核心思想就是：控制上限，循环复用。
+
+它通常由两个核心部分组成：
+
+1. 任务队列（Task Queue）：一个通道（Channel），用来存放等待执行的任务。
+2. 工作协程（Workers）：一组固定数量的 Goroutine（比如限制为 10 个）。它们启动后永远不退出，而是不停地从任务队列里拿任务出来执行。
+
+```go
+// 任务结构体
+type Task struct {
+	ID int
+}
+
+// Worker 逻辑：每个 Worker 都是一个常驻协程，不停地从任务通道里拿任务
+func worker(id int, taskQueue <-chan Task, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for task := range taskQueue {
+		time.Sleep(500 * time.Millisecond) // 模拟耗时任务
+	}
+}
+
+func main() {
+	taskCount := 10               // 总共有 10 个任务
+	workerCount := 3              // 限制：协程池里最多只有 3 个协程在工作
+	
+	taskQueue := make(chan Task, taskCount)
+	var wg sync.WaitGroup
+
+	// 1. 启动 3 个工作协程（Workers）
+	for i := 1; i <= workerCount; i++ {
+		wg.Add(1)
+		go worker(i, taskQueue, &wg)
+	}
+
+	// 2. 投放 10 个任务到队列中
+	for i := 1; i <= taskCount; i++ {
+		taskQueue <- Task{ID: i}
+	}
+	close(taskQueue) // 投放完毕后关闭通道，告诉 workers 没任务了，执行完手里剩下的就退出吧
+
+	// 3. 等待所有 worker 执行完毕
+	wg.Wait()
+	fmt.Println("🎉 所有任务执行完毕!")
+}
+
+```
+
 ## API 版本化 +1
 
 多端并行使用、要做不兼容改动时，常见三种放法：
