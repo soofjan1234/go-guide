@@ -1,5 +1,5 @@
 ---
-title: Interface
+title: 其它
 weight: 160
 date: 2026-05-25
 draft: false

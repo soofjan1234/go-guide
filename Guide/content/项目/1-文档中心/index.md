@@ -40,23 +40,19 @@ draft: false
 # 二、搜索引擎
 ## ES、MS、bleve、MySQL 对比？
 
-在搜索引擎选型中，我们优先考虑部署复杂度与空间占用。
-
 ES虽然功能强大，但更适用于大规模分布式场景，需要 Java 环境，默认消耗 1-2GB；
-
-Meilisearch\ZincSearch搜索比bleve快，建立比bleve慢；
-
-MySQL 的 FULLTEXT 索引能做简单全文检索，但文档中心需要中文分词与高亮等，用 MySQL 要么要自己拼，维护成本高
-
-SQLite FTS5更适合单机、轻量、简单查询、数据和 SQLite 强绑定的场景
 
 Bleve，就像sqlite，完全嵌入式，同时是go原生，无需额外服务，从而降低运维成本并提升部署效率。
 
-## ES和bleve区别
+Meilisearch搜索比bleve快，建立比bleve慢，更适合千万级文档；
 
-bleve的索引和搜索比es快大概10倍左右
+SQLite FTS5更适合单机、轻量、简单查询、数据和 SQLite 强绑定的场景
 
-即使排除 JVM 和 HTTP 服务，ES 仍然会因为 DocValues、Aggregation 中间状态、Cluster Metadata 等数据结构占用远高于 Bleve 的内存。
+MySQL 的 FULLTEXT 索引能做简单全文检索，但文档中心需要中文分词与高亮等，用 MySQL 要么要自己拼，维护成本高
+
+PostgreSQL，为了搜索引入一整套数据库”，收益不足以覆盖成本，GIN只是一种倒排索引结构，不等于完整的中文搜索方案
+
+ZincSearch 中文分词有问题，并且项目很久没更新，成熟度不足
 
 ## 怎么没有用这个 AI 搜索 / 向量搜索？
 
