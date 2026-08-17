@@ -104,7 +104,7 @@
     \item \textbf{AI相册}：
     \begin{itemize}
         \item 基于 JNI 封装实现标签分类；通过 DBSCAN 聚类算法实现人脸无监督聚类，基于 LFW/WIDER Face 验证模型效果，实现不同人误合并率 0\%、同人归类准确率 89\%。
-        \item 通过拉普拉斯方差算法检测模糊照片；通过 dHash+qHash 算法检测重复照片。
+        \item 基于拉普拉斯方差实现照片模糊检测，支持全量与增量扫描；通过 CPU 自适应 Worker Pool 并行计算，将 SQLite 持久化收敛为串行写入，并支持任务取消。
     \end{itemize}
 
      \item \textbf{云端}：
@@ -112,7 +112,6 @@
         \item 主导设计 NAT 穿透交互架构，规范客户端、服务端、云端及穿透端的通信流程，实现复杂网络下稳定高效访问。
         \item 采用应用层 AES+RSA 和传输层 TLS 的双层加密方案，保障凭证与敏感字段在复杂网络下的传输安全。
     \end{itemize}
-
 
     \item \textbf{其他}：
     \begin{itemize}
