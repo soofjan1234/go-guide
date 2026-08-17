@@ -56,7 +56,7 @@
         \item 掌握 MySQL InnoDB 存储引擎的 Buffer Pool，事务，隔离性，MVCC，索引，内部日志底层以及慢查询的工作原理。
         \item 掌握 Redis 数据结构与底层实现，熟悉过期删除、持久化等机制，掌握缓存三兄弟问题、双写一致性的解决方案。
         \item 具备基础 RabbitMQ 消息队列的知识，理解消息重复、丢失处理方法；了解 Kafka、RocketMQ 相关选型。
-        \item 基本掌握全文检索原理与 Bleve 搜索引擎，理解分词、倒排索引机制，具备索引内存与查询性能优化经验。
+        \item 基本掌握全文检索原理与 Bleve 搜索引擎，理解分词、倒排索引机制。
     \end{itemize}
     
     \item \textbf{工程基础}
@@ -86,7 +86,7 @@
 \paragraph*{私有云存储系统（NAS）开发}\mbox{}\\
 {\small
 \noindent NAS（Network Attached Storage，网络附加存储）是部署于局域网内的私有云存储设备，为用户提供文件存储、备份及远程访问等能力。\\
-\noindent\textcolor{gray}{\textbf{技术栈：} Go, Gin, Gorm, MySQL, SQLite, Bleve, P2P, Docker, RKNN, OpenCV, RAG, LLM}
+\noindent\textcolor{gray}{\textbf{技术栈：} Go, Gin, Gorm, MySQL, SQLite, Bleve, P2P, Docker, RKNN, OpenCV}
 }
 \vspace{0.3ex}
 \vspace{0.3ex}
@@ -113,11 +113,6 @@
         \item 采用应用层 AES+RSA 和传输层 TLS 的双层加密方案，保障凭证与敏感字段在复杂网络下的传输安全。
     \end{itemize}
 
-    \item \textbf{智能邮件处理系统}：
-    \begin{itemize}
-        \item 面向客服邮件处理场景，构建入站邮件审核、候选回复生成、人工编辑与发送闭环，提升历史回复与 FAQ 知识的复用效率。
-        \item 基于 PostgreSQL + pgvector 设计历史邮件与 FAQ 的 Embedding 存储方案，结合向量相似度与 PostgreSQL FTS 全文检索实现混合召回。
-    \end{itemize}
 
     \item \textbf{其他}：
     \begin{itemize}

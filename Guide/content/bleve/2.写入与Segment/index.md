@@ -11,6 +11,8 @@ Mapping 决定“字段怎么建”，Scorch 决定“这些字段怎么批量�
 
 可以把 Scorch 理解成一条索引写入流水线：上游把字段准备好，它负责分析字段、生成新段、接入索引视图，并在后台持久化和合并。
 
+![](三条链路.png)
+
 ---
 
 ## Scorch：`Batch` 主流程
@@ -45,26 +47,64 @@ Mapping 决定“字段怎么建”，Scorch 决定“这些字段怎么批量�
 Bleve 底层不是不断修改一个巨大的索引文件，而是把索引拆成多个 segment：
 
 ```text
-segment A
-  - term dictionary
-  - inverted index
-  - stored fields
-  - doc values
-
-segment B
-  - term dictionary
-  - inverted index
-  - stored fields
-  - doc values
+Segment A
+├── Term Dictionary     词典：有哪些词？
+├── Inverted Index      倒排索引：这个词在哪些文档里？
+├── Stored Fields       存储字段：这篇文档原始字段是什么？
+└── Doc Values          列式数据：这个字段在各文档中的值是什么？
 ```
 
-每个 segment 内部都有自己的一套倒排索引和局部 docID。
+### Term Dictionary：词典
 
-新增文档时，Bleve 更偏向追加生成新的 segment，而不是原地改旧 segment。这样写入路径更简单，也更适合批量写入。
+假设 Segment A 里只有三篇文档：
+```
+Doc1: "go is fast"
+Doc2: "go is simple"
+Doc3: "java is fast"
+```
+分词以后得到 go、is、fast、simple、java。Term Dictionary 保存的核心信息可以理解成：
+```
+fast   -> 倒排数据位置 X
+go     -> 倒排数据位置 Y
+is     -> 倒排数据位置 Z
+java   -> 倒排数据位置 ...
+simple -> 倒排数据位置 ...
+```
+所以它解决的是：我要搜索 go，首先去哪里找到 go 对应的倒排索引？
+
+### Inverted Index：倒排索引
+
+Term Dictionary 解决「有没有这个词、去哪里找」，真正保存这个词出现在哪些文档中的是 Inverted Index。
+```
+go ->
+    Doc1: freq=1, position=[0]
+    Doc2: freq=1, position=[0]
+```
+可能包含 docID、词频 frequency、位置 position 等信息
+
+### Stored Fields：拿回原始数据
+
+这和数据库里的「先通过索引找到主键，再根据主键回表」有一点相似
+
+### Doc Values：为排序和聚合准备的列式数据
+```
+modifiedAt:
+Doc1 -> 2026-01-01
+Doc2 -> 2026-03-01
+Doc3 -> 2026-02-01
+
+size:
+Doc1 -> 100
+Doc2 -> 300
+Doc3 -> 200
+```
+
 
 ---
 
 ## 为什么不直接改老索引
+
+新增文档时，Bleve 更偏向追加生成新的 segment，而不是原地改旧 segment。
 
 在搜索引擎里，数据是按“词 -> 文档列表”存的，也就是倒排索引，不是按“文档行记录”存的。
 

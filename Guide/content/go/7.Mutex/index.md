@@ -5,6 +5,40 @@ date: 2026-05-18
 draft: false
 ---
 
+
+## 结构 +1
+
+![Mutex 结构与 state](pic/sync.Mutex.概览与state.png)
+
+```go
+type Mutex struct {
+	state int32
+	sema  uint32
+}
+
+const (
+	mutexLocked = 1 << iota // mutex is locked
+	mutexWoken
+	mutexStarving
+	mutexWaiterShift = iota
+
+	starvationThresholdNs = 1e6
+)
+```
+
+`sync.Mutex` 主要由两块组成——
+
+1. `state`：一个32位整数，里头同时塞了几种信息  
+   - **`locked`（锁位）**：最低位，表示“这把锁现在有没有人占着”。  
+   - **`woken`（被唤醒位）**：用来标记“已经有 goroutine 被叫醒/正处在交接链上”。  
+     - 这样 `Unlock()` 在慢路径里就知道：有些人可能已经在路上了，不必重复唤醒更多人（避免无谓唤醒导致的抖动和尾延迟）。
+   - **`starving`（饥饿位）**：表示 mutex 进入“饥饿模式”。  
+   - **等待者计数（waiter count）**：其余高位存“当前大概有多少人在等这把锁”。  
+     - `Unlock()` 用它判断：到底需不需要走唤醒逻辑，以及在某些慢路径里如何更新等待队列状态。
+2. `sema`：运行时用的 **信号量**，runtime 用的「睡/醒」入口
+   - Lock 抢不到且不能一直自旋时，通过它把 goroutine 挂起；
+   - Unlock 发现有人在等时，通过它叫醒一个。
+   
 ## 加锁解锁 +2
 
 ### Lock
@@ -42,38 +76,6 @@ draft: false
 - **正常模式**：等待者按队列排，但被 `Unlock()` 唤醒的不一定马上拿到锁，还要和**新来的 goroutine** 抢；若有人等太久（1ms），runtime 可能切入饥饿模式。
 - **饥饿模式**：更偏向把锁**交给队首等待者**；新来的不占便宜（通常不自旋，排到队尾）；队列只有自己、队首等待时间回落后，会再切回正常模式。
 
-## 结构 +1
-
-![Mutex 结构与 state](pic/sync.Mutex.概览与state.png)
-
-```go
-type Mutex struct {
-	state int32
-	sema  uint32
-}
-
-const (
-	mutexLocked = 1 << iota // mutex is locked
-	mutexWoken
-	mutexStarving
-	mutexWaiterShift = iota
-
-	starvationThresholdNs = 1e6
-)
-```
-
-`sync.Mutex` 主要由两块组成——
-
-1. `state`：一个32位整数，里头同时塞了几种信息  
-   - **`locked`（锁位）**：最低位，表示“这把锁现在有没有人占着”。  
-   - **`woken`（被唤醒位）**：用来标记“已经有 goroutine 被叫醒/正处在交接链上”。  
-     - 这样 `Unlock()` 在慢路径里就知道：有些人可能已经在路上了，不必重复唤醒更多人（避免无谓唤醒导致的抖动和尾延迟）。
-   - **`starving`（饥饿位）**：表示 mutex 进入“饥饿模式”。  
-   - **等待者计数（waiter count）**：其余高位存“当前大概有多少人在等这把锁”。  
-     - `Unlock()` 用它判断：到底需不需要走唤醒逻辑，以及在某些慢路径里如何更新等待队列状态。
-2. `sema`：运行时用的 **信号量**，runtime 用的「睡/醒」入口
-   - Lock 抢不到且不能一直自旋时，通过它把 goroutine 挂起；
-   - Unlock 发现有人在等时，通过它叫醒一个。
 
 ## sema到底是什么
 

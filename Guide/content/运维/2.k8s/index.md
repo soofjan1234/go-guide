@@ -65,6 +65,17 @@ K8s 中最小的部署和调度单元。一个 Pod 里面可以包含一个或�
 - 同一个 Pod 内的容器共享相同的网络 IP、端口空间和存储卷。它们之间可以通过 `localhost` 直接通信，就像住在一个房间里的室友。
 - Pod 是短寿命（短暂的）的。如果一个 Pod 挂了，K8s 不会去修复它，而是会创建一个全新的 Pod 来代替它，因此 Pod 的 IP 地址是经常变化的。
 
+```yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+```
+
 ### 2. Node（节点）
 
 1. 就是我们前面提到的工作节点（可以是物理机或虚拟机）。
@@ -82,6 +93,32 @@ K8s 中最小的部署和调度单元。一个 Pod 里面可以包含一个或�
 2. 滚动更新（Rolling Update）：当你要升级应用版本时，Deployment 可以做到“先建一个新版的 Pod，再删一个旧版的 Pod”，实现零停机时间（Zero Downtime）的平滑升级。
 3. 回滚（Rollback）：如果新版本上线后发现有 Bug，可以一键回滚到上一个稳定版本。
 
+```yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:                 # Pod 的定义模板
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+```
+
+负责运行和管理 Pod 的工作负载资源（控制器）：
+- Deployment：适合无状态应用，如 Web 服务。支持扩缩容、滚动升级和回滚。
+- ReplicaSet：保证指定数量的 Pod 一直存在。通常由 Deployment 自动创建，不直接使用。
+- DaemonSet：让每个符合条件的节点各运行一个 Pod，常用于日志采集、监控 Agent。
+- StatefulSet：适合有状态应用；每个 Pod 有稳定的名称、身份和存储，常用于数据库、Kafka 等
+
 ### 4. Service（服务）
 
 1. 由于 Pod 的 IP 地址经常变化（一重建 IP 就变了），客户端无法直接通过 Pod IP 稳定地访问应用。
@@ -90,6 +127,32 @@ K8s 中最小的部署和调度单元。一个 Pod 里面可以包含一个或�
 主要功能：
 1. 服务发现：不管后端的 Pod 怎么销毁重建、IP 怎么变，Service 的 IP（ClusterIP）是固定不变的。
 2. 负载均衡：当流量到达 Service 时，它会自动将请求分发（负载均衡）给后端的多个 Pod。
+
+```yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+spec:
+  selector:
+    app: nginx
+  ports:
+    - port: 6666
+      targetPort: 80
+  type: ClusterIP
+```
+
+- ClusterIP
+    - 默认类型，只允许从集群内部访问：集群内客户端 → ClusterIP → Pod
+    - 适合 Web 服务访问数据库、服务之间互相调用。
+- NodePort
+    - 在每个节点开放一个端口，外部可通过：任意节点IP:NodePort → Service → Pod
+    - 默认 NodePort 范围通常是 30000–32767。
+- LoadBalancer
+    - 由云平台提供一个外部负载均衡器和公网入口：公网IP → 云负载均衡器 → Service → Pod
+    - 本地自建集群如果没有安装相应实现，EXTERNAL-IP 可能一直显示 <pending>。
+- ExternalName
+    - 不代理到 Pod，而是通过 DNS 把 Service 名称映射到外部域名。
 
 ### 5. Ingress（应用路由入口）
 
