@@ -121,4 +121,18 @@
 
 \end{itemize}
 
+\section{\faCode\ 个人项目}
+\paragraph*{Go Coding Agent}\mbox{}\\
+{\small
+\noindent\textcolor{gray}{\textbf{技术栈：} Go, LLM, Tool Calling, JSONL, Prompt Engineering}
+}
+\vspace{0.3ex}
+
+\begin{itemize}
+    \item 基于 Go 实现 Coding Agent 核心循环，完成代码探索、文件修改、命令执行与测试反馈驱动的多轮 Tool Call 闭环。
+    \item 构建具备工作区边界的读写工具链，引入路径校验、差异预览、操作确认、冲突检测及失败保护机制。
+    \item 实现基于 JSONL 的会话持久化、重启恢复、消息重放与上下文压缩机制。
+    \item 设计 Tool Registry、Skills 按需加载和 Prompt Template 扩展体系，支持项目级配置覆盖与加载诊断，新增工具或 Skill 无需修改 Agent 核心循环。
+\end{itemize}
+
 \end{document}
