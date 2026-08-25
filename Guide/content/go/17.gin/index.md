@@ -27,40 +27,7 @@ Fiber 是基于 Go 社区大名鼎鼎的 valyala/fasthttp 重新重写了底层�
 
 ### 全流程执行架构图
 
-```mermaid
-flowchart TD
-    A["客户端请求 Client"] --> B["net/http 接收并解析请求"]
-    B --> C["连接处理 Goroutine"]
-    C --> D["Engine.ServeHTTP(w, req)"]
-
-    subgraph ContextPool["Context 对象池复用"]
-        D --> E["从 sync.Pool 获取 gin.Context"]
-        E --> F["绑定 Writer 和 Request，并执行 c.reset()"]
-    end
-
-    subgraph Routing["Radix Tree 路由匹配"]
-        F --> G["根据 HTTP Method 选择路由树"]
-        G --> H{"Path 是否匹配？"}
-        H -- "是" --> I["提取 Path 参数到 c.Params"]
-        I --> J["装载 Handler 链：中间件 + 业务 Handler"]
-        H -- "否" --> K["装载 NoRoute 404 或 NoMethod 405 Handler 链"]
-        K --> J
-    end
-
-    subgraph Onion["c.Next() 洋葱模型"]
-        J --> L["Middleware 1 前置逻辑"]
-        L --> M["Middleware 2 前置逻辑"]
-        M --> N["业务 Handler"]
-        N --> O["c.JSON / c.String / c.Protobuf"]
-        O --> P["Middleware 2 后置逻辑"]
-        P --> Q["Middleware 1 后置逻辑"]
-    end
-
-    Q --> R["responseWriter 写入状态码和响应体"]
-    R --> S["net/http 将响应发送给客户端"]
-    S --> T["Context 放回 sync.Pool"]
-    T -. "下一次请求复用" .-> E
-```
+![](pic/Gin流程.png)
 
 ### 1. 底层接收阶段（`net/http` 监听）
 
