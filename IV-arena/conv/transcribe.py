@@ -24,7 +24,7 @@ def transcribe(audio_path: str):
         return
     
     print(f"正在加载 Whisper 模型...")
-    model = whisper.load_model("base")  # 可选: tiny, base, small, medium, large
+    model = whisper.load_model("small")  # 可选: tiny, base, small, medium, large
     
     print(f"正在转录: {audio_path}")
     result = model.transcribe(
