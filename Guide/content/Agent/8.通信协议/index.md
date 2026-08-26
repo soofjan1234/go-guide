@@ -9,75 +9,146 @@ weight: 80
 
 在简单聊天场景中，通信可以只是自然语言。但在 Agent 系统中，模型经常需要调用工具、接收结构化结果、与多个模块协作，甚至参与多 Agent 任务分工。因此，通信协议决定了信息如何被表达、传递、解析和执行。
 
-## 1. 为什么需要 MCP？（解决什么痛点）
+## 目录
 
-在 MCP 之前，AI 接入生态面临着**典型的“$N \times M$ 碎片化难题”**：
+1. Tool Calling：让 Agent 调用工具
+2. Skill：告诉 Agent 应该怎样做事
+3. MCP：让 Agent 接入外部能力
+4. Tool Calling、Skill 与 MCP 的区别
 
-- 如果你有 $N$ 个 AI 客户端（如 Cursor、Claude Desktop、VS Code AI 扩展、自定义 Agent）；
-- 同时有 $M$ 个外部工具/数据源（如 Git、Jira、Slack、PostgreSQL）；
-- 开发者需要为每一个客户端与工具组合，重复编写 $N \times M$ 次对接逻辑。
-    
+## 1. Tool Calling：让 Agent 调用工具
 
+### Tool Calling 是什么
+
+Tool Calling（也常被称为 Function Calling）让模型不只输出一段文字，还能提出一个结构化的“调用请求”。例如用户问“北京今天天气怎么样”，模型可以决定调用 `get_weather`，并给出参数 `{"city":"北京"}`。
+
+模型本身不会真的访问天气服务。它只负责选择合适的工具和填写参数；真正执行调用的是 Agent 程序，执行结果再作为一条新消息交回给模型。
+
+### 调用过程：模型选择工具 → 传入参数 → 工具返回结果
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant A as Agent
+    participant L as LLM
+    participant T as 工具
+
+    U->>A: 北京今天天气怎么样？
+    A->>L: 用户问题 + 可用工具说明
+    L-->>A: 调用 get_weather({city: "北京"})
+    A->>T: 执行天气查询
+    T-->>A: {temperature: "26°C", condition: "晴"}
+    A->>L: 工具执行结果
+    L-->>A: 北京今天晴，26°C
+    A-->>U: 北京今天晴，26°C
 ```
-【以前：私有对接，混乱不堪】
-Cursor   ----(私有代码)----> GitHub / Postgres
-Claude   ----(插件格式)----> GitHub / Postgres
-Custom   ----(自定义API)----> GitHub / Postgres
 
-【现在：MCP 统一标准，天然解耦】
-Cursor   \                                   / GitHub Server
-Claude   ---->  [ MCP 标准协议通信 ]  ---->  - Postgres Server
-Custom   /                                   \ Slack Server
+这个过程可以分为四步：
+
+1. **注册工具：** Agent 把工具名称、用途和参数格式告诉模型。
+2. **模型决策：** 模型根据用户问题，决定直接回答，还是请求调用某个工具。
+3. **程序执行：** Agent 校验参数并执行真正的函数、API 或命令。
+4. **结果回填：** 工具结果回到模型上下文中，由模型整理成用户能理解的回答。
+
+### 简单示例：查询天气
+
+假设 Agent 有下面这个工具：
+
+```json
+{
+  "name": "get_weather",
+  "description": "查询指定城市的实时天气",
+  "parameters": {
+    "city": "城市名称"
+  }
+}
 ```
 
-有了 MCP 之后：
+当用户问“上海要带伞吗？”时，模型可以生成：
 
-1. 工具提供商（如 Postgres 或 GitHub）只需要编写**一次** MCP Server。
-2. 任何支持 MCP 协议的 AI 客户端，都可以**直接插入使用**这个 Server，无需二次改造。
-    
+```json
+{
+  "name": "get_weather",
+  "arguments": {
+    "city": "上海"
+  }
+}
+```
 
-## 2. MCP 的核心架构（Client - Host - Server）
+Agent 执行后得到天气数据，再交给模型回答。这里的关键是：**模型负责决定和组织参数，程序负责执行，工具返回事实结果。**
 
-MCP 的架构灵感深度借鉴了编程语言界极其成功的 **LSP（Language Server Protocol，语言服务协议）**。
+## 2. Skill：告诉 Agent 应该怎样做事
 
-其体系由三个核心角色构成：
+### Skill 是什么
 
-1. **MCP Host（宿主环境）：** 发起连接的 AI 应用程序（例如 Cursor 编辑器、Claude Desktop 客户端或你的自定义 Agent 框架）。
-    
-2. **MCP Client（协议客户端）：** 运行在 Host 内部，与 MCP Server 建立 1:1 稳定连接的通信代理。
-    
-3. **MCP Server（协议服务端）：** 一个独立的轻量级进程（或服务），专门用来**暴露特定的数据资源、工具能力或 Prompt 模板**。
-    
+Skill（技能）是一份给 Agent 阅读的操作说明。它不直接执行操作，而是告诉 Agent：遇到什么任务时应该做什么、按什么顺序做、有哪些限制。
 
-### 底层通信机制
+例如，“代码审查” Skill 可以规定：先查看当前改动，再检查测试和边界条件，最后按严重程度输出问题。Agent 仍然要靠读取文件、运行测试等工具完成实际操作。
 
-- **协议标准：** 基于 **JSON-RPC 2.0** 消息格式。
-- **传输层（Transport）：**
-    
-    - **stdio（标准输入输出）：** 用于本地进程间通信（例如 Claude Desktop 直接拉起一个本地运行的 Python/Node.js MCP 脚本）。
-    - **SSE（Server-Sent Events）：** 用于跨网络/远程 HTTP 通信，支持异步推送。
-        
+### Skill 中通常有什么：适用场景、操作步骤、注意事项
 
-## 3. MCP 暴露给 AI 的三大核心能力
+一个 Skill 通常保存为 `SKILL.md`，内容可以很简单：
 
-一个 MCP Server 可以向 AI 模型提供以下三种能力：
+- **适用场景：** 什么请求应该使用它。
+- **操作步骤：** 要先做什么、后做什么。
+- **约束：** 哪些事不能做，哪些结果必须验证。
+- **可用资源：** 需要参考的文档、脚本或模板。
 
-### ① Resources（资源 - Read Only）
+Agent 不必一开始就把所有 Skill 的完整内容放进上下文。常见做法是先让模型看到每个 Skill 的名称和简介；当模型决定使用某个 Skill 时，再加载它的完整说明。这样既保留了可扩展性，也不会占满上下文。
 
-类似 HTTP 的 `GET` 请求。向模型提供**只读的上下文数据**（如文件内容、数据库 Schema、API 接口文档、日志流等）。
+### Skill 和工具的关系
 
-- _例子：_ `file:///path/to/project/main.go` 或 `postgres://database/schema`
-    
+可以把它们理解成“说明书”和“工具箱”的关系：
 
-### ② Tools（工具 - Executable）
+- **Skill** 说明这件事应该怎样完成。
+- **Tool Calling** 让模型请求使用某个具体工具。
+- **工具** 才是真正执行读取文件、查询数据或修改内容的执行者。
 
-类似于 LLM 的 **Function Calling（函数调用）**。允许模型触发执行某些业务动作，并返回执行结果。
+因此，Skill 可以引导 Agent 多次使用工具，但 Skill 本身不等于一个工具。
 
-- _例子：_ 执行 `git_commit`、发起 `send_slack_message`、运行 `execute_sql_query`。
-    
+### 简单示例：代码审查 Skill
 
-### ③ Prompts（预设提示词/模板）
+用户说：“帮我审查这次改动。”
 
-允许 MCP Server 暴露一些精心调优过的**交互模板**，帮助用户快速触发特定复杂任务。
+代码审查 Skill 可以给出如下步骤：
 
-- _例子：_ 一个 Code Review 服务可以提供名为 `analyze-security-vulnerabilities` 的 Prompt 模板。
+1. 查看当前 Git diff。
+2. 阅读改动附近的调用路径。
+3. 检查错误处理、边界条件和测试覆盖。
+4. 只报告问题，不直接修改代码。
+
+随后 Agent 会根据这些步骤，通过 `git_diff`、`read_file`、`run_test` 等工具完成工作。Skill 负责方法，工具负责动作。
+
+## 3. MCP：让 Agent 接入外部能力
+
+### MCP 是什么
+
+MCP（Model Context Protocol）是一套让外部能力以统一方式接入 Agent 的开放协议。
+
+没有统一协议时，不同 Agent 想接 GitHub、数据库或本地文件，往往都要分别编写一套适配代码。MCP 把这些能力包装成标准接口：支持 MCP 的 Agent 可以连接支持 MCP 的服务端，并发现和使用它提供的能力。
+
+### MCP 能提供什么：工具、资源和提示词
+
+一个 MCP Server 可以向 Agent 提供三类内容：
+
+- **Tools（工具）：** 可以执行的操作，例如创建 Issue、查询数据库。
+- **Resources（资源）：** 可读取的上下文，例如文件内容、数据库 Schema、项目文档。
+- **Prompts（提示词）：** 可复用的任务模板，例如“生成代码审查报告”。
+
+其中 Tools 最接近前面讲的 Tool Calling：MCP 定义了外部工具怎样被发现和调用；模型仍通过 Tool Calling 决定要不要调用它。
+
+### 简单示例：通过 MCP 读取本地文件或查询 GitHub
+
+例如，一个本地文件 MCP Server 可以提供 `read_file` 工具；一个 GitHub MCP Server 可以提供 `search_repositories` 或 `create_issue` 工具。
+
+当用户说“看看这个项目最近的 Issue”时，Agent 先连接 GitHub MCP Server，获得它提供的工具说明；模型再通过 Tool Calling 请求调用查询工具；MCP Server 最后把查询结果返回给 Agent。这样，Agent 不需要为每一个 GitHub 操作重新定义私有接口。
+
+## 4. Tool Calling、Skill 与 MCP 的区别
+
+| 概念 | 它关注的重点 | 例子 |
+| --- | --- | --- |
+| Tool Calling | 这一次要调用什么工具、传什么参数 | 按下工具按钮，例如调用天气查询 |
+| Skill | 面对一类任务时应该怎样做 | 操作说明书，例如代码审查步骤 |
+| MCP | 外部能力如何被标准化地提供给 Agent | 工具插座标准，例如接入 GitHub |
+
+一句话记忆：**Tool Calling 是一次调用动作，Skill 是做事方法，MCP 是接入外部能力的统一协议。**
