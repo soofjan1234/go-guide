@@ -9,43 +9,73 @@
 *   **高精度**：使用 OpenAI Whisper (Base) 模型进行中文转录。
 
 ## 环境准备 (首次使用)
-工具依赖 `conda` 环境和 `ffmpeg`。
+工具依赖 `conda` 环境和 **Homebrew 的** `ffmpeg`。macOS 上不要把 ffmpeg / llvm-openmp 装进 conda 环境，否则 Whisper 推理时容易 `Segmentation fault: 11`（exit 139）。
 
-1.  **安装 FFmpeg** (如果未安装):
+1.  **安装 FFmpeg**（系统级，不要用 conda 装）:
     ```bash
     brew install ffmpeg
     ```
 
 2.  **创建 Conda 环境**:
-    可以运行 `sh run_with_conda.sh` 自动初始化（如果该脚本可用），或者手动创建：
+    可以运行 `sh run_with_conda.sh` 自动初始化，或者手动创建：
     ```bash
     conda create -n iv-helper-speech python=3.10 -y
     conda activate iv-helper-speech
+    conda install nomkl -y
     pip install -r requirements.txt
+    ```
+
+3.  **清掉冲突的 conda 包**（环境里如果有就卸掉；可重复执行）:
+    ```bash
+    conda remove -n iv-helper-speech ffmpeg llvm-openmp -y
     ```
 
 ## 使用方法
 
+在 `IV-arena/conv` 目录下执行。macOS 每次运行前都要带上 OpenMP 相关环境变量。
+
 ### 1. 简单用法 (直接使用 Python)
 如果你已经激活了环境：
 ```bash
+export KMP_DUPLICATE_LIB_OK=TRUE
 python transcribe.py <你的文件路径>
 ```
 
 ### 2. 通过 Conda 运行 (推荐)
 无需手动切换环境，直接执行：
 ```bash
-export KMP_DUPLICATE_LIB_OK=TRUE  # macOS 必填，防止 OpenMP 报错
-cd /Users/Zhuanz/projects/OtherWS/Note/IV-arena/conv
+export KMP_DUPLICATE_LIB_OK=TRUE
 conda run -n iv-helper-speech python transcribe.py '文件'
 ```
 
-### 3. 先提取音频再转录 (处理超大视频推荐)
-如果视频非常大，可以手动先提取音频提速：
+### 3. 先转 wav 再转录（推荐，尤其是长录音 / 仍崩溃时）
+Whisper 内部会再采样到 16 kHz；先转成 wav 可以避开部分 AAC 解码路径：
 ```bash
-ffmpeg -i input_video.mp4 -vn -ar 16000 -ac 1 -y temp_audio.m4a
-conda run -n iv-helper-speech python transcribe.py temp_audio.m4a
+ffmpeg -i input.m4a -vn -ar 16000 -ac 1 -y output.wav
+export KMP_DUPLICATE_LIB_OK=TRUE
+conda run -n iv-helper-speech python transcribe.py output.wav
 ```
+
+若仍在进度条 `0%` 处 segfault，限制线程后再跑：
+```bash
+export KMP_DUPLICATE_LIB_OK=TRUE
+export OMP_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export VECLIB_MAXIMUM_THREADS=1
+conda run -n iv-helper-speech python transcribe.py output.wav
+```
+
+## 排查：Segmentation fault: 11
+
+崩溃发生在「正在转录」之后、进度条刚到 `0%`，并伴随 `OMP: Info #276`，通常是 conda 的 `llvm-openmp` / `ffmpeg` 和 pip 的 PyTorch OpenMP 抢同一套原生库。`KMP_DUPLICATE_LIB_OK=TRUE` 只能压住报错，挡不住 segfault。
+
+处理顺序：
+
+1. `conda remove -n iv-helper-speech ffmpeg llvm-openmp -y`
+2. 确认 `which ffmpeg` 指向 `/opt/homebrew/bin/ffmpeg`
+3. 转 wav + 上面的线程限制后再跑
+
+不要再往该环境里 `conda install ffmpeg`。
 
 ## 输出结果说明
 转录完成后，会在同一目录下生成一个同名的 `.txt` 文件：
