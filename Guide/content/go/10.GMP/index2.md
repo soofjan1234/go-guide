@@ -106,7 +106,7 @@ Go 的抢占演进有两步：
 
 ## 阻塞与唤醒、网络 +4
 
-#### 普通阻塞（G 级别）
+### 普通阻塞（G 级别）
 ![](pic/GMP机制.普通阻塞.png)
 
 **触发情况**：`channel` 收发对不上、锁拿不到、`time.Sleep` 等待计时器到期等。
@@ -118,7 +118,7 @@ Go 的抢占演进有两步：
 4. G 被标记回 runnable，通过 ready/runqput 回到可运行队列
 5. 调度器后续在 findRunnable 取到它并继续执行
 
-#### 网络阻塞
+### 网络阻塞
 ![](pic/GMP机制.网络阻塞.png)
 
 **触发情况**：net.Conn 去 Read/Write 时，如果内核判断“现在还不能读/写”，G进入等待。
@@ -135,8 +135,15 @@ Go 的抢占演进有两步：
 - fd: file descriptor，文件描述符，是操作系统用来标识一个文件的抽象概念。在网络里，一个 socket 就对应一个 fd。
 - pollDesc：Go runtime 里“某个 fd 的等待说明书/挂钩对象”，哪个 G 在等这个 fd
 - netpoll：Go runtime 里负责「网络 I/O 就绪」的那一层，把很多个 fd 交给操作系统提供的 多路复用机制（Linux 上主要是 epoll，macOS 常见 kqueue，Windows 上有别的封装），在「内核说有 fd 可读了/可写了」时把 对应的 G 重新放进可运行队列
+- 系统调用：极快，数据已在socket，所以G和M不会解绑P
 
-#### 系统调用阻塞（syscall 级别）
+#### 唤醒G的方式
+
+1. Sysmon 系统监控协程：每隔一定时间会去调用netpoll
+2. M 在调度循环中寻找 G（Work-Stealing 机制）
+3. GC 垃圾回收过程：也会顺带触发 netpoll() 来检查网络事件。
+
+### 系统调用阻塞（syscall 级别）
 ![](pic/GMP机制.系统调用阻塞.png)
 
 触发场景：

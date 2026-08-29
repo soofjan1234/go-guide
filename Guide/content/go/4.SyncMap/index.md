@@ -4,15 +4,6 @@ weight: 40
 date: 2026-05-25
 draft: false
 ---
-## sync.Map最佳实践、优化手段 +1
-
-1. 用于多读少写、每个 goroutine 维护自己的 key的情况
-2. 用LoadOrStore、LoadAndDelete、CAS系列方法，避免并发冲突
-    - 比如热路径上，先load判断再store，中间可能被插队
-3. 热路径少 Range、少 Delete
-    - Range 要遍历全表，实现里通常会长时间持锁，阻塞其它读写
-4. 大 value 用指针
-    - sync.Map的类型是interface{}，所以大值会拷贝，增加成本
 
 ## 结构
 
@@ -58,8 +49,6 @@ type entry struct {
 
 由于两边存的都是同一个 `*entry` 指针，这就意味着：**如果一个 Key 同时存在于 `read` 和 `dirty` 中，只要通过原子操作修改 `entry.p`，两边的数据会瞬间同步，不需要加锁！**
 
----
-
 ## 🔄 核心数据流转（增删改查）
 
 ### 1. 查 (Load)
@@ -85,3 +74,15 @@ type entry struct {
 * 如果 Key 在 `read` 里，它连锁都不加，直接用原子操作把 `entry.p` 指针置为 **`nil`**（或者是专门的删除标记 `expunged`）。
 * 真正的硬物理删除，会等到下一次 `dirty` 被晋升清空、或者重新从 `read` 复制构建 `dirty` 的时候才会彻底被刷掉。
 
+## sync.Map最佳实践、优化手段 +1
+
+1. 用于多读少写、每个 goroutine 维护自己的 key的情况
+    - 已在 read 里的 key，Load 只做原子读，不抢 mu。
+    - Store 若只是改已有 entry.p，同样无锁，读写可以叠在一起。
+    - 一新增，就到dirty，加锁也就越多
+2. 用LoadOrStore、LoadAndDelete、CAS系列方法，避免并发冲突
+    - 比如热路径上，先load判断再store，中间可能被插队
+3. 热路径少 Range、少 Delete
+    - Range 要遍历全表，实现里通常会长时间持锁，阻塞其它读写
+4. 大 value 用指针
+    - sync.Map的类型是interface{}，所以大值会拷贝，增加成本
