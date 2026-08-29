@@ -1,6 +1,6 @@
 ---
 title: Gin
-weight: 170
+weight: 150
 date: 2026-05-25
 draft: false
 ---

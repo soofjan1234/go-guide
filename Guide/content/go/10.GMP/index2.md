@@ -1,6 +1,6 @@
 ---
-title: GMP1
-weight: 100
+title: GMP2
+weight: 102
 date: 2026-05-15
 draft: false
 ---

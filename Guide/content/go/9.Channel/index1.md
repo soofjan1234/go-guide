@@ -1,5 +1,5 @@
 ---
-title: Channel
+title: Channel1
 weight: 90
 date: 2026-05-16
 draft: false

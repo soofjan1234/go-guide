@@ -7,7 +7,7 @@ draft: false
 
 ## 常见情况 +2
 
-![](../9.Channel/pic/阻塞.png)
+![](pic/阻塞.png)
 
 ### 阻塞
 - 在 **nil channel 上发送和接收**，并且没有select+default，就会进入阻塞流程：

@@ -1,6 +1,6 @@
 ---
 title: 竞态
-weight: 140
+weight: 120
 date: 2026-07-10
 draft: false
 ---

@@ -1,6 +1,6 @@
 ---
 title: pprof
-weight: 150
+weight: 130
 date: 2026-07-09
 draft: false
 ---
