@@ -60,7 +60,10 @@ MVCC（Multi-Version Concurrency Control）：多版本并发控制。在不加�
 1. 快照读，读的是“过去某一时刻的数据版本”
     - 在读已提交的情况下，每条 SQL 重新生成 ReadView
     - 在可重复读的情况下，第一次 SELECT 生成 ReadView
-2. 当前读，读的是最新的数据。命令有select ... for update/lock in share mode，或者其它修改操作
+2. 当前读，读的是最新的数据。加锁，防止别人同时修改
+    - 显式加共享锁 (S 锁)：有select ... lock in share mode
+    - 显式加排他锁 (X 锁)：有select ... for update
+    - 或者其它修改操作 
 
 ## InnoDB 在 RR 级别下还会有幻读吗？ +3
 

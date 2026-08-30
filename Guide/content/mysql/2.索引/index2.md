@@ -1,6 +1,6 @@
 ---
 title: 索引2
-weight: 20
+weight: 21
 date: 2026-05-25
 draft: false
 ---
@@ -14,6 +14,40 @@ draft: false
 - 需要排序、分组，且数据量大
 - 有唯一性 / 完整性要求
 - 读多写少，或读的性能是瓶颈
+
+## 索引查看 +3
+
+### 预计查看
+
+![索引.EXPLAIN](pic/索引.EXPLAIN.png)
+
+1. type：
+    - system / const：极优，通过主键或唯一索引一次定位。
+    - eq_ref / ref：较好，常见于普通索引等值查询。
+    - range：中等，适用于范围查询。
+    - index：全索引扫描，说明虽然扫描的是索引树，但仍然遍历了大量叶子节点
+    - All：全表扫描，数据量一大就是危险信号。
+2. key：表示实际使用到的索引
+3. possible_keys：MySQL 预测可能会用到的索引
+4. key_len：联合索引到底命中了多少列
+5. extra
+    - **`Using index`**：命中了覆盖索引，不需要回表。
+    - **`Using index condition`**：触发了 ICP（索引下推），在索引遍历阶段就做了一部分过滤。
+    - **`Using filesort / Using temporary`**：说明排序、分组、去重没有很好地利用索引，往往需要进一步优化。
+6. rows：预估扫描行数 
+
+### 实际扫描
+
+EXPLAIN ANALYZE（MySQL 8.0.+）
+-> Filter: (users.age > 18)  (cost=10.5 rows=25) (actual time=0.081..0.155 rows=30 loops=1)
+
+> 除了 `EXPLAIN`，还有慢查询日志查看，有个开关log_queries_not_using_indexes = ON可以看
+
+### Index Hint（索引提示）
+
+- FORCE INDEX（强制使用索引）
+- USE INDEX（建议使用）
+- IGNORE INDEX（忽略索引）
 
 ## 索引失效 +2
 
@@ -51,18 +85,3 @@ WHERE A = 1 OR B = 2, 如果 `A`、`B` 都有索引，MySQL 5.0+ 的 **Index Mer
 4. 排序、分页没按索引
 4. 返回结果集过大
 5. 统计信息不准
-
-
-## changeBuffer +1
-
-![索引.changeBuffer](pic/索引.changeBuffer.png)
-
-**基本等价于唯一索引和普通索引在实现上的区别**
-
-主键索引是顺序的，插入磁盘就比较快；而二级索引是随机插入的，比较慢
-
-所以对非唯一的二级索引，有一个ChangeBuffer存放修改后的脏页
-
-等后续合适的时机再一并刷盘
-
-> 唯一二级索引不用 Change Buffer（要立刻判重）
