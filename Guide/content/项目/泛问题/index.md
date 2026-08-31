@@ -24,7 +24,6 @@ draft: false
     - 过去 10 分钟内：同一个 query_fingerprint 慢查询次数 >= 20；或者某个模块总数 >= 50 
     - 同一个 module + query_fingerprint，60 分钟内只生成一次告警
     - NAS 管理后台消息中心展示，用户选择是否上传诊断包
-4. 系统监控
 
 ## 数据库优化
 

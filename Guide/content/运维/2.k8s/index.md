@@ -20,6 +20,7 @@ draft: false
 1. 一个高可用、强一致性的分布式键值（Key-Value）数据库。
 2. 用于存储 Kubernetes 集群的所有状态信息和元数据、敏感信息与配置数据
 3. 当管理员在 etcd 中修改配置后，由于 etcd 的 Watch 机制，所有服务器会瞬间收到通知并更新本地配置，实现“一处修改，全局生效”
+
 ### 3. kube-scheduler（分发任务的调度器）
 
 1. 监听 kube-apiserver 中新创建的、且尚未分配到具体 Node 的 Pod。
@@ -191,14 +192,6 @@ spec:
 3. 重新调度：
     - 这些被驱逐的 Pod 会在 Master 节点上被标记为“待重建”。
     - Scheduler 会在其他健康的 Node 上重新创建并运行这些 Pod。
-
-### Kubernetes 为什么能够自动恢复？
-
-1. 声明式（Declarative）：你不需要告诉 K8s “怎么做”（比如：先调这个 API 创建容器，再调那个分配 IP），你只需要告诉它**“最终状态是什么”**（比如：我要 3 个 Nginx 副本）。
-2. 控制循环（Reconciliation Loop / 调协循环）：K8s 控制器（Controller Manager）内部运行着无数个死循环。它的工作只有三步：
-    - Watch（看）：通过 API Server 监听集群的实际状态（Actual State）。
-    - Diff（比对）：将实际状态与你声明的期望状态（Desired State）进行对比。
-    - Act（做）：如果发现不一致，就调用底层 API 执行操作，直到实际状态逼近期望状态。
 
 ### etcd 配置更新
 
