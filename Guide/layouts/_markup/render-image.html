@@ -1,0 +1,22 @@
+{{- /*
+  解析 Markdown 图片地址。
+  叶子 bundle（index.md）的 pic/ 是当前页资源；
+  普通页（index1.md）的 pic/ 发布在上一级，相对当前 permalink 会 404。
+*/ -}}
+{{- $dest := .Destination -}}
+{{- $url := $dest -}}
+{{- if or (strings.HasPrefix $dest "https://") (strings.HasPrefix $dest "http://") (strings.HasPrefix $dest "//") (strings.HasPrefix $dest "/") -}}
+  {{- /* 1. 绝对地址原样使用 */ -}}
+  {{- $url = $dest -}}
+{{- else -}}
+  {{- /* 2. 优先当前页资源（index.md 叶子 bundle） */ -}}
+  {{- with .Page.Resources.Get $dest -}}
+    {{- $url = .RelPermalink -}}
+  {{- else -}}
+    {{- /* 3. 普通页回退到内容目录（与 md 同级的 pic/） */ -}}
+    {{- if and (ne .Page.BundleType "leaf") .Page.File -}}
+      {{- $url = printf "/%s%s" .Page.File.Dir $dest -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+<img src="{{ $url | safeURL }}" alt="{{ .Text }}"{{ with .Title }} title="{{ . }}"{{ end }}>

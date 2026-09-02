@@ -7,6 +7,10 @@ markup:
   goldmark:
     renderer:
       unsafe: true
+    renderHooks:
+      image:
+        # 使用 layouts/_markup/render-image.html，不要走内置 hook
+        useEmbedded: never
   highlight:
     noClasses: false
     style: github-dark
