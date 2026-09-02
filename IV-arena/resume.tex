@@ -23,23 +23,28 @@
 
 \section{\faInfoCircle\ 基本信息}
 \vspace{0.5ex}
-\begin{minipage}{0.72\textwidth}
+\begin{minipage}[t]{0.48\textwidth}
 \begin{itemize}[label=,leftmargin=*]
 \large
 \item \textbf{当前状态：}\textbf{深圳在职}
 \item \textbf{到岗时间：}\textbf{2周}
 \item \textbf{学历：}\textbf{本科全日制（学信网可查）}
 \item \textbf{求职偏好：}不外包 / 不驻场
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\begin{itemize}[label=,leftmargin=*]
+\large
 \item \textbf{微信：}1489938120
 \item \textbf{邮箱：}\href{mailto:Soofjan1489938120@gmail.com}{Soofjan1489938120@gmail.com}
 \item \textbf{个人网站：}\href{https://Soofjan.com}{Soofjan.com}
 \item \textbf{博客：}\href{https://juejin.cn/user/4074147977125020}{技术博客}
 \end{itemize}
 \end{minipage}
-\begin{minipage}{0.25\textwidth}
-\centering
-{\setlength{\fboxsep}{0pt}\fbox{\includegraphics[height=5cm,keepaspectratio]{photo.jpg}}}
-\end{minipage}
+% \begin{minipage}{0.25\textwidth}
+% \centering
+% {\setlength{\fboxsep}{0pt}\fbox{\includegraphics[height=5cm,keepaspectratio]{photo.jpg}}}
+% \end{minipage}
 
 \section{\faCogs\ 综合技术能力}
 \begin{itemize}
@@ -73,6 +78,20 @@
     \end{itemize}
 \end{itemize}
 
+\section{\faCode\ 个人项目}
+\paragraph*{Go Coding Agent}\mbox{}\\
+{\small
+\noindent\textcolor{gray}{\textbf{技术栈：} Go, LLM, Tool Calling, Multi-Agent, Prompt Engineering}
+}
+\vspace{0.3ex}
+
+\begin{itemize}
+    \item 使用 Go 实现多智能体框架，抽象 Simple、ReAct、Reflection、Plan-and-Solve 四类 Agent，打通模型调用、工具执行、结果回传和迭代推理链路。
+    \item 支持 Skill 扩展机制，通过元数据扫描、模型按需加载和正文缓存降低上下文开销；支持子 Agent 任务委派、工具权限隔离及任务摘要回传。
+    \item 实现上下文工程与会话恢复机制，基于 Token 预算进行历史压缩、相关内容筛选和工具输出截断。
+
+\end{itemize}
+
 \section{\faGraduationCap\ 教育背景}
 \datedsubsection{\textbf{广州大学} \quad 学士，计算机科学与技术}{2019.09 -- 2023.06}
 \begin{itemize}
@@ -94,45 +113,59 @@
 \begin{itemize}
 
     \item \textbf{文档中心}：
+    {\small
+    \noindent\textcolor{gray}{负责 NAS 文档中心后端建设，提供多格式文档同步、内容解析、索引构建、全文检索及多维筛选能力。}
+    }
+    \vspace{0.2ex}
     \begin{itemize}
         \item 构建文档同步、解析、索引、检索一体化链路，支持 PDF、Word、Excel、PPT、Markdown、HTML、EPUB 等多类型文档的自动识别与内容抽取。
         \item 针对内存受限环境，基于 Bleve 构建轻量级搜索能力，实现快速的全文检索与多维度筛选。
         \item 设计基于块的索引策略与搜索结果聚合算法，解决超长文档索引阶段内存占用过高问题，峰值 heapInuse 降幅约 76\%+。
         \item 使用 CJDict 词典分词，并以压缩 Trie longest-match 替代 substring + map 查词，将 Trace 总耗时降低约 48\%、进程 user CPU 降低约 63\%。
     \end{itemize}
+    \vspace{1ex}
 
-    \item \textbf{AI相册}：
+    \item \textbf{相册}：
+    {\small
+    \noindent\textcolor{gray}{负责 NAS 智能相册后端建设，提供媒体目录同步、元数据索引、多维检索、模糊/重复照片治理、相册收藏、智能回忆及端侧 AI 结果管理。}
+    }
+    \vspace{0.2ex}
     \begin{itemize}
-        \item 基于 JNI 封装实现标签分类；通过 DBSCAN 聚类算法实现人脸无监督聚类，基于 LFW/WIDER Face 验证模型效果，实现不同人误合并率 0\%、同人归类准确率 89\%。
-        \item 基于拉普拉斯方差实现照片模糊检测，支持全量与增量扫描；通过 CPU 自适应 Worker Pool 并行计算，将 SQLite 持久化收敛为串行写入，并支持任务取消。
+        \item 实现可恢复的 AI 异步任务协调器，通过 SHA1 去重、claim token、条件更新、失败分类及退避重试，解决进程重启和旧 worker 竞争导致的任务覆盖问题。
+        \item 基于 Protobuf/gRPC over Unix Domain Socket 接入本地推理服务，并按 gRPC 状态码区分可重试与终态错误。
+        \item 基于拉普拉斯方差实现照片模糊检测；通过 dHash+qHash 算法检测重复照片。
+        \item 支持全量与增量扫描；通过 CPU 自适应 Worker Pool 并行计算，将 SQLite 持久化收敛为串行写入，并支持任务取消，吞吐提升 41\%。
     \end{itemize}
+    \vspace{1ex}
+
+    \item \textbf{MediaAI}：
+    {\small
+    \noindent\textcolor{gray}{主导本地 AI 运行平台建设，将模型管理、NPU 调度与 ASR、TTS、目标检测、人脸分析服务解耦为独立进程和发布单元，形成统一管理、业务直连推理的数据面架构。}
+    }
+    \vspace{0.2ex}
+    \begin{itemize}
+        \item 基于余弦距离实现增量式人脸聚类，基于 LFW/WIDER Face 验证模型效果，实现不同人误合并率 0\%、同人归类准确率 89\%。
+        \item 设计 NPU 租约调度机制，支持优先级、deadline、P0 公平轮换及心跳超时回收。
+    \end{itemize}
+    \vspace{1ex}
 
      \item \textbf{云端}：
+    {\small
+    \noindent\textcolor{gray}{负责 NAS 远程访问的云端信令服务，提供设备注册、穿透凭证与校验码发放、对端发现及连接协商能力。}
+    }
+    \vspace{0.2ex}
     \begin{itemize}
         \item 主导设计 NAT 穿透交互架构，规范客户端、服务端、云端及穿透端的通信流程，实现复杂网络下稳定高效访问。
         \item 采用应用层 AES+RSA 和传输层 TLS 的双层加密方案，保障凭证与敏感字段在复杂网络下的传输安全。
     \end{itemize}
-
+    \vspace{1ex}
+    
     \item \textbf{其他}：
     \begin{itemize}
         \item 文件索引同步系统：自研 BFS+Queue 架构替代 fsnotify 监听，在海量文件场景下内存开销降低 87\% 以上。
         \item Docker：转发 Docker Engine API 实现镜像、容器、网络和运行状态管理。
         \item 通过 rate 限流与 Ristretto 缓存库有效缓解并发流量冲击，响应时间缩短 90ms。
     \end{itemize}
-
-\end{itemize}
-
-\section{\faCode\ 个人项目}
-\paragraph*{Go Coding Agent}\mbox{}\\
-{\small
-\noindent\textcolor{gray}{\textbf{技术栈：} Go, LLM, Tool Calling, Multi-Agent, Prompt Engineering}
-}
-\vspace{0.3ex}
-
-\begin{itemize}
-    \item 使用 Go 实现多智能体框架，抽象 Simple、ReAct、Reflection、Plan-and-Solve 四类 Agent，打通模型调用、工具执行、结果回传和迭代推理链路。
-    \item 支持 Skill 扩展机制，通过元数据扫描、模型按需加载和正文缓存降低上下文开销；支持子 Agent 任务委派、工具权限隔离及任务摘要回传。
-    \item 实现上下文工程与会话恢复机制，基于 Token 预算进行历史压缩、相关内容筛选和工具输出截断，并持久化对话、配置、工具 Schema 哈希及文件缓存，恢复时执行一致性校验。
 
 \end{itemize}
 
