@@ -131,10 +131,10 @@
     }
     \vspace{0.2ex}
     \begin{itemize}
+        \item 基于拉普拉斯方差实现照片模糊检测；通过 dHash+qHash 算法检测重复照片。
+        \item 支持全量与增量扫描；通过 CPU 自适应 Worker Pool 并行计算，将 SQLite 持久化收敛为串行写入，并支持任务取消，吞吐提升 65.3\%。
         \item 实现可恢复的 AI 异步任务协调器，通过 SHA1 去重、claim token、条件更新、失败分类及退避重试，解决进程重启和旧 worker 竞争导致的任务覆盖问题。
         \item 基于 Protobuf/gRPC over Unix Domain Socket 接入本地推理服务，并按 gRPC 状态码区分可重试与终态错误。
-        \item 基于拉普拉斯方差实现照片模糊检测；通过 dHash+qHash 算法检测重复照片。
-        \item 支持全量与增量扫描；通过 CPU 自适应 Worker Pool 并行计算，将 SQLite 持久化收敛为串行写入，并支持任务取消，吞吐提升 41\%。
     \end{itemize}
     \vspace{1ex}
 
