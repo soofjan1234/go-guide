@@ -75,6 +75,20 @@ RPC 能做到“像调用本地函数一样”，底层靠的是 Stub（存根/�
 - 熔断限流与降级（Circuit Breaker / Rate Limiting）：防止单点故障引发雪崩。
 - 链路追踪与可观测性（Tracing）：注入 `TraceID` / `SpanID`，打通 OpenTelemetry / Jaeger 链路。
 
+## Protobuf + gRPC  vs  HTTP + JSON
+
+.proto + gRPC 往往更合适：
+- 字段和类型固定，改接口时更容易发现双方不兼容。
+- 自动生成 Go/C++ 等客户端代码，少手写请求和响应解析。
+- 二进制编码通常更小、更快。
+- 原生支持 deadline、取消、流式调用和标准状态码。
+- 很适合 Unix Domain Socket 的本机进程通信。
+
+但 HTTP + JSON 也有明显优势：
+- 浏览器、脚本、curl 都能直接调用和调试。
+- 对外开放 API 更通用，文档和排障门槛低。
+- 数据结构经常变化、调用方语言杂时更灵活。
+
 ## 为什么不适用HTTP/3 
 
 HTTP/3 (QUIC) 的核心卖点主要针对复杂的公网弱网环境（移动互联网），一旦放进数据中心内网，这些优势瞬间变得毫无意义：

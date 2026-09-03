@@ -64,7 +64,7 @@ Bleve 默认 all=true 是为了让“无配置全文搜索”成立。偏向“�
 ## 技术选型
 
 1. bleve自带的standard分词器，会把中文分成单个汉字，token 数最多，建索引和查询都偏慢
-2. jieba需要cgo，带来的交叉编译/设备部署风险；而gse，基于jieba的纯 Go 中文分词库，测试里效果和性能都不如 CJDict，sego 的性能表现也是不如 CJDict
+2. jieba需要cgo，带来的交叉编译/设备部署风险；而gse，基于jieba的纯 Go 中文分词库，和sego 的性能表现也是不如 CJDict
 3. CJDict的优势是可控，可以自定义实现分词算法
 
 ## 算法改进

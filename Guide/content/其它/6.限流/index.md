@@ -4,8 +4,8 @@ weight: 60
 date: 2026-06-06
 draft: false
 ---
-## 限流算法有哪些？ +1
-### 固定窗口计数器
+
+## 固定窗口计数器
 
 ![](pic/固定窗口.png)
 
@@ -15,13 +15,13 @@ draft: false
 
 最简单的 Redis 实现是 String + INCR。
 
-### 滑动窗口计数器、滑动日志
-
-![](pic/滑动窗口.png)
+# 滑动窗口
 
 规则举例：任意连续 1 秒内，最多 100 次请求。
 
-1. 滑动窗口计数器
+## 滑动窗口计数器
+
+![](pic/滑动窗口.png)
 
 滑动窗口把一个大窗口拆成多个小格子，请求来了就落到当前小格子里，统计最近一段时间所有格子的总和
 
@@ -36,7 +36,7 @@ HINCRBY ratelimit:login:10001 1718000060 1
 # 删掉 6 格以前的 field，HGET 最近 6 个 field 求和
 ```
 
-2. 滑动日志
+## 滑动日志
 
 而滑动日志会记录每个请求的时间戳，每次请求进来时删除窗口外的旧记录，再判断窗口内请求数是否超过阈值。精度更高。
 
@@ -63,26 +63,74 @@ if count < 100:
     ZADD ratelimit:login:10001 now {unique_id}
 ```
 
-### 漏桶、令牌桶算法
+# 桶
 
 ![](pic/桶.png)
 
+## 漏桶
+
 漏桶把请求看成水，请求先进入桶，桶以固定速率向外流出。出口速率稳定，但即使系统暂时有空闲能力，也只能按固定速率放行。
 
-令牌桶按固定速率生成令牌，请求必须拿到令牌才能通过。漏桶控制的是流出速率，更强调平滑。
+## 令牌桶算法
 
- Go 官方的 `x/time/rate` 库实现了令牌桶算法。
+令牌桶按固定速率生成令牌，请求必须拿到令牌才能通过。Go 官方的 `x/time/rate` 库实现了令牌桶算法。
 
-## 简洁版
+## 对比
 
-常见的限流算法有 5 种：
+1. 令牌桶装的是令牌；漏桶是请求
+2. 令牌桶的流出速率动态可变；漏桶是固定的
+3. 令牌桶能应对突发流量，只要桶里有积攒的令牌，瞬间全部放行；漏桶不能，必须匀速处理
 
-1. 固定窗口 ：在固定时间窗口内限制请求数，比如每分钟 100 个。但它有"突刺流量"问题——窗口边界可能有 2 倍流量。
+## x/time/rate讲解
 
-2. 滑动窗口 ：把大窗口分成多个小格子（比如 1 分钟分成 6 个 10 秒格子），新请求只统计最近 6 个格子的总和。这样平滑了边界。
+初学者设计令牌桶时，往往会想：“我是不是要开一个后台定时线程，每隔 10ms 往桶里 push 一个令牌？”
 
-3. 滑动日志 ：按时间戳记录每个请求，统计时只保留最近 1 分钟的日志。最精确，但存储开销大。
+千万不要这么做！ 维护上万个定时器会把 CPU 拖垮。
 
-4. 漏桶 ：出口按固定速率流出，强行平滑流量。
+工业界的做法是 “惰性计算（Lazy Evaluation）”：不启动任何定时器，只在请求到达时，用时间戳差值算一下应该加多少令牌。
 
-5. 令牌桶 ：按固定速率加令牌，请求拿令牌才能处理。 优点是可以处理突发流量 ——如果桶里有积攒的令牌，突发请求可以一次性处理。
+**Go 官方标准扩展库 golang.org/x/time/rate 的核心实现就是基于这种惰性计算（Lazy Evaluation）**
+
+在 rate.Limiter 的结构体中，你会发现根本没有任何 time.Ticker 或后台 Goroutine，只存了这几个字段：
+
+```go
+type Limiter struct {
+	mu     sync.Mutex
+	limit  Limit         // 每秒生成速率 (r)
+	burst  int           // 桶容量 (b)
+	tokens float64       // 当前剩余的令牌数 (可以带小数)
+	last   time.Time     // 上次更新 tokens 的时间戳
+	lastEvent time.Time  // 上次有事件发生的时间
+}
+
+// 每次你调用 limiter.Allow()、limiter.Wait() 或 limiter.Reserve() 时，底层都会先调用一个叫 advance 的内部函数。
+// 源码简化版逻辑：根据时间流逝，推进并计算当前的 tokens
+func (lim *Limiter) advance(now time.Time) (newNow time.Time, newTokens float64) {
+	last := lim.last
+	if now.Before(last) {
+		last = now
+	}
+
+	// 1. 计算时间差：从上次到现在过去了多久
+	elapsed := now.Sub(last)
+	
+	// 2. 计算这段时间应该补充多少令牌：时间差 * 速率
+	delta := lim.limit.tokensFromDuration(elapsed)
+	
+	// 3. 累加令牌，但不能超过容量上限 (burst)
+	tokens := lim.tokens + delta
+	if burst := float64(lim.burst); tokens > burst {
+		tokens = burst
+	}
+	
+	return now, tokens
+}
+
+```
+
+### 为什么tokens是小数
+
+假设每秒 3 个令牌：
+- 理论上每约 333ms 应该补 1 个。
+- 若只用“每秒整数补充”，就会在整秒时突然加 3 个请求额度：前 999ms 全部拒绝，1 秒整又突然允许 3 个。
+- float64 可以随着时间累计 3 × elapsedSeconds，到约 333ms、666ms、1s 分别形成可用令牌，限流更均匀。
