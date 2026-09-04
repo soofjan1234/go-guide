@@ -23,54 +23,72 @@
 
 \section{\faInfoCircle\ Basic Information}
 \vspace{0.5ex}
-\begin{minipage}{0.72\textwidth}
+\begin{minipage}[t]{0.48\textwidth}
 \begin{itemize}[label=,leftmargin=*]
 \large
 \item \textbf{Current Status:} \textbf{Employed in Shenzhen}
 \item \textbf{Availability:} \textbf{2 weeks}
-\item \textbf{Education:} \textbf{Full-time Bachelor's Degree (CHSI verifiable)}
-\item \textbf{Job Preference:} In-house roles only / No client-site assignments
+\item \textbf{Education:} \textbf{Full-time Bachelor's Degree}
+\item \textbf{Job Preference:} In-house roles only 
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\begin{itemize}[label=,leftmargin=*]
+\large
 \item \textbf{WeChat:} 1489938120
 \item \textbf{Email:} \href{mailto:Soofjan1489938120@gmail.com}{Soofjan1489938120@gmail.com}
 \item \textbf{Website:} \href{https://Soofjan.com}{Soofjan.com}
 \item \textbf{Blog:} \href{https://juejin.cn/user/4074147977125020}{Technical Blog}
 \end{itemize}
 \end{minipage}
-\begin{minipage}{0.25\textwidth}
-\centering
-{\setlength{\fboxsep}{0pt}\fbox{\includegraphics[height=5cm,keepaspectratio]{photo.jpg}}}
-\end{minipage}
+% \begin{minipage}{0.25\textwidth}
+% \centering
+% {\setlength{\fboxsep}{0pt}\fbox{\includegraphics[height=5cm,keepaspectratio]{photo.jpg}}}
+% \end{minipage}
 
 \section{\faCogs\ Comprehensive Technical Skills}
 \begin{itemize}
     \item \textbf{Programming Languages}
     \begin{itemize}
-        \item In-depth understanding of the Go runtime GMP model, including the scheduling loop, work stealing, blocking handling, and goroutine preemption.
-        \item Strong knowledge of Go concurrency and internal mechanisms; familiar with the implementations of channel, slice, and map, as well as core features such as select, locks, and context.
-        \item In-depth understanding of Go memory management and performance diagnostics, including escape analysis, stack/heap allocation, memory allocators, tri-color marking, write barriers, and GC.
-        \item Hands-on experience with Vue, React, and Android, with the ability to work across multiple platforms.
+        \item Go runtime: GMP scheduling, work stealing, blocking, and goroutine preemption.
+        \item Go internals and concurrency: channel, slice, map, select, locks, and context.
+        \item Go memory and profiling: escape analysis, allocation, tri-color marking, write barriers, and GC.
+        \item Hands-on experience with Vue, React, and Android.
     \end{itemize}
 
     \item \textbf{Databases and Middleware}
     \begin{itemize}
-        \item Strong knowledge of MySQL InnoDB, including the Buffer Pool, transactions, isolation, MVCC, indexes, internal logging mechanisms, and slow-query analysis.
-        \item Strong knowledge of Redis data structures and internal implementations; familiar with expiration, persistence, cache penetration/breakdown/avalanche, and cache-database consistency solutions.
-        \item Foundational knowledge of RabbitMQ, including duplicate-message and message-loss handling; familiar with the selection considerations for Kafka and RocketMQ.
-        \item Working knowledge of full-text search and the Bleve search engine; understand tokenization and inverted indexes, with experience optimizing index memory usage and query performance.
+        \item MySQL InnoDB: Buffer Pool, transactions, isolation, MVCC, indexes, logs, and slow queries.
+        \item Redis: data structures, expiration, persistence, cache failures, and cache-database consistency.
+        \item RabbitMQ: duplicate/lost message handling; familiar with Kafka and RocketMQ trade-offs.
+        \item Full-text search: Bleve, tokenization, and inverted indexes.
     \end{itemize}
 
     \item \textbf{Engineering Fundamentals}
     \begin{itemize}
-        \item Familiar with core networking protocols and mechanisms, including HTTP/HTTPS, NAT, DNS, and TCP/UDP.
-        \item Familiar with Docker-based containerized deployment and the Kubernetes architecture.
-        \item Familiar with the AI Agent technology stack, including Transformer architectures, agent paradigms, LangChain, memory, and context engineering.
+        \item Networking: HTTP/HTTPS, NAT, DNS, and TCP/UDP.
+        \item Docker deployments and Kubernetes architecture.
+        \item AI Agents: Transformers, agent paradigms, LangChain, memory, and context engineering.
     \end{itemize}
 
     \item \textbf{Additional Strengths}
     \begin{itemize}
-        \item Passionate about programming and open source; proficient in using AI tools such as Codex and Cursor to improve development efficiency.
-        \item Committed to technical sharing and community building, with 200+ educational videos and articles and 1K+ total likes and bookmarks.
+        \item Use Codex and Cursor to improve engineering productivity.
+        \item Published 200+ technical videos/articles, earning 1K+ likes and bookmarks.
     \end{itemize}
+\end{itemize}
+
+\section{\faCode\ Personal Projects}
+\paragraph*{Go Coding Agent}\mbox{}\\
+{\small
+\noindent\textcolor{gray}{\textbf{Tech Stack:} Go, LLM, Tool Calling, Multi-Agent, Prompt Engineering}
+}
+\vspace{0.3ex}
+
+\begin{itemize}
+    \item Built a Go multi-agent framework with Simple, ReAct, Reflection, and Plan-and-Solve agents, integrating model calls, tools, and iterative reasoning.
+    \item Added Skills and sub-agent delegation with on-demand loading, caching, permission isolation, and summary feedback.
+    \item Added token-budgeted context compression, content filtering, output truncation, and session recovery.
 \end{itemize}
 
 \section{\faGraduationCap\ Education}
@@ -85,8 +103,8 @@
 
 \paragraph*{Private Cloud Storage System (NAS) Development}\mbox{}\\
 {\small
-\noindent NAS (Network Attached Storage) is a private cloud storage device deployed on a local network, providing file storage, backup, and remote access capabilities.\\
-\noindent\textcolor{gray}{\textbf{Tech Stack:} Go, Gin, Gorm, MySQL, SQLite, Bleve, P2P, Docker, RKNN, OpenCV, RAG, LLM}
+\noindent Private NAS platform for file storage, backup, and remote access.\\
+\noindent\textcolor{gray}{\textbf{Tech Stack:} Go, Gin, Gorm, MySQL, SQLite, Bleve, P2P, Docker, RKNN, OpenCV}
 }
 \vspace{0.3ex}
 \vspace{0.3ex}
@@ -94,29 +112,58 @@
 \begin{itemize}
 
     \item \textbf{Document Center:}
+    {\small
+    \noindent\textcolor{gray}{Built multi-format document sync, parsing, indexing, search, and filtering.}
+    }
+    \vspace{0.2ex}
     \begin{itemize}
-        \item Built an end-to-end document synchronization, parsing, indexing, and retrieval pipeline, supporting automatic format detection and content extraction for PDF, Word, Excel, PPT, Markdown, HTML, EPUB, and other document types.
-        \item Built lightweight Bleve-based search for memory-constrained environments, enabling fast full-text retrieval and multidimensional filtering.
-        \item Designed a block-based indexing strategy and search-result aggregation algorithm to address excessive memory usage when indexing large documents, reducing peak heapInuse by approximately 76\%+.
-        \item Used CJDict tokenization and replaced substring + map lookup with compressed Trie longest-match, reducing total trace time by approximately 48\% and process user CPU by approximately 63\%.
+        \item Built a sync-to-search pipeline supporting PDF, Word, Excel, PPT, Markdown, HTML, and EPUB.
+        \item Delivered lightweight Bleve full-text search and multidimensional filtering.
+        \item Reduced peak heapInuse by 76\%+ with block-based indexing and result aggregation.
+        \item Replaced CJDict substring/map lookup with compressed-Trie longest-match, cutting trace time by 48\% and user CPU by 63\%.
     \end{itemize}
+    \vspace{1ex}
 
-    \item \textbf{AI Photo Album:}
+    \item \textbf{Photo Album:}
+    {\small
+    \noindent\textcolor{gray}{Built media sync, search, photo cleanup, albums, smart memories, and AI result management.}
+    }
+    \vspace{0.2ex}
     \begin{itemize}
-        \item Implemented tag classification through JNI wrappers and unsupervised face clustering with DBSCAN; validated model performance using LFW/WIDER Face, achieving a 0\% false-merge rate across different identities and 89\% same-person clustering accuracy.
-        \item Detected blurry photos using Laplacian variance and duplicate photos using dHash + qHash.
+        \item Built recoverable AI task coordination with SHA1 deduplication, claim tokens, conditional updates, and backoff retries.
+        \item Integrated local inference via Protobuf/gRPC over Unix sockets with status-based error handling.
+        \item Detected blur with Laplacian variance and duplicates with dHash + qHash.
+        \item Combined full/incremental scans, a CPU-adaptive worker pool, serialized SQLite writes, and cancellation to improve throughput by 41\%.
     \end{itemize}
+    \vspace{1ex}
 
-    \item \textbf{Cloud Services:}
+    \item \textbf{MediaAI:}
+    {\small
+    \noindent\textcolor{gray}{Led a local AI platform for model management, NPU scheduling, ASR, TTS, detection, and face analysis.}
+    }
+    \vspace{0.2ex}
     \begin{itemize}
-        \item Led the design of a NAT traversal interaction architecture, standardizing communication flows among clients, backend services, cloud services, and traversal components to provide stable and efficient access across complex network environments.
-        \item Implemented dual-layer encryption using application-layer AES + RSA and transport-layer TLS to protect credentials and sensitive fields during transmission across complex networks.
+        \item Built cosine-distance face clustering; achieved 0\% cross-person false merges and 89\% same-person accuracy on LFW/WIDER Face.
+        \item Designed NPU lease scheduling with priorities, deadlines, P0 fairness, and heartbeat-based reclamation.
     \end{itemize}
+    \vspace{1ex}
+
+     \item \textbf{Cloud Services:}
+    {\small
+    \noindent\textcolor{gray}{Built cloud signaling for device registration, NAT traversal, peer discovery, and negotiation.}
+    }
+    \vspace{0.2ex}
+    \begin{itemize}
+        \item Designed NAT traversal flows across clients, NAS services, cloud signaling, and traversal services.
+        \item Protected credentials with application-layer AES + RSA and transport-layer TLS.
+    \end{itemize}
+    \vspace{1ex}
 
     \item \textbf{Other Contributions:}
     \begin{itemize}
-        \item File indexing and synchronization system: developed a BFS + Queue architecture to replace fsnotify-based monitoring, reducing memory overhead by more than 87\% in massive-file scenarios.
-        \item Mitigated concurrent traffic spikes using rate limiting and the Ristretto caching library, reducing response time by 90 ms.
+        \item Replaced fsnotify with BFS + Queue file sync, reducing memory overhead by 87\%+ at scale.
+        \item Proxied Docker Engine APIs for image, container, network, and runtime management.
+        \item Reduced response time by 90 ms with rate limiting and Ristretto caching.
     \end{itemize}
 
 \end{itemize}
