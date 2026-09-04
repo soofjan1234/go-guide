@@ -5,6 +5,7 @@
 网络阻塞
 
 sync.Map、sync.Mutex和分段锁的使用场景
+
 dataRace
 
 CPU周期性尖刺延迟排查
@@ -59,6 +60,7 @@ k8s的基本架构
 code review怎么做
 官网访问慢怎么排查
 部分下单失败怎么排查
+令牌桶
 
 ## 项目
 
