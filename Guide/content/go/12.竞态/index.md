@@ -131,30 +131,7 @@ func value() int64 {
 
 atomic 适合很小的、独立的状态。只要涉及多个字段之间的一致性，比如“余额和流水要一起更新”，通常还是应该用锁或事务。
 
-### 5. 用不可变对象和拷贝
-
-读多写少时，可以让读者永远读不可变快照，写者创建新对象再替换。
-
-```go
-type Config struct {
-	Timeout time.Duration
-	Addr    string
-}
-
-var current atomic.Value
-
-func loadConfig() Config {
-	return current.Load().(Config)
-}
-
-func storeConfig(c Config) {
-	current.Store(c)
-}
-```
-
-读取方拿到的是一个值拷贝，不会和写入方同时修改同一个对象。
-
-### 6. 在外部系统里用事务和约束兜底
+### 5. 在外部系统里用事务和约束兜底
 
 很多竞态不是发生在 Go 进程内，而是发生在多个请求、多个服务、多个实例之间。
 

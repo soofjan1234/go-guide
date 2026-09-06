@@ -5,48 +5,41 @@ date: 2026-05-27
 draft: false
 ---
 
+## 什么是RPC
+
 RPC（Remote Procedure Call，远程过程调用）是一种计算机通信协议。它的核心思想是：让调用远程计算机（服务）上的函数，就像调用本地代码中的函数一样简单、透明。
-
-# 1. 为什么需要 RPC？（RPC vs HTTP/RESTful）
-
-在单体应用时代，模块间的调用都是本地函数调用（比如 `orderService.GetOrder(id)`），直接走内存和 CPU 寄存器，速度在纳秒/微秒级。
-
-当系统演变为微服务架构后，`OrderService` 和 `UserService` 被拆分部署在不同的服务器上。如果使用传统的 HTTP/RESTful 协议通信：
-
-- 需要手动拼接 URL、处理 Query/Body。
-- 需要处理 JSON 序列化与反序列化。
-- 需要解析 HTTP 状态码、Header 等重型文本协议。
-
-RPC 的出现就是为了抹平这个网络差异。它通过封装底层的网络传输、序列化和协议解析，让程序员在代码层面上感知不到网络的存在。
 
 ## RPC vs HTTP/RESTful 对比
 
-| 维度 | 传统 HTTP / RESTful | RPC (以 gRPC / Protobuf 为例) |
-| --- | --- | --- |
-| 核心理念 | 面向资源（URL + HTTP 动词） | 面向动作/函数（直接调用 `Service.Method`） |
-| 传输协议 | 通常是 HTTP/1.1（文本协议） | 通常基于 HTTP/2 或 TCP 自定义长连接 |
-| 数据序列化 | 通常是 JSON / XML（文本，可读性好但体积大、解析慢） | 通常是 Protobuf / Thrift（二进制，体积极小、解析极快） |
-| 契约约束 | 弱约束（靠 Swagger/OpenAPI 文档，容易失效） | 强约束（基于 `.proto` 或 IDL 文件强类型编译） |
-| 性能/吞吐 | 较慢，Header 冗余，内存分配多 | 极高，适合微服务内部高频通信 |
+1. 核心理念：HTTP 面向资源（URL + HTTP 动词）；RPC 面向动作/函数
+2. 传输协议：HTTP 通常是 HTTP/1.1（文本协议）；RPC 通常基于 HTTP/2 或 TCP 自定义长连接 
+3. 数据序列化：HTTP 通常是 JSON / XML（文本，可读性好但体积大、解析慢）；PRC 通常是 Protobuf / Thrift（二进制，体积极小、解析极快） 
+4. 契约约束：HTTP 弱约束（靠 Swagger/OpenAPI 文档，容易失效）；PRC 强约束（基于 `.proto` 或 IDL 文件强类型编译） 
+5. 性能/吞吐：HTTP 较慢，Header 冗余，内存分配多；PRC 极高，适合微服务内部高频通信 
 
----
+### Protobuf + gRPC  vs  HTTP + JSON
 
-# 2. RPC 的核心工作流程（透明调用的秘密）
+.proto + gRPC 往往更合适：
+- 字段和类型固定，改接口时更容易发现双方不兼容。
+- 自动生成 Go/C++ 等客户端代码，少手写请求和响应解析。
+- 二进制编码通常更小、更快。
+- 原生支持 deadline、取消、流式调用和标准状态码。
+- 很适合 Unix Domain Socket 的本机进程通信。
 
-RPC 能做到“像调用本地函数一样”，底层靠的是 Stub（存根/代理）机制。整个过程可以拆解为经典的 8 个步骤：
+但 HTTP + JSON 也有明显优势：
+- 浏览器、脚本、curl 都能直接调用和调试。
+- 对外开放 API 更通用，文档和排障门槛低。
+- 数据结构经常变化、调用方语言杂时更灵活。
 
-1. Client（调用方）：像调用本地方法一样，发起对 `Client Stub` 的函数调用：`GetUserInfo(req)`。
-2. Client Stub（客户端存根）：将调用的方法名、参数打包，并调用序列化器将数据转为二进制字节流（如 Protobuf/JSON）。
-3. Network Transport（网络传输）：客户端网络库通过 TCP/HTTP2 长连接将二进制数据包发送给目标服务器。
-4. Server Transport（服务端网络层）：服务端网卡接收到数据包，递交给 `Server Stub`。
-5. Server Stub（服务端存根）：拿到二进制字节流，进行反序列化，还原出原始的方法名和参数结构体。
-6. Local Call（本地服务执行）：`Server Stub` 根据方法名，调用服务端本地真正实现的 `UserService.GetUserInfo()` 函数。
-7. Return Response（返回结果）：本地函数执行完毕，结果按照相反的路径（本地返回 $\rightarrow$ 序列化 $\rightarrow$ 网络传输 $\rightarrow$ 反序列化）送回 Client。
-8. Client 拿到结果：`Client Stub` 解包出最终的 `resp` 结构体，`GetUserInfo` 函数返回，完成一次调用。
+## RPC 的核心工作流程
 
----
+你写业务时调的是本地函数，真正发出去的是 Stub：
 
-# 3. RPC 框架的核心四大组件
+1. Client Stub：方法名 + 参数 → 序列化 → 丢给网络
+2. Server Stub：字节流 → 反序列化 → 调本地真正的实现
+3. 结果原路回来，Client Stub 拆成 resp 给你
+
+## RPC 框架的核心四大组件
 
 现代工业级的 RPC 框架（如 gRPC、Dubbo、Kitex）不仅仅是简单的“网络+序列化”，它通常包含以下四大核心能力：
 
@@ -74,20 +67,6 @@ RPC 能做到“像调用本地函数一样”，底层靠的是 Stub（存根/�
 - 负载均衡（Load Balancing）：客户端本地进行 Round-Robin、随机、加权或最小连接数轮询。
 - 熔断限流与降级（Circuit Breaker / Rate Limiting）：防止单点故障引发雪崩。
 - 链路追踪与可观测性（Tracing）：注入 `TraceID` / `SpanID`，打通 OpenTelemetry / Jaeger 链路。
-
-## Protobuf + gRPC  vs  HTTP + JSON
-
-.proto + gRPC 往往更合适：
-- 字段和类型固定，改接口时更容易发现双方不兼容。
-- 自动生成 Go/C++ 等客户端代码，少手写请求和响应解析。
-- 二进制编码通常更小、更快。
-- 原生支持 deadline、取消、流式调用和标准状态码。
-- 很适合 Unix Domain Socket 的本机进程通信。
-
-但 HTTP + JSON 也有明显优势：
-- 浏览器、脚本、curl 都能直接调用和调试。
-- 对外开放 API 更通用，文档和排障门槛低。
-- 数据结构经常变化、调用方语言杂时更灵活。
 
 ## 为什么不适用HTTP/3 
 

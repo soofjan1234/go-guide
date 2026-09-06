@@ -24,15 +24,13 @@ Prompt 决定了模型的起点，而上下文工程（Context Engineering）决
 
 上下文工程就是为了解决这些矛盾而生的**动态信息调度学科**。
 
-## 上下文工程
-
-### ① 动态检索与筛选（Retrieval & Filtering）
+## ① 动态检索与筛选（Retrieval & Filtering）
 
 根据当前任务，从庞大的外部世界中精确提取**最相关**的信息切片。
 
 ![](pic/多路召回和重排.png)
 
-#### 1. **多路召回：**
+### 1. **多路召回：**
 
 没有任何单一的检索方式能完美胜任所有场景。多路召回的精髓在于**优势互补**：
 
@@ -44,18 +42,18 @@ Prompt 决定了模型的起点，而上下文工程（Context Engineering）决
 
 怎么把不同来源的分数合并？最工业级且高效的处理方案是 **RRF (Reciprocal Rank Fusion，倒数排名融合)** 算法：它**不看绝对分值，只看相对排名**。
     
-#### 2. **重排（Reranking）：**
+### 2. **重排（Reranking）：**
 
 使用 Cross-Encoder 等重排模型对召回结果进行二次打分，确保最优质的信息排在最前面。
     
 
-### ② 上下文压缩与精炼（Context Compression）
+## ② 上下文压缩与精炼（Context Compression）
 
 在不丢失核心语义的前提下，大幅削减进入 Context Window 的 Token 数量。
 
 ![](pic/上下文压缩与精炼.png)
 
-#### 1. **摘要化（Summarization）：** 
+### 1. **摘要化（Summarization）：** 
 
 针对长文档（RAG 场景）或长轮次对话历史（Agent 场景），直接拼接原文会导致 Token 迅速爆满：
 
@@ -72,16 +70,16 @@ Prompt 决定了模型的起点，而上下文工程（Context Engineering）决
 	    - **增量写入：** 小模型读取“现有的长期总结” + “刚刚滑出窗口的那一轮对话”，生成**新的长期总结（New Memory State）**，覆盖掉旧的状态。
 	    - 这个过程是增量（Incremental）的，类似于：新记忆 = 压缩算法(旧记忆 + 新流出的碎片)。
     
-#### 2. **Token 级剪枝：**
+### 2. **Token 级剪枝：**
 
 使用 LLMLingua 等算法，剔除自然语言中的冗余词（如介词、过渡词），仅保留关键语法主干。
     
-#### 3. **信息抽象（Extraction）：** 
+### 3. **信息抽象（Extraction）：** 
 
 遇到长表格或复杂 JSON 时，仅抽取与当前问题匹配的键值对或特定字段。
     
 
-### ③ 动态生命周期管理（Lifecycle & Decay）
+## ③ 动态生命周期管理（Lifecycle & Decay）
 
 模拟人脑的“工作记忆”与“遗忘曲线”，决定哪些信息该留、哪些该丢、哪些该沉淀到外部存储。
 
@@ -94,7 +92,7 @@ Prompt 决定了模型的起点，而上下文工程（Context Engineering）决
 - **遗忘与更新（Forget & Overwrite）：** 当用户修正偏好或任务状态改变时，及时在 Context 中覆盖旧规则，防止产生逻辑冲突。
     
 
-### ④ 结构化装配与布局优化（Structuring & Placement）
+## ④ 结构化装配与布局优化（Structuring & Placement）
 
 “信息放在哪”和“信息怎么排”对模型理解效率影响极大。
 
@@ -117,7 +115,7 @@ graph TD
 2.  **语义标签隔离：** 使用清晰的 XML 标签（如 `<context>`、`<rules>`、`<history>`）或 Markdown 标记严格区分不同来源的信息，避免模型产生“把参考文档当成用户指令”的伪造攻击（Prompt Injection）。
     
 
-### ⑤ 状态与缓存管理（State & Caching）
+## ⑤ 状态与缓存管理（State & Caching）
 
 ![](pic/状态与缓存管理.png)
 
