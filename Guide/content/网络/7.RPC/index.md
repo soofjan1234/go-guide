@@ -11,6 +11,8 @@ RPC（Remote Procedure Call，远程过程调用）是一种计算机通信协�
 
 ## RPC vs HTTP/RESTful 对比
 
+![](pic/RPCvsHTTP.png)
+
 1. 核心理念：HTTP 面向资源（URL + HTTP 动词）；RPC 面向动作/函数
 2. 传输协议：HTTP 通常是 HTTP/1.1（文本协议）；RPC 通常基于 HTTP/2 或 TCP 自定义长连接 
 3. 数据序列化：HTTP 通常是 JSON / XML（文本，可读性好但体积大、解析慢）；PRC 通常是 Protobuf / Thrift（二进制，体积极小、解析极快） 
@@ -18,6 +20,15 @@ RPC（Remote Procedure Call，远程过程调用）是一种计算机通信协�
 5. 性能/吞吐：HTTP 较慢，Header 冗余，内存分配多；PRC 极高，适合微服务内部高频通信 
 
 ### Protobuf + gRPC  vs  HTTP + JSON
+
+![](Protobuf对比Json.png)
+
+```proto
+message User {
+    int32 user_id = 1;  // 唯一代号/编号 Tag
+    string name   = 2;  // 这个字段的代号是 2
+}
+```
 
 .proto + gRPC 往往更合适：
 - 字段和类型固定，改接口时更容易发现双方不兼容。

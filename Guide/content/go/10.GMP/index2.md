@@ -125,10 +125,10 @@ Go 的抢占演进有两步：
 
 **流程**
 1. G 在 Read/Write 里试了一下，发现现在搞不定
-2. G 会进入等待，并把 「这个 G ↔ 这个 fd ↔ 关心的事件（读/写）」 记到 pollDesc 一类结构里
-3. M 去跑别的 G 
-4. 内核通过 epoll 等机制报告 fd 就绪
-5. netpoll 处理结果，把 G 设回 runnable，返回本地或全局
+2. G 会进入等待，并把 「这个 G ↔ 这个 fd ↔ 关心的事件（读/写）」 记到 pollDesc 一类结构里，M 去跑别的 G 
+3. Netpoller 会把这个 fd 注册到 epoll
+4. Poller/Selector 线程多路复用监听epoll，内核通过 epoll 等机制报告 fd 就绪
+5. Netpoller 处理结果，把 G 设回 runnable，返回本地或全局
 6. 之后 G 再被调度，重试 Read/Write，这时再做系统调用把 I/O 做完
 
 **补充知识**
