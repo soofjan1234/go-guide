@@ -16,24 +16,18 @@ draft: false
 
 ##  PDF、Word、Excel、PPT、Markdown、HTML、EPUB 分别怎么解析？
 
-- PDF：通过pdftotext解析
-
-- Word：docx 直接读取 docx 内部 XML，提取 w:t 文本节点；doc 会通过 antiword 解析。
-- Excel：使用 excelize 打开 xlsx，遍历 sheet 和 row，把单元格内容拼成文本。
-- PPT：pptx 本质是 zip 包，读取 ppt/slides/slide*.xml，按页码排序后提取 a:t 文本节点。
-
-- Markdown：先用 Markdown parser 转成 HTML，再用 HTML 解析器提取纯文本。
-- HTML：用 goquery 解析 DOM，然后提取 text。
-
-- TXT：会先做编码检测，如果不是 UTF-8，就转换成 UTF-8 后再读取。
-- EPUB：先解压 EPUB，再按 EPUB 内部章节顺序提取文本。
+1. pdf 通过pdftotext解析; doc 会通过 antiword 解析，wv兜底
+2. docx、xlsx、pptx：底层就是解压 Zip -> 遍历 DOM 树 -> 过滤提取文本节点
+3. html 用 goquery 解析 DOM，然后提取 text；md 是转为 html 再提取。
+4. txt 会先做编码检测，如果不是 UTF-8，就转换成 UTF-8 后再读取。
+5. epub 先解压，再按 EPUB 内部章节顺序提取文本。
 
 ## 为什么不用其它方法
 
 1. Apache Tika：极度稳定、格式支持最全，但是基于JVM环境
-2. Pandoc：内存占用高
+2. Docling\RapidDoc\MarkItDown：都需要python环境，cpu、内存占用效果不如第三方库
 3. LibreOffice：还原度最高，支持老旧格式，但是太重
-4. Docling\RapidDoc\MarkItDown：都需要python环境，cpu、内存占用效果不如第三方库
+4. Pandoc：内存占用高
 
 我选型时优先考虑四个指标：格式覆盖、文本抽取质量、部署成本、失败可控性
 
@@ -44,15 +38,19 @@ ES虽然功能强大，但更适用于大规模分布式场景，需要 Java 环
 
 Bleve，就像sqlite，完全嵌入式，同时是go原生，无需额外服务，从而降低运维成本并提升部署效率。
 
-Meilisearch搜索比bleve快，建立比bleve慢，更适合千万级文档；
+Meilisearch搜索比bleve快，更适合千万级文档；
 
 ZincSearch 中文分词有问题，并且项目很久没更新，成熟度不足
 
-SQLite FTS5更适合单机、轻量、简单查询、数据和 SQLite 强绑定的场景
+无论是评价 SQLite、MySQL 还是 PostgreSQL，背后的核心逻辑都是在做工程折中（Trade-off）。它们的核心矛盾都在于：用关系型数据库去兼职做搜索引擎，在面对‘中文分词’和‘搜索体验（高亮/排序）’时，边际成本骤增，而边际效应骤降。
 
-MySQL 的 FULLTEXT 索引能做简单全文检索，但文档中心需要中文分词与高亮等，用 MySQL 要么要自己拼，维护成本高
+## 做了什么测试
 
-PostgreSQL，为了搜索引入一整套数据库”，收益不足以覆盖成本，GIN只是一种倒排索引结构，不等于完整的中文搜索方案
+在同一套语料、相同 4 核 4G 资源下，分别跑了 5 轮。
+
+Meilisearch 确实快一些，但没有快到两倍 QPS，延迟也没有降到 Bleve 的一半；而 Bleve 的 180ms 已经满足我们 500ms 的目标。对于单机私有化部署，Bleve 可以直接嵌在 Go 服务里，不需要额外部署、监控和维护一个搜索服务。  
+
+所以这个阶段我们选 Bleve：它已经满足性能和稳定性目标。
 
 ## 怎么没有用这个 AI 搜索 / 向量搜索？
 
