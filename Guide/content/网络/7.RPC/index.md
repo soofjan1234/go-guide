@@ -9,6 +9,10 @@ draft: false
 
 RPC（Remote Procedure Call，远程过程调用）是一种计算机通信协议。它的核心思想是：让调用远程计算机（服务）上的函数，就像调用本地代码中的函数一样简单、透明。
 
+### gRPC呢？
+
+gRPC 是 Google 开源的 RPC 框架，默认 HTTP/2 + Protobuf。一份 `.proto` 能生成多种语言的客户端/服务端，所以能跨语言调用。
+
 ## RPC vs HTTP/RESTful 对比
 
 ![](pic/RPCvsHTTP.png)
