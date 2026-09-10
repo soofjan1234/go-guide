@@ -216,7 +216,13 @@ healthcheck:
 
 2. restart：崩溃重启策略
 
-- restart: unless-stopped
+- no：默认，容器退出时不进行任何自动重启。
+- on-failure：只有当容器的退出状态码（Exit Code）不为 0（表示由于错误而崩溃/异常退出）时，Docker 才会重启它。可以选择最大重试次数
+- always：总是重启
+- unless-stopped: 
+  - 与 always 非常相似，唯一的区别在于如何对待手动停止的容器。
+  - 如果容器被你手动执行了 docker stop，或者在 Docker 守护进程关闭前已经是停止状态，那么当 Docker 守护进程/宿主机重启后，它不会被自动启动。
+  - 只有在关机前处于运行状态的容器，才会在重启后恢复运行
 
 3. logging：日志滚动限制
 

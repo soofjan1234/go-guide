@@ -13,6 +13,41 @@ RPC（Remote Procedure Call，远程过程调用）是一种计算机通信协�
 
 gRPC 是 Google 开源的 RPC 框架，默认 HTTP/2 + Protobuf。一份 `.proto` 能生成多种语言的客户端/服务端，所以能跨语言调用。
 
+### 四种 gRPC 调用模型
+
+gRPC 不只有“请求一次、返回一次”，服务方法在 `.proto` 中可定义为四种模型：
+
+```proto
+service PhotoService {
+    // 1. 一元 RPC：一次请求，对应一次响应。
+    rpc GetPhoto(PhotoRequest) returns (PhotoResponse);
+
+    // 2. 服务端流：客户端请求一次，服务端连续返回多条消息。
+    rpc WatchProgress(TaskRequest) returns (stream Progress);
+
+    // 3. 客户端流：客户端连续上传多条消息，最后得到一次响应。
+    rpc UploadPhoto(stream PhotoChunk) returns (UploadResult);
+
+    // 4. 双向流：两端都可连续发送消息，读写相互独立。
+    rpc Chat(stream ChatMessage) returns (stream ChatMessage);
+}
+```
+
+1. **一元 RPC（Unary）**：最常用，适合查询照片、创建任务等普通请求/响应场景。
+2. **服务端流（Server streaming）**：适合订阅任务进度、日志或持续推送结果；客户端发完一个请求后持续读取服务端消息。
+3. **客户端流（Client streaming）**：适合分片上传文件、批量上报数据；客户端写完多条消息后，服务端统一处理并返回结果。
+4. **双向流（Bidirectional streaming）**：适合实时聊天、协同编辑或持续交互；客户端和服务端可以各自独立地读写消息。
+
+同一个流中的消息顺序由 gRPC 保证；不同 RPC 之间不应假定存在全局顺序。
+
+### gRPC Metadata
+
+Metadata 是附着在**一次 RPC 调用**上的键值对，类似 HTTP Header，但不属于 `.proto` 定义的业务消息。它通常随请求或响应的 Header 发送，服务端还可以在调用结束时通过 Trailer 返回附加信息。
+
+- 适合放鉴权凭证、TraceID、请求 ID、租户标识、灰度标记等跨接口通用信息。
+- 业务字段，例如 `photo_id`、文件内容、任务参数，仍应放在 Protobuf message 中，不能借 Metadata 绕开接口契约。
+- Metadata 的 key 是字符串；二进制值通常使用以 `-bin` 结尾的 key。`grpc-` 前缀由 gRPC 保留，业务方不能使用。
+
 ## RPC vs HTTP/RESTful 对比
 
 ![](pic/RPCvsHTTP.png)
