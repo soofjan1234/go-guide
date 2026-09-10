@@ -7,59 +7,65 @@ draft: false
 
 # AI 异步任务协调器
 
-## 步骤
+相册发起分析请求
 
-1. 添加任务时，使用 SHA1 去重：同一内容只推理一次
-
-2. 领取任务时拿到处理权凭证 claim token
-
-worker 不能先查出 `pending` 再自行处理，因为两个 worker 可能同时查到同一条任务。
-
-因此领取时会做一次原子条件更新：
-
-```text
-UPDATE media_ai_tasks
-SET state = 'processing',
-    claim_token = '本次随机令牌',
-    attempts = attempts + 1
-WHERE id = ?
-  AND state IN ('pending', 'failed_retryable')
-  AND next_attempt_at <= 当前时间;
+```
+文件同步 / 开启 AI
+        │
+        │ 创建持久化任务，只记录 SHA1
+        ▼
+media_ai_tasks 任务表
+        │
+        │ 唤醒
+        ▼
+AI 异步任务协调器
+        │
+        │ 领取任务、选路径、检查文件
+        ▼
+rknnAISvc.AnalyzePhoto
 ```
 
-谁成功把 pending 原子改成 processing，谁才真正拥有处理权。
+相册进程启动时，会把处于 processing 的遗留任务恢复成 pending。后续旧 worker 即使迟到，也会因为 claim_token 已失效而无法覆盖状态。
 
-3. 条件更新：旧 worker 不能覆盖新 worker
+## 单个协调器
 
-完成任务时，不能只根据任务 ID 更新，而是必须同时满足：
+1. 不断串行处理任务；
+2. 有新任务时通过 channel 快速唤醒；
+3. 即使唤醒信号丢失，也会每秒轮询一次任务表；
+4. 任务存在 SQLite 中，进程重启后不会全部消失。
 
-```sql
-WHERE id = ?
-  AND state = 'processing'
-  AND claim_token = ?
+## 领任务
+
+只领取以下两类到期任务：
+1. pending
+2. failed_retryable 且已到 next_attempt_at
+
+领取顺序为：
+1. next_attempt_at 最早的优先
+2. 相同时，任务 ID 更小的优先
+
+领取成功后，数据库会原子更新：
+```
+state                 = processing
+attempts              = attempts + 1
+processing_started_at = 当前时间
+claim_token           = 新 UUID
 ```
 
-也就是说，只有“任务仍在处理中，并且 token 仍是我当初领取的那个”的 worker 才能提交结果。
+claim_token 可以理解为这次领取任务的“工作凭证”。后面只有持有当前凭证的 worker，才有权提交结果，防止旧 worker 覆盖新结果。
 
-解决“旧 worker 晚回来覆盖新状态”。
-
-4. 为什么重启后任务能恢复
-
-任务状态不放在内存队列，而是持久化在 SQLite：
-
-- `processing_started_at`：本次处理从什么时候开始；
-- `state`：当前状态；
-- `claim_token`：当前处理权属于谁；
-- `attempts`、`next_attempt_at`：重试调度信息。
-
-服务启动时，会把超过处理时限、仍停留在 `processing` 的任务恢复为可领取状态。新 worker 领取后会获得新 token；旧进程即便随后恢复，也失去提交权。
-
-旧 worker 的结果写入靠 claim token 做条件更新来隔离；NPU 租约过期只能回收调度权，不能假设已在执行的 rknn_run 被中断。只有确认旧进程退出、推理返回，或 watchdog 完成恢复后，才能把物理 NPU 安全分配给新 worker。
+领任务后，查看是否已经有持久化人脸结果？
+- 有就直接把任务标记为 success，不再调用
+- 否则检查并发送请求：
+  request_id:      "本次调用的唯一编号"
+  deadline:        "一分钟后必须结束"
+  sha1:            "这张照片内容的身份"
+  absolute_path:   "/实际照片路径/a.jpg"
 
 # gRPC 状态码
 
-- 参数、权限、文件有问题会中止
-- 服务不可用、连接超时默认可重试
+- 参数错误、权限错误、资源明确不存在时，任务进入 failed_terminal，不再自动重试。
+- 暂时找不到可用图片路径、文件状态查询失败、服务不可用或调用超时时，任务进入 failed_retryable，按退避时间重试
 
 ## 搜索
 

@@ -18,3 +18,17 @@ JOIN = 根据关联条件，把两张（或多张）表横向拼接。
 JOIN 是否快，主要取决于关联字段有没有索引。
 
 没有 ON（或关联条件错误）就会产生笛卡尔积，结果集会按 A × B 的数量爆炸。
+
+```
+SELECT * FROM user u CROSS JOIN device d;
+```
+
+注意：MySQL 官方至今不支持 FULL JOIN 语法！
+
+如何实现：在 MySQL 中需要通过 LEFT JOIN 和 RIGHT JOIN 配合 UNION 来模拟：
+
+```
+SELECT * FROM user u LEFT JOIN device d ON u.id = d.user_id
+UNION
+SELECT * FROM user u RIGHT JOIN device d ON u.id = d.user_id;
+```
