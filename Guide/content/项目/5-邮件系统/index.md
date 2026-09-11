@@ -9,13 +9,13 @@ draft: false
 
 把历史客服回复和FAQ沉淀为知识库，用户发邮件后利用RAG技术找到相似的并生成草稿，最后人工审核发布。
 
-## 技术选型
+# 技术选型
 
-### Python
+## Python
 
-项目瓶颈主要在模型调用、业务迭代，吞吐并不高，Python 能降低 AI 能力集成和效果验证成本
+项目主要在模型调用、业务迭代，吞吐并不高，Python 的 AI 生态和实验效率更适合当前 MVP
 
-### FastAPI
+## FastAPI
 
 1. FastAPI 基于 ASGI，适合异步 HTTP 接口：邮件系统有大量外部IO，比如调用模型网关、查询PostgreSQL
 2. FastAPI 与 Pydantic 集成后，可以统一处理参数校验：这个项目的数据结构较多
@@ -25,12 +25,12 @@ draft: false
 1. Flask 更轻，但项目需要类型校验、OpenAPI、异步接口和较多业务契约。如果用 Flask，这些能力通常需要额外组合多个扩展；FastAPI 在这些方面提供了相对统一的默认方案
 2. Django 的后台管理、ORM很成熟，对于当前项目可能稍重
 
-### PostgreSQL
+## PostgreSQL
 
 1. 项目需要同时完成关系数据存储、全文关键词检索和向量语义检索。PostgreSQL 配合 GIN 和 pgvector，可以在一套数据库中完成三种能力，减少引入 Elasticsearch、Milvus 后的数据同步和运维成本。
 2. 如果去掉知识检索需求，MySQL 同样能够满足这个项目的常规业务功能。
 
-### pgvector
+## pgvector
 
 pgvector 是 PostgreSQL 的向量扩展；Milvus 是独立的专业向量数据库。
 
@@ -38,7 +38,13 @@ pgvector 是 PostgreSQL 的向量扩展；Milvus 是独立的专业向量数据�
 2. 如果引入Milvus，维护增多，数据库一致性要处理
 3. 项目规模，向量达到千万级、并发检索成为独立瓶颈后，再考虑迁移到 Milvus
 
-## 业务
+## LangGraph
+
+1. 本项目选择 LangGraph，主要因为需要展示非线性的高级 RAG 工作流：查询改写、证据评估、生成校验、有上限的循环重试、多分支路由和人工兜底。
+2. LangGraph 可以通过 Conditional Edges 和 Cycles 显式表达这些路径，并通过 Checkpoint 和 Interrupt 保存、暂停及恢复工作流。  
+3. 它替代的是自研 Agent 流程状态机，不替代邮件、审核、知识库等业务表，也不替代权限校验、审计记录和副作用幂等机制。
+
+# 业务
 
 ### 拉取怎么拉取的
 
