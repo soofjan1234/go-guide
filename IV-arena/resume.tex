@@ -19,7 +19,7 @@
 \begin{document}
 \pagenumbering{gobble}
 
-\name{侯汶政｜Go后端工程师}
+\name{侯汶政｜后端/全栈/Agent工程师}
 
 \section{\faInfoCircle\ 基本信息}
 \vspace{0.5ex}
@@ -52,7 +52,7 @@
     \begin{itemize}
         \item 深入理解 Go runtime GMP 模型，掌握调度循环、工作窃取、阻塞处理及 goroutine 抢占。
         \item 掌握 Go 并发编程与源码机制，熟悉 channel、slice、map 等组件的实现原理，理解 select、锁及 context 等核心特性。
-        \item 深入理解 Go 内存管理与性能排查方法，掌握逃逸分析、栈/堆分配、内存分配器、三色标记、写屏障与 GC。
+        \item 深入理解 Go 内存管理与性能排查方法，掌握逃逸和泄漏分析、内存分配器与 GC 原理。
         \item 拥有 Vue/React/Android 实战经验，具备多端适应能力。
     \end{itemize}
 
@@ -65,9 +65,9 @@
     
     \item \textbf{工程基础}
     \begin{itemize}
-        \item 熟悉计算机网络核心协议，掌握 HTTP/HTTPS、NAT、DNS、TCP/UDP 等基础机制。
+        \item 熟悉 HTTP/HTTPS、TCP、DNS；结合业务做过 NAT 穿透信令，以及 gRPC + Protobuf。
         \item 熟悉 Docker 容器化部署技术，了解 k8s 架构。
-        \item 了解 AI Agent 相关技术栈，包括 Transformer 等模型架构、智能体范式、LangChain框架、记忆和上下文工程
+        \item 对Agent开发有兴趣，了解工具调用、skill、RAG、上下文管理、LangChain/LangGraph框架等基本概念。
     \end{itemize}
 
     \item \textbf{其他}
@@ -84,13 +84,14 @@
 \item 全国大学生算法设计与编程挑战赛（银奖）
 \end{itemize}
 
+\newpage
 \section{\faSuitcase\ 工作经历}
 \datedsubsection{\textbf{软件工程师 @ 慧为智能科技有限公司}}{2023.05 - 至今}
 
 \paragraph*{私有云存储系统（NAS）开发}\mbox{}\\
 {\small
 \noindent NAS（Network Attached Storage，网络附加存储）是部署于局域网内的私有云存储设备，为用户提供文件存储、备份及远程访问等能力。\\
-\noindent\textcolor{gray}{\textbf{技术栈：} Go, Gin, Gorm, MySQL, SQLite, Bleve, P2P, Docker, RKNN, OpenCV}
+\noindent\textcolor{gray}{\textbf{技术栈：} Go, Gin, Gorm, MySQL, PostgreSQL, SQLite, Bleve, gRPC, Docker, RKNN, LangGraph}
 }
 \vspace{0.3ex}
 \vspace{0.3ex}
@@ -104,9 +105,19 @@
     \vspace{0.2ex}
     \begin{itemize}
         \item 构建文档同步、解析、索引、检索一体化链路，支持 PDF、Word、Excel、PPT、Markdown、HTML、EPUB 等多类型文档的自动识别与内容抽取。
-        \item 针对内存受限环境，基于 Bleve 构建轻量级搜索能力，实现快速的全文检索与多维度筛选。
-        \item 设计基于块的索引策略与搜索结果聚合算法，解决超长文档索引阶段内存占用过高问题，峰值 heapInuse 降幅约 76\%+。
+        \item 针对内存受限环境，基于 Bleve 构建轻量级搜索能力；对超长文档采用分块索引和结果聚合，峰值 heapInuse 下降约 76\%。
         \item 使用 CJDict 词典分词，并以压缩 Trie longest-match 替代 substring + map 查词，将 Trace 总耗时降低约 48\%、进程 user CPU 降低约 63\%。
+    \end{itemize}
+    \vspace{1ex}
+
+    \item \textbf{售后邮件 Agent}：
+    {\small
+    \noindent\textcolor{gray}{负责 NAS 售后英文邮件处理：真实收件后检索产品文档与已审核案例，生成带引用的回复草稿，人工审核通过后再发出。}
+    }
+    \vspace{0.2ex}
+    \begin{itemize}
+        \item 用 LangGraph + PostgreSQL Checkpointer 编排分类、检索改写、证据评估、生成校验与人工 interrupt；出草稿 P95 约 31s，审核通过才出站。
+        \item 产品文档与历史案例分路检索（全文 + pgvector，RRF 融合）；依据不足、资料冲突或高风险时只补信息或转人工。上线 1 个月直接批准 46\%、编辑后批准 37\%、拒绝 7\%、转人工 10\%。
     \end{itemize}
     \vspace{1ex}
 
@@ -116,10 +127,8 @@
     }
     \vspace{0.2ex}
     \begin{itemize}
-        \item 基于拉普拉斯方差实现照片模糊检测；通过 dHash+qHash 算法检测重复照片。
-        \item 支持全量与增量扫描；通过 CPU 自适应 Worker Pool 并行计算，将 SQLite 持久化收敛为串行写入，并支持任务取消，吞吐提升 65.3\%。
-        \item 实现可恢复的 AI 异步任务协调器，通过 SHA1 去重、claim token、条件更新、失败分类及退避重试，解决进程重启和旧 worker 竞争导致的任务覆盖问题。
-        \item 基于 Protobuf/gRPC over Unix Domain Socket 接入本地推理服务，并按 gRPC 状态码区分可重试与终态错误。
+        \item 基于拉普拉斯方差实现照片模糊检测；通过 CPU 自适应 Worker Pool 并行计算，SQLite 串行写入并支持取消，吞吐提升 65.3\%。
+        \item 实现可恢复的 AI 异步任务协调器：任务落库，用 claim token 领取；进程重启或旧 worker 迟到时，不能覆盖新结果。
     \end{itemize}
     \vspace{1ex}
 
@@ -130,7 +139,7 @@
     \vspace{0.2ex}
     \begin{itemize}
         \item 基于余弦距离实现增量式人脸聚类，基于 LFW/WIDER Face 验证模型效果，实现不同人误合并率 0\%、同人归类准确率 89\%。
-        \item 设计 NPU 租约调度机制，支持优先级、deadline、P0 公平轮换及心跳超时回收。
+        \item 基于 Protobuf/gRPC over Unix Domain Socket 对本机业务提供接口；设计 NPU 租约调度机制，支持优先级、deadline 及心跳超时回收。
     \end{itemize}
     \vspace{1ex}
 

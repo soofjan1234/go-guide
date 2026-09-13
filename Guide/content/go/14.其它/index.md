@@ -78,9 +78,19 @@ func f() {
 
 ## 限制并发、等待、取消 +2
 
-### 1. 限制并发：两种
+三件事正交，先拆开再组合：
 
-**工人池**：固定起 `x` 个 goroutine，循环从任务通道取活。并发上限 = 工人数，多出来的任务堵在 channel 里，**不会创建 1000 个 G**。
+| 问题 | 手段 | 不管什么 |
+|---|---|---|
+| 同时最多跑几个 | 工人池 / 信号量 | 不负责超时、不负责取消 |
+| 主流程等到什么时候 | WaitGroup / select / errgroup | 不负责限制并发 |
+| 中途通知停 | `context` 或 `close(done)` | 不杀 G，也不让 `Wait()` 提前返回 |
+
+`cancel()` 只广播「该停了」。工人必须自己听 `ctx.Done()`；`do()` 要把 `ctx` 传到 HTTP/DB，进行中的调用才能停。
+
+### 1. 限制并发
+
+**工人池**：固定起 `x` 个 G，循环从任务通道取活。并发上限 = 工人数，多出来的任务堵在 channel 里，**不会创建 1000 个 G**。
 
 ```go
 tasks := make(chan int)
@@ -101,7 +111,7 @@ close(tasks) // 只有生产者关
 wg.Wait()
 ```
 
-**信号量**：`sem := make(chan struct{}, x)`，循环里先占用一个槽再 `go`。并发上限 = 缓冲大小；**acquire 要放在 `go` 之前**，否则会先拉起 1000 个 G，只是其中 `x` 个在跑、其余堵在 `sem <-`。
+**信号量**：`sem := make(chan struct{}, x)`，循环里先占槽再 `go`。并发上限 = 缓冲大小。**`sem <-` 必须在 `go` 之前**，否则会先拉起 1000 个 G，只是其中 `x` 个在跑、其余堵在 `sem <-`。
 
 ```go
 sem := make(chan struct{}, x)
@@ -121,92 +131,18 @@ wg.Wait()
 | | 工人池 | 信号量 |
 |---|---|---|
 | 同时跑的任务 | `x` | `x` |
-| goroutine 数量 | 恒为 `x` | 约 `x`（acquire 在 `go` 前） |
-| 适合 | 任务流长、要复用工人 | 一次性 N 个任务、写法简单 |
+| goroutine 数量 | 恒为 `x` | 约 `x`（占槽在 `go` 前） |
+| 适合 | 任务流长、复用工人 | 一次性 N 个任务、写法简单 |
 
-### 2. 等待：两种（语义不同）
+### 2. 等待
 
-- **WaitGroup**：等**全部**结束。`Wait()` 不能被取消、不能超时，计数变 0 才返回。
-- **select + 结果通道**：等**一个事件**（成功 / 失败 / `ctx.Done()`），主流程可以先返回。结果通道必须带缓冲（容量 1），否则超时后无人接收，工人卡在发送上泄漏。见 Context 节。
+三种语义，不要混：
 
-要「全部结束 + 谁先错谁取消其余」，用 `errgroup.WithContext`（内部仍是 WaitGroup + ctx）。
+1. **WaitGroup**：等**全部**结束。`Wait()` 不能取消、不能超时，计数到 0 才返回。
+2. **select + 结果通道**：等**一个事件**（成功 / 失败 / `ctx.Done()`），主流程可以先返回。结果通道必须缓冲（容量 1），否则超时后无人接收，工人卡在发送上泄漏。
+3. **errgroup.WithContext**：要「全部结束 + 谁先错谁取消其余」。内部仍是 WaitGroup + ctx。
 
-### 3. 取消：信号一样，退出路径不同
-
-取消/超时都是 **`ctx, cancel := WithCancel/WithTimeout`，工人 `select` 监听 `ctx.Done()`**（或自己 `close(done)`）。`cancel()` 只是广播「该停了」，**不会把已经在跑的 G 杀掉**，也不会让 `wg.Wait()` 提前返回。
-
-因此和上面两种模型绑定时：
-
-1. **工人池**：`cancel` 之后工人必须在「取任务」处 `select`，否则还会把通道里剩余任务做完。主循环也要停投递。只 `close(tasks)` 是「没有新任务了」，不是取消正在执行的 `do()`；`do()` 内部还要把 `ctx` 传到 HTTP/DB。
-
-```go
-ctx, cancel := context.WithCancel(context.Background())
-defer cancel()
-
-tasks := make(chan int)
-var wg sync.WaitGroup
-for i := 0; i < x; i++ {
-    wg.Add(1)
-    go func() {
-        defer wg.Done()
-        for {
-            select {
-            case <-ctx.Done():
-                return
-            case t, ok := <-tasks:
-                if !ok {
-                    return
-                }
-                do(ctx, t) // 进行中的活也要能停
-            }
-        }
-    }()
-}
-
-loop:
-for _, t := range jobs {
-    select {
-    case <-ctx.Done():
-        break loop // 停投递
-    case tasks <- t:
-    }
-}
-close(tasks)
-wg.Wait()
-```
-
-2. **信号量**：每个任务一个 G，各自听 `ctx.Done()`。主流程若用 select 提前返回，工人仍要靠 ctx 自己退出；`Wait()` 的话会等到这些退出（所以工人必须响应 ctx，否则超时也等死）。
-
-```go
-ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-defer cancel()
-
-sem := make(chan struct{}, x)
-var wg sync.WaitGroup
-for i := 0; i < 1000; i++ {
-    select {
-    case <-ctx.Done():
-        wg.Wait()
-        return ctx.Err()
-    case sem <- struct{}{}:
-    }
-    
-    wg.Add(1)
-    go func(i int) {
-        defer wg.Done()
-        defer func() { <-sem }()
-        select {
-        case <-ctx.Done():
-            return
-        default:
-        }
-        do(ctx, i)
-    }(i)
-}
-wg.Wait()
-```
-
-3. **WaitGroup vs select**：取消不能替代 Wait。select 先返回后，未收尾的 G 仍在跑 → 必须 ctx + 缓冲结果通道；若必须确认全部停干净，取消后还是要 `Wait()`（或 errgroup）。
+主流程 `select` 先返回，不等于工人已经停。要确认收干净，`cancel()` 之后还是 `Wait()`。
 
 ```go
 ctx, cancel := context.WithTimeout(parent, 100*time.Millisecond)
@@ -225,7 +161,63 @@ select {
 case v := <-resCh:
     return v, nil
 case <-ctx.Done():
-    return "", ctx.Err() // 主流程先返回；工人靠 ctx 自己退出
+    return "", ctx.Err() // 主流程先走；工人靠 ctx 自己退
 }
-// 若必须等工人停干净：cancel() 之后再 wg.Wait()
+```
+
+### 3. 取消怎么接到两种限流模型上
+
+信号都是 `WithCancel` / `WithTimeout`，差别只在工人从哪退出。
+
+**工人池**：在「取任务」处 `select`，否则通道里剩下的任务还会做完。主循环同时停投递。`close(tasks)` 只表示没有新任务，不是取消正在执行的 `do()`。
+
+```go
+for {
+    select {
+    case <-ctx.Done():
+        return
+    case t, ok := <-tasks:
+        if !ok {
+            return
+        }
+        do(ctx, t)
+    }
+}
+```
+
+**信号量**：每个任务一个 G，各自听 `ctx`。主循环占槽时也要 `select` `ctx.Done()`，否则已经超时还在往 `sem` 里塞。已经拉起的 G 必须响应 `ctx`，否则 `Wait()` 会等死。`Wait()` 只出现在提前返回和循环结束两处，不要写进每一轮。
+
+```go
+func runWithSem(parent context.Context, jobs []int, x int) error {
+    ctx, cancel := context.WithTimeout(parent, time.Second)
+    defer cancel()
+
+    sem := make(chan struct{}, x) // 并发上限
+    var wg sync.WaitGroup
+
+    for _, job := range jobs {
+        select {
+        case <-ctx.Done():
+            wg.Wait() // 不再起新 G，等已经拉起的退完
+            return ctx.Err()
+        case sem <- struct{}{}: // 占槽在 go 之前
+        }
+
+        wg.Add(1)
+        go func(job int) {
+            defer wg.Done()
+            defer func() { <-sem }() // 释放槽
+
+            select {
+            case <-ctx.Done():
+                return
+            default:
+            }
+            do(ctx, job) // 进行中的活也要能停
+        }(job)
+    }
+
+    wg.Wait()
+    return ctx.Err() // 全部投完后也可能已经超时
+}
 ```
