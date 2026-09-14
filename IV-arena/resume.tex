@@ -58,7 +58,7 @@
 
     \item \textbf{数据库与中间件}
     \begin{itemize}
-        \item 掌握 MySQL InnoDB 存储引擎的 Buffer Pool，事务，隔离性，MVCC，索引，内部日志底层以及慢查询的工作原理。
+        \item 掌握 MySQL InnoDB 存储引擎的 Buffer Pool，事务，MVCC 和锁，索引，内部日志底层以及慢查询的工作原理。
         \item 掌握 Redis 数据结构与底层实现，熟悉过期删除、持久化等机制，掌握缓存三兄弟问题、双写一致性的解决方案。
         \item 具备基础 RabbitMQ 消息队列的知识，理解消息重复、丢失处理方法；了解 Kafka、RocketMQ 相关选型。
     \end{itemize}
@@ -91,7 +91,7 @@
 \paragraph*{私有云存储系统（NAS）开发}\mbox{}\\
 {\small
 \noindent NAS（Network Attached Storage，网络附加存储）是部署于局域网内的私有云存储设备，为用户提供文件存储、备份及远程访问等能力。\\
-\noindent\textcolor{gray}{\textbf{技术栈：} Go, Gin, Gorm, MySQL, PostgreSQL, SQLite, Bleve, gRPC, Docker, RKNN, LangGraph}
+\noindent\textcolor{gray}{\textbf{技术栈：} Go/Gin, Gorm, MySQL, Python/FastAPI, PostgreSQL, SQLite, Bleve, gRPC, Docker, RKNN, LangGraph}
 }
 \vspace{0.3ex}
 \vspace{0.3ex}
@@ -139,7 +139,7 @@
     \vspace{0.2ex}
     \begin{itemize}
         \item 基于余弦距离实现增量式人脸聚类，基于 LFW/WIDER Face 验证模型效果，实现不同人误合并率 0\%、同人归类准确率 89\%。
-        \item 基于 Protobuf/gRPC over Unix Domain Socket 对本机业务提供接口；设计 NPU 租约调度机制，支持优先级、deadline 及心跳超时回收。
+        \item 设计 NPU 租约调度机制，支持优先级、deadline 及心跳超时回收；基于 Protobuf/gRPC over Unix Domain Socket 对本机业务提供接口。
     \end{itemize}
     \vspace{1ex}
 
