@@ -344,7 +344,9 @@
   <header class="site-header">
     <div class="header-inner">
       <div class="header-brand">
-        <h1><a href="{{ "/go/" | relLangURL }}">{{ site.Title }}</a></h1>
+        {{ with site.GetPage "section" "Go/Go" }}
+        <h1><a href="{{ .RelPermalink }}">{{ site.Title }}</a></h1>
+        {{ end }}
       </div>
       <div class="header-center">
         {{ partial "header-topnav.html" . }}

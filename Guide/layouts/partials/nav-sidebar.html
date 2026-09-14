@@ -1,16 +1,24 @@
 {{ $current := . }}
-{{ $sections := slice "go" "go实战" "mysql" "redis" "RabbitMQ" "rabbitmq" "bleve" "其它" "网络" "运维" "Agent" "agent" "项目" }}
+{{ $sections := slice "Go" "go" "中间件" "其它" "项目" }}
 <nav class="nav-sidebar" aria-label="站点目录">
   <h2 class="side-title">目录</h2>
   <ul class="side-list">
     {{ if in $sections $current.Section }}
-      {{ with site.GetPage "section" $current.Section }}
+      {{ $sectionPath := $current.Section }}
+      {{ if eq $sectionPath "go" }}
+        {{ $sectionPath = "Go" }}
+      {{ end }}
+      {{ with site.GetPage "section" $sectionPath }}
+        {{ $group := . }}
+        {{ $navSection := $group }}
+        {{ range $group.Sections.ByWeight }}
+          {{ if hasPrefix $current.RelPermalink .RelPermalink }}
+            {{ $navSection = . }}
+          {{ end }}
+        {{ end }}
+        {{ range $navSection.Pages.ByWeight }}
         <li>
-          <a href="{{ .RelPermalink }}" class="side-link{{ if $current.Eq . }} is-active{{ end }}">{{ .Title }}（索引）</a>
-        </li>
-        {{ range .Pages.ByWeight }}
-        <li>
-          <a href="{{ .RelPermalink }}" class="side-link{{ if $current.Eq . }} is-active{{ end }}">{{ .Title }}</a>
+          <a href="{{ .RelPermalink }}" class="side-link{{ if or ($current.Eq .) (hasPrefix $current.RelPermalink .RelPermalink) }} is-active{{ end }}">{{ .Title }}</a>
         </li>
         {{ end }}
       {{ end }}
