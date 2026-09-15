@@ -27,11 +27,33 @@ weight: 40
 pip install langchain-core
 ```
 
-## 2. 顺序执行：RunnableSequence
+## 2. 函数包装：RunnableLambda
+
+`RunnableLambda` 把普通函数变成 Runnable，从而能调用 `invoke()` / `batch()`，也能用 `|` 接入链。LCEL 里写 `prompt | model | some_fn` 时，普通函数通常会被自动包装成 `RunnableLambda`。
+
+它负责转换数据：清洗、取字段、改类型、补计算。不调用模型，也不放宽「前一步输出必须对上下一步输入」这条规则。
 
 ```python
 from langchain_core.runnables import RunnableLambda
 
+# 整个输入作为函数的第一个参数；不会按参数名从字典里自动取值。
+to_upper = RunnableLambda(lambda text: text.upper())
+print(to_upper.invoke("sku-a"))
+# SKU-A
+
+# `|` 右侧写普通函数时，效果与显式 RunnableLambda 相同。
+chain = to_upper | (lambda text: {"sku": text})
+print(chain.invoke("sku-a"))
+# {'sku': 'SKU-A'}
+```
+
+输入是字典时，函数拿到的仍是整个字典，lambda audience: ... 并不能取出 audience 字段
+
+要从字典取某个键，应写 `lambda data: data["audience"]`。
+
+## 3. 顺序执行：RunnableSequence
+
+```python
 # 第一步清理文本，第二步将字符串转换为字典。
 clean = RunnableLambda(lambda text: text.strip())
 wrap = RunnableLambda(lambda text: {"product": text})
@@ -45,7 +67,7 @@ print(chain.batch([" 鼠标 ", " 键盘 "]))
 
 `clean | wrap` 构成 `RunnableSequence`。把模型加入流程时也是同样的规则：如果模型返回 `AIMessage`，下游需要字符串，可以用 `StrOutputParser` 转换；下游 Prompt 需要多个变量，则要组织成对应的字典。
 
-## 3. 并行处理：RunnableParallel
+## 4. 并行处理：RunnableParallel
 
 ```python
 from langchain_core.runnables import RunnableParallel
@@ -61,12 +83,24 @@ print(parallel.invoke({"name": "无线鼠标", "price": 99, "quantity": 2}))
 
 分支之间没有先后依赖，适合对同一文本分别生成摘要、关键词等。不要让并行分支修改共享输入；并行也不保证更快，仍受网络、限流和任务本身影响。
 
-## 4. 保留与补充输入：RunnablePassthrough
+## 5. 保留与补充输入：RunnablePassthrough
+
+`RunnablePassthrough()` 原样返回输入，单独使用没有信息变化。和 `RunnableLambda` 的差别是：Lambda 用函数的返回值**替换**输入；Passthrough 把输入**留下来**。
 
 ```python
 from langchain_core.runnables import RunnablePassthrough
 
-# 输入必须是字典；保留原字段，并计算 total。
+data = {"price": 99, "quantity": 2}
+print(RunnablePassthrough().invoke(data))
+# {'price': 99, 'quantity': 2}
+
+print(RunnableLambda(lambda d: d["price"] * d["quantity"]).invoke(data))
+# 198
+```
+
+真正常用的是 `assign`：输入必须是字典，保留原字段，再补上新键。补值的那一步仍是 Lambda（或别的 Runnable）。
+
+```python
 with_total = RunnablePassthrough.assign(
     total=RunnableLambda(lambda data: data["price"] * data["quantity"])
 )
@@ -74,11 +108,7 @@ print(with_total.invoke({"price": 99, "quantity": 2}))
 # {'price': 99, 'quantity': 2, 'total': 198}
 ```
 
-一个常见误区是写 `{"target_audience": RunnablePassthrough()}`，以为它会取出输入中的 `target_audience`。实际上它透传整个输入。要提取字段，应使用 `lambda data: data["target_audience"]`。
-
-同一次 `assign` 中的多个计算都读取该步骤的输入，不应依赖同次计算新生成的其他字段。有依赖关系时，串联多次 `assign`。
-
-## 5. 条件路由：RunnableBranch
+## 6. 条件路由：RunnableBranch
 
 ```python
 from langchain_core.runnables import RunnableBranch
@@ -94,7 +124,7 @@ print(route.invoke({"stock": 0}))   # 缺货
 
 分支由开发者定义的条件决定。若需要模型判断问题类型，可以先得到分类结果，再路由；这与 Agent 自主选择工具是不同的执行方式。
 
-## 6. 加入模型：保留原输入，生成商品文案
+## 7. 加入模型：保留原输入，生成商品文案
 
 安装 `langchain-openai`，配置 `OPENAI_API_KEY` 与可用的 `OPENAI_MODEL`，再运行下面示例。代码复用前文导入的 Runnable 类。
 
@@ -130,8 +160,6 @@ print(answer)
 
 这条链调用模型两次：先提取卖点，再生成文案。拆成多步便于观察和替换某一步，但也增加调用成本；简单任务不必为了使用链而拆分。
 
-## 7. 与 LangGraph 的边界
+## 8. 与 LangGraph 的边界
 
 LCEL 适合表达顺序、并行、分支以及数据转换。需要显式循环、可恢复状态、人工暂停等流程控制时，可以使用 LangGraph。它们可以配合：一个 LangGraph 节点内部也可以执行 LCEL 链。
-
-调用 `stream()` 不代表每一步都能逐 token 透传；中间若有必须等完整输入的函数，该步骤就会产生缓冲。
