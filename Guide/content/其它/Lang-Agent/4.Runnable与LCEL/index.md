@@ -83,6 +83,28 @@ print(parallel.invoke({"name": "无线鼠标", "price": 99, "quantity": 2}))
 
 分支之间没有先后依赖，适合对同一文本分别生成摘要、关键词等。不要让并行分支修改共享输入；并行也不保证更快，仍受网络、限流和任务本身影响。
 
+### 字典简写：自动转换为 RunnableParallel
+
+在 LCEL 中，字典与 Runnable 通过 `|` 组合时，会被自动转换为 `RunnableParallel`（也就是 `RunnableMap`）。字典的键定义输出字段名，值定义该分支如何处理输入。
+
+```python
+# 复用前文导入的 RunnableLambda、RunnableParallel。
+branches = {
+    "name": RunnableLambda(lambda data: data["name"]),
+    "total": RunnableLambda(lambda data: data["price"] * data["quantity"]),
+}
+take_total = RunnableLambda(lambda data: data["total"])
+
+# 简写与显式写法等价。
+short_chain = branches | take_total
+explicit_chain = RunnableParallel(branches) | take_total
+data = {"name": "无线鼠标", "price": 99, "quantity": 2}
+print(short_chain.invoke(data))     # 198
+print(explicit_chain.invoke(data))  # 198
+```
+
+两个分支接收同一个完整输入，先汇总成 `{"name": "无线鼠标", "total": 198}`，再传给 `take_total`。注意：单独创建的 `branches` 仍是普通 Python 字典，没有 `.invoke()`；自动转换发生在与 Runnable 的组合过程中，并非任意字典运算都属于 LCEL。
+
 ## 5. 保留与补充输入：RunnablePassthrough
 
 `RunnablePassthrough()` 原样返回输入，单独使用没有信息变化。和 `RunnableLambda` 的差别是：Lambda 用函数的返回值**替换**输入；Passthrough 把输入**留下来**。

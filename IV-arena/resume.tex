@@ -66,7 +66,7 @@
     \item \textbf{工程基础}
     \begin{itemize}
         \item 熟悉 HTTP/HTTPS、TCP、DNS；结合业务做过 NAT 穿透信令，以及 gRPC + Protobuf。
-        \item 熟悉 Docker 容器化部署技术，了解 k8s 架构。
+        \item 熟悉 Docker 容器化部署技术；实现前后端，转发 Docker Engine API 实现镜像、容器、网络和运行状态管理。
         \item 对Agent开发有兴趣，了解工具调用、skill、RAG、上下文管理、LangChain/LangGraph框架等基本概念。
     \end{itemize}
 
@@ -91,7 +91,7 @@
 \paragraph*{私有云存储系统（NAS）开发}\mbox{}\\
 {\small
 \noindent NAS（Network Attached Storage，网络附加存储）是部署于局域网内的私有云存储设备，为用户提供文件存储、备份及远程访问等能力。\\
-\noindent\textcolor{gray}{\textbf{技术栈：} Go/Gin, Gorm, MySQL, Python/FastAPI, PostgreSQL, SQLite, Bleve, gRPC, Docker, RKNN, LangGraph}
+\noindent\textcolor{gray}{\textbf{技术栈：} Go/Gin, Gorm, MySQL, Python/FastAPI, PostgreSQL, SQLite, Bleve, gRPC, RKNN, LangGraph}
 }
 \vspace{0.3ex}
 \vspace{0.3ex}
@@ -112,7 +112,7 @@
 
     \item \textbf{售后邮件 Agent}：
     {\small
-    \noindent\textcolor{gray}{负责 NAS 售后英文邮件处理：真实收件后检索产品文档与已审核案例，生成带引用的回复草稿，人工审核通过后再发出。}
+    \noindent\textcolor{gray}{负责 NAS 售后邮件处理：真实收件后检索产品文档与已审核案例，生成带引用的回复草稿，人工审核通过后再发出。}
     }
     \vspace{0.2ex}
     \begin{itemize}
@@ -154,12 +154,12 @@
     \end{itemize}
     \vspace{1ex}
     
-    \item \textbf{其他}：
-    \begin{itemize}
-        \item 文件索引同步系统：自研 BFS+Queue 架构替代 fsnotify 监听，在海量文件场景下内存开销降低 87\% 以上。
-        \item Docker：转发 Docker Engine API 实现镜像、容器、网络和运行状态管理。
-        \item 通过 rate 限流与 Ristretto 缓存库有效缓解并发流量冲击，响应时间缩短 90ms。
-    \end{itemize}
+    % \item \textbf{其他}：
+    % \begin{itemize}
+    %     \item 文件索引同步系统：自研 BFS+Queue 架构替代 fsnotify 监听，在海量文件场景下内存开销降低 87\% 以上。
+    %     \item Docker：转发 Docker Engine API 实现镜像、容器、网络和运行状态管理。
+    %     \item 通过 rate 限流与 Ristretto 缓存库有效缓解并发流量冲击，响应时间缩短 90ms。
+    % \end{itemize}
 
 \end{itemize}
 

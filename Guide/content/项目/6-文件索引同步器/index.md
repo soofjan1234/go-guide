@@ -1,6 +1,6 @@
 ---
 title: 文件索引同步器
-weight: 40
+weight: 60
 date: 2026-06-12
 draft: false
 ---
