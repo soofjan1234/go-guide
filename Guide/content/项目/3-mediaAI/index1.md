@@ -35,7 +35,13 @@ draft: false
 
 # NPU调度
 
-NPU 租约调度器：在多个本地 AI 服务竞争同一颗 NPU 时，决定下一次 rknn_run 由谁执行
+## 架构
+
+- ai-manager：负责服务的启停，模型的管理
+- npu-scheduler：NPU 租约、优先级与资源准入
+- 推理服务：持有模型，完成输入校验、推理、后处理
+
+相册发起分析请求，rknn-ai-svc 执行分析返回结果，npu-scheduler 分配 NPU 使用权
 
 ## 优先级
 
@@ -79,3 +85,34 @@ MediaAI 这里的“心跳”本质是租约续约，防止正在正常执行的
 1. 使用unix domain socket，降低了常规延迟
 2. 租约时长会大于续约间隔，比如 30 秒租约、10 秒续约，并使用单调时钟判断是否真正过期。  
 3. 每个租约都带 lease ID 和递增的 fencing token。租约过期并重新分配后，旧持有者后续的续约、释放或执行请求都会因为 lease ID 或代际不匹配被拒绝，不能影响新持有者。
+
+## 交互
+
+rknn-ai-svc 申请 YuNet 时，会向 npu-scheduler 发送:
+
+| 参数 | 实际值 | 含义 |
+|---|---|---|
+| `pid` | rknn-ai-svc 当前进程号 | 谁在申请和持有租约 |
+| `request_id` | `abc-123:yunet` | 这一次具体的模型调用 |
+| `client` | `rknn-ai` | 申请者属于哪个服务 |
+| `workload` | `yunet` | 准备运行哪个工作负载 |
+| `deadline` | 从相册请求截止时间换算出的单调时钟时间 | 最晚可以等到什么时候 |
+
+如果有人正在跑，时间线是：
+```
+A 正在持有租约并执行 rknn_run
+B 发起 ACQUIRE
+  → 调度器把 B 记入 pending 队列
+  → 回复 QUEUED，关闭本轮连接
+B 每 5 ms 用相同 request_id 轮询
+A RELEASE
+  → 调度器下次处理请求时从 pending 中选出 B 并发放租约
+B 下次轮询得到 GRANTED
+```
+
+如果一直轮询到截止时间仍未获批：
+```
+rknn-ai-svc 发送 CANCEL(request_id, pid)
+调度器移除 pending 队列记录，并留下取消标记
+rknn-ai-svc 得到 NPU_LEASE_TIMEOUT
+```
