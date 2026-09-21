@@ -15,35 +15,36 @@ draft: false
 - 有唯一性 / 完整性要求
 - 读多写少，或读的性能是瓶颈
 
-## 索引查看 +3
+# 索引查看 +3
 
-### 预计查看
+## 预计查看
 
 ![索引.EXPLAIN](pic/索引.EXPLAIN.png)
 
 1. type：
     - system / const：极优，通过主键或唯一索引一次定位。
-    - eq_ref / ref：较好，常见于普通索引等值查询。
+    - eq_ref：极优（JOIN）。 JOIN 里主键或唯一索引一次命中一行。
+    - ref：较好，常见于普通索引等值查询。
     - range：中等，适用于范围查询。
     - index：全索引扫描，说明虽然扫描的是索引树，但仍然遍历了大量叶子节点
     - All：全表扫描，数据量一大就是危险信号。
 2. key：表示实际使用到的索引
 3. possible_keys：MySQL 预测可能会用到的索引
-4. key_len：联合索引到底命中了多少列
+4. key_len：实际使用的索引字节数，可以推断联合索引到底命中了多少列
 5. extra
-    - **`Using index`**：命中了覆盖索引，不需要回表。
+    - **`Using index`**：命中了覆盖索引，不需要回表，效率极高。
     - **`Using index condition`**：触发了 ICP（索引下推），在索引遍历阶段就做了一部分过滤。
     - **`Using filesort / Using temporary`**：说明排序、分组、去重没有很好地利用索引，往往需要进一步优化。
 6. rows：预估扫描行数 
 
-### 实际扫描
+## 实际扫描
 
 EXPLAIN ANALYZE（MySQL 8.0.+）
 -> Filter: (users.age > 18)  (cost=10.5 rows=25) (actual time=0.081..0.155 rows=30 loops=1)
 
 > 除了 `EXPLAIN`，还有慢查询日志查看，有个开关log_queries_not_using_indexes = ON可以看
 
-### Index Hint（索引提示）
+## Index Hint（索引提示）
 
 - FORCE INDEX（强制使用索引）
 - USE INDEX（建议使用）
@@ -60,18 +61,28 @@ EXPLAIN ANALYZE（MySQL 8.0.+）
     - 所以字段 phone 是 VARCHAR 类型，但查询时写成 WHERE phone = 13800000000
     - 但是字段 age 是 INT 类型，但查询时写成 WHERE age = "12"，是可以使用索引的
 3. like '%xxx'
-    - WHERE name LIKE '%ob'，可能有很多情况，所以不能用索引
+    - WHERE name LIKE '%ob'，前导通配无法 seek。覆盖索引仍可能 type=index 扫叶子。
 4. a or b，有一列不是索引
 5. 组合索引没用对
 6. 优化器认为全表更快
 
-### 其它
+# 其它问题
 
-1. or
+## possible_keys 有值，但 key 是 NULL
+
+可能是回表成本（Random I/O）与优化器的代价估算。
+
+## possible_keys 为 NULL，但 key 却有值
+
+可能在没写 WHERE 条件，或者 WHERE 根本没走索引的情况下
+
+优化器检查 SELECT 的字段列表时，发现要查的所有列刚好全包含在某个二级索引里
+
+## 多列 OR 查询时，key 字段可能同时出现两个索引吗？
 
 WHERE A = 1 OR B = 2, 如果 `A`、`B` 都有索引，MySQL 5.0+ 的 **Index Merge（索引合并）** 机制将会生效。引擎会分别并发扫描 A 索引和 B 索引，提取出匹配的主键 ID 集合，并在内存中进行**求并集（Union 去重）**操作，最终拿着并集后的 ID 统一进行回表。
 
-2. null
+## null一定不走索引吗？
 
 在 InnoDB 引擎中，B+树索引（二级索引）是记录了 NULL 值的。在 B+树中，所有 NULL 值都会被放在叶子节点的最左边（最小端）。既然索引里有，那么理论上绝对可以走索引。可能走，可能不走的原因还是在优化器的估算
 
