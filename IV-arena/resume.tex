@@ -93,18 +93,17 @@
 \noindent NAS（Network Attached Storage，网络附加存储）是部署于局域网内的私有云存储设备，为用户提供文件存储、备份及远程访问等能力。\\
 \noindent\textcolor{gray}{\textbf{技术栈：} Go/Gin, Gorm, MySQL, Python/FastAPI, PostgreSQL, SQLite, Bleve, gRPC, RKNN, LangGraph}
 }
-\vspace{0.3ex}
-\vspace{0.3ex}
+\vspace{1ex}
 
 \begin{itemize}
 
     \item \textbf{文档中心}：
     {\small
-    \noindent\textcolor{gray}{负责 NAS 文档中心后端建设，提供多格式文档同步、内容解析、索引构建、全文检索及多维筛选能力。}
+    \noindent\textcolor{gray}{NAS 本地文档管理与检索服务，支持多格式内容解析、全文索引与检索}
     }
     \vspace{0.2ex}
     \begin{itemize}
-        \item 构建文档同步、解析、索引、检索一体化链路，支持 PDF、Word、Excel、PPT、Markdown、HTML、EPUB 等多类型文档的自动识别与内容抽取。
+        \item 完成多格式文档解析器选型：PDF 解析总耗时降低约 86\%，典型内存由约 218 MB 降至 10+ MB；平均解析 CPU 由约 80\% 降至 33\%。
         \item 针对内存受限环境，基于 Bleve 构建轻量级搜索能力；对超长文档采用分块索引和结果聚合，峰值 heapInuse 下降约 76\%。
         \item 使用 CJDict 词典分词，并以压缩 Trie longest-match 替代 substring + map 查词，将 Trace 总耗时降低约 48\%、进程 user CPU 降低约 63\%。
     \end{itemize}
@@ -112,29 +111,19 @@
 
     \item \textbf{售后邮件 Agent}：
     {\small
-    \noindent\textcolor{gray}{负责 NAS 售后邮件处理：真实收件后检索产品文档与已审核案例，生成带引用的回复草稿，人工审核通过后再发出。}
+    \noindent\textcolor{gray}{基于产品文档与历史案例的售后邮件 Agent，完成邮件分类、知识检索、回复生成与人工审核闭环}
     }
     \vspace{0.2ex}
     \begin{itemize}
+        \item 构建合成基准集 + 历史真实邮件双阶段 Retrieval Benchmark，以 Recall@K、MRR、P95 延迟和内存对 4 个 Embedding 模型进行选型
         \item 用 LangGraph + PostgreSQL Checkpointer 编排分类、检索改写、证据评估、生成校验与人工 interrupt，审核通过才出站。
-        \item 产品文档与历史案例分路检索（全文 + pgvector，RRF 融合）；依据不足、资料冲突或高风险时只补信息或转人工。上线 1 个月直接批准 46\%、编辑后批准 37\%、拒绝 7\%、转人工 10\%。
-    \end{itemize}
-    \vspace{1ex}
-
-    \item \textbf{相册}：
-    {\small
-    \noindent\textcolor{gray}{负责 NAS 智能相册后端建设，提供媒体目录同步、元数据索引、多维检索、模糊/重复照片治理、相册收藏、智能回忆及端侧 AI 结果管理。}
-    }
-    \vspace{0.2ex}
-    \begin{itemize}
-        \item 基于拉普拉斯方差实现照片模糊检测；通过 CPU 自适应 Worker Pool 并行计算，SQLite 串行写入并支持取消，吞吐提升 65.3\%。
-        \item 实现可恢复的 AI 异步任务协调器：任务落库，用 claim token 领取；进程重启或旧 worker 迟到时，不能覆盖新结果。
+        \item 产品文档与历史案例分路检索（全文 + pgvector，RRF 融合）；依据不足、资料冲突或高风险时只补信息或转人工。上线 1 个月直接批准 26\%、编辑后批准 47\%、拒绝 17\%、转人工 10\%。
     \end{itemize}
     \vspace{1ex}
 
     \item \textbf{MediaAI}：
     {\small
-    \noindent\textcolor{gray}{主导本地 AI 运行平台建设，将模型管理、NPU 调度与 ASR、TTS、目标检测、人脸分析服务解耦为独立进程和发布单元，形成统一管理、业务直连推理的数据面架构。}
+    \noindent\textcolor{gray}{NAS 本地 AI 运行平台，统一管理模型、NPU 资源及 ASR、TTS、人脸分析等 AI 服务}
     }
     \vspace{0.2ex}
     \begin{itemize}
@@ -145,7 +134,7 @@
 
      \item \textbf{云端}：
     {\small
-    \noindent\textcolor{gray}{负责 NAS 远程访问的云端信令服务，提供设备注册、穿透凭证与校验码发放、对端发现及连接协商能力。}
+    \noindent\textcolor{gray}{NAS 远程访问云端信令服务，负责设备发现、穿透凭证发放与连接协商}
     }
     \vspace{0.2ex}
     \begin{itemize}
@@ -156,6 +145,7 @@
     
     \item \textbf{其他}：
     \begin{itemize}
+        \item 相册：基于拉普拉斯方差实现照片模糊检测，通过 CPU 自适应 Worker Pool 并行计算，SQLite 串行写入并支持取消，吞吐提升 65.3\%；并实现可恢复的 AI 异步任务协调器。
         \item 文件索引同步系统：自研 BFS+Queue 架构替代 fsnotify 监听，在海量文件场景下内存开销降低 87\% 以上。
         \item 通过 rate 限流与 Ristretto 缓存库有效缓解并发流量冲击，响应时间缩短 90ms。
     \end{itemize}

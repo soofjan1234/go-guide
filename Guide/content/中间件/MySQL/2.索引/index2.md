@@ -9,11 +9,9 @@ draft: false
 
 ![索引.设计原则](pic/索引.设计原则.png)
 
-- 查询明显变慢，且 EXPLAIN 显示代价高
-- WHERE / JOIN 条件稳定、重复出现
-- 需要排序、分组，且数据量大
-- 有唯一性 / 完整性要求
-- 读多写少，或读的性能是瓶颈
+- 读多写少，读是瓶颈，explain显示代价高
+- where、join、排序、分组 重复出现，数据量大
+- 唯一性要求
 
 # 索引查看 +3
 
@@ -32,14 +30,15 @@ draft: false
 3. possible_keys：MySQL 预测可能会用到的索引
 4. key_len：实际使用的索引字节数，可以推断联合索引到底命中了多少列
 5. extra
-    - **`Using index`**：命中了覆盖索引，不需要回表，效率极高。
-    - **`Using index condition`**：触发了 ICP（索引下推），在索引遍历阶段就做了一部分过滤。
-    - **`Using filesort / Using temporary`**：说明排序、分组、去重没有很好地利用索引，往往需要进一步优化。
+    - **Using index**：命中了覆盖索引，不需要回表，效率极高。
+    - **Using index condition**：触发了 ICP（索引下推），在索引遍历阶段就做了一部分过滤。
+    - **Using filesort / Using temporary**：说明排序、分组、去重没有很好地利用索引，往往需要进一步优化。
 6. rows：预估扫描行数 
 
 ## 实际扫描
 
 EXPLAIN ANALYZE（MySQL 8.0.+）
+
 -> Filter: (users.age > 18)  (cost=10.5 rows=25) (actual time=0.081..0.155 rows=30 loops=1)
 
 > 除了 `EXPLAIN`，还有慢查询日志查看，有个开关log_queries_not_using_indexes = ON可以看
@@ -50,6 +49,8 @@ EXPLAIN ANALYZE（MySQL 8.0.+）
 - USE INDEX（建议使用）
 - IGNORE INDEX（忽略索引）
 
+# 其它问题
+
 ## 索引失效 +2
 
 1. 索引列参与运算
@@ -57,16 +58,11 @@ EXPLAIN ANALYZE（MySQL 8.0.+）
     - B+树无法对“计算后的结果”进行二分查找，因为树里没有存“计算后的值”。
     - 如果做优化，计算成本、边界都要考虑，更麻烦
 2. 格式转换
-    - 当字符串和数字进行比较时，MySQL 会自动把字符串转为数字再比较
-    - 所以字段 phone 是 VARCHAR 类型，但查询时写成 WHERE phone = 13800000000
-    - 但是字段 age 是 INT 类型，但查询时写成 WHERE age = "12"，是可以使用索引的
 3. like '%xxx'
     - WHERE name LIKE '%ob'，前导通配无法 seek。覆盖索引仍可能 type=index 扫叶子。
 4. a or b，有一列不是索引
 5. 组合索引没用对
 6. 优化器认为全表更快
-
-# 其它问题
 
 ## possible_keys 有值，但 key 是 NULL
 
@@ -81,6 +77,34 @@ EXPLAIN ANALYZE（MySQL 8.0.+）
 ## 多列 OR 查询时，key 字段可能同时出现两个索引吗？
 
 WHERE A = 1 OR B = 2, 如果 `A`、`B` 都有索引，MySQL 5.0+ 的 **Index Merge（索引合并）** 机制将会生效。引擎会分别并发扫描 A 索引和 B 索引，提取出匹配的主键 ID 集合，并在内存中进行**求并集（Union 去重）**操作，最终拿着并集后的 ID 统一进行回表。
+
+## 什么情况下格式转换也会用到索引？
+
+在 MySQL 中，当一个数字和一个字符串进行比较时，MySQL 会把“字符串”转换成“数字”再比较。
+
+```
+-- age 是 INT，传入的是字符串 "12"
+SELECT * FROM users WHERE age = "12";
+
+-- 在 MySQL 优化器眼里，等价于变成了：
+SELECT * FROM users WHERE age = CAST("12" AS SIGNED);
+
+-- 也就是：
+SELECT * FROM users WHERE age = 12;
+```
+
+既然 age 本身没有包裹任何函数，B+ 树的有序性就没有被破坏，所以 MySQL 依然可以顺畅地利用 age 上的索引进行二分查找。
+
+```
+-- phone 是 VARCHAR，参数是 INT
+SELECT * FROM users WHERE phone = 13800000000; 
+
+-- 每一行的 phone 字段都必须先被转成数字，才能跟后面的数字比较
+SELECT * FROM users WHERE CAST(phone AS SIGNED) = 13800000000;
+
+```
+
+后果：B+ 树索引里存的是字符串的字典序（'138...'），而转成数字后的大小关系可能被打乱，MySQL 无法再使用索引树进行 Seek 定位，索引彻底失效，直接退化为全表扫描（type: ALL）
 
 ## null一定不走索引吗？
 
