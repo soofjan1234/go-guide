@@ -145,7 +145,7 @@
     
     \item \textbf{其他}：
     \begin{itemize}
-        \item 相册：基于拉普拉斯方差实现照片模糊检测，通过 CPU 自适应 Worker Pool 并行计算，SQLite 串行写入并支持取消，吞吐提升 65.3\%；并实现可恢复的 AI 异步任务协调器。
+        \item 相册：基于拉普拉斯方差实现照片模糊检测，通过 CPU 自适应 Worker Pool 并行计算，SQLite 串行写入并支持取消，吞吐提升 65.3\%。
         \item 文件索引同步系统：自研 BFS+Queue 架构替代 fsnotify 监听，在海量文件场景下内存开销降低 87\% 以上。
         \item 通过 rate 限流与 Ristretto 缓存库有效缓解并发流量冲击，响应时间缩短 90ms。
     \end{itemize}
