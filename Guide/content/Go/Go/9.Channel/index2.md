@@ -41,7 +41,6 @@ draft: false
 1. 数据传输指针 (elem)
     - 当 G 因为 ch <- v 阻塞时，elem 指向 v 的地址。
     - 当另一个 Goroutine 来接收时，它不需要通过 Channel 的环形缓冲区，而是直接利用 sudog.elem，通过 memmove 把数据从发送方 G 的栈，直接拷贝到接收方 G 的栈。
-    - 这就是 Go channel 著名的“零拷贝（内存直接复制）”优化。
 2. 双向链表指针 (next 和 prev)
 3. Select 相关的控制字段
 4. 树形结构指针

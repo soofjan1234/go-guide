@@ -7,7 +7,6 @@ draft: false
 
 ## defer +3
 
-
 ![](pic/关键字.defer.png)
 
 特点：用于收尾，比如关闭连接、通道等，先进后出，os.Exit()不会触发
@@ -82,7 +81,6 @@ recover可以对panic进行恢复
 **为nil的原因可能有**：
 1. 未发生panic
 2. 不在defer里面写recover
-3. panic(nil) 时，recover() 也会得到 nil
 
 ```go
 func f() {

@@ -5,9 +5,9 @@ date: 2026-05-27
 draft: false
 ---
 
-## 事务 +2
+# 事务 +2
 
-### 事务的ACID +2
+## 事务的ACID +2
 ![](pic/ACID四块拼图.关系图.png)
 
 1. A：原子性。事务要么完成要么失败。由Undolog保证
@@ -15,7 +15,7 @@ draft: false
 3. I：隔离性。事务之间互不干扰。由锁+MVCC保证
 4. D：持久性。事务变更永久有效。由Redolog保证
 
-### 并发事务的四大问题
+## 并发事务的四大问题
 ![事务与并发.四大并发问题](pic/事务与并发.四大并发问题.png)
 
 1. 脏读。读别人未提交的数据
@@ -23,7 +23,7 @@ draft: false
 3. 幻读。读两次数据量不一致
 4. 丢失修改。两个事务改同一数据，有个修改丢失了
 
-### 四个隔离级别分别能解决哪些问题？ +2
+## 四个隔离级别分别能解决哪些问题？ +2
 
 ![](pic/隔离级别阶梯.对比图.png)
 
@@ -34,11 +34,11 @@ draft: false
     - 减轻幻读
 4. 串行化，解决幻读
 
-## MVCC +2
+# MVCC +2
 
 ![事务与并发.MVCC](pic/事务与并发.MVCC.png)
 
-### MVCC 是什么？
+## MVCC 是什么？
 
 MVCC（Multi-Version Concurrency Control）：多版本并发控制。在不加锁或少加锁的情况下，实现高并发读写，组成有Undo Log和ReadView：
 
@@ -53,7 +53,7 @@ MVCC（Multi-Version Concurrency Control）：多版本并发控制。在不加�
 
 读取时先看最新版本的 trx_id 是否对当前事务可见，如果不可见，就沿着 undo log 版本链往前找，直到找到可见版本。
 
-### 快照读和当前读在 MVCC 下分别怎么走？
+## 快照读和当前读在 MVCC 下分别怎么走？
 
 ![](pic/RC与RR-ReadView时机.时间线图.png)
 
@@ -65,7 +65,7 @@ MVCC（Multi-Version Concurrency Control）：多版本并发控制。在不加�
     - 显式加排他锁 (X 锁)：有select ... for update
     - 或者其它修改操作 
 
-## InnoDB 在 RR 级别下还会有幻读吗？ +3
+## InnoDB 在 RR 级别下还会有幻读、可重复读吗？ +3
 
 ![](pic/RR与幻读.png)
 

@@ -73,8 +73,10 @@ func doRealHeavyWork(ctx context.Context, params string) (string, error) {
 	
 	// 如果你使用了 http.Client，也必须传 ctx：
 	// http.NewRequestWithContext(ctx, "GET", ...)
-
-	time.Sleep(150 * time.Millisecond) // 模拟一个需要 150ms 的慢操作
+	select { 
+		case <-time.After(...); 
+		case <-ctx.Done() 
+	}
 	return "success_data", nil
 }
 ```

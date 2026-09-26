@@ -14,7 +14,8 @@ draft: false
 - `lock`：每次操作通道内部状态（比如改指针、改计数）前先加锁，防止并发把结构弄乱。
 - 等待队列：当“送不进去/拿不到货”时，就把等着的人挂到 `sendq/recvq` 里；每个等待者用 `sudog` 这个小包表示。
 - `closed`：通道有没有被关闭（关闭后发送会 panic，接收则通过 `ok=false` 告诉你没数据了）。
-- `qcount 和 dataqsiz`：当前 buf 里有多少个元素
+- `qcount`：当前 buf 里有多少个元素
+- `dataqsiz`：缓冲容量
 
 ![channel.数据结构](pic/channel.Channel数据结构.png)
 

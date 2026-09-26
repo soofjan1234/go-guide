@@ -5,11 +5,9 @@ date: 2026-05-19
 draft: false
 ---
 
-## 结构 +2
-
 为了进一步的优化性能、缓存命中率，Go从桶换成了SwissTable
 
-### SwissTable
+## SwissTable
 
 ![](pic/SwissTable定位.png)
 
@@ -25,11 +23,11 @@ SwissTable最大的优势是SIMD，一条指令，同时处理多个数据。
 2. 把 H2 广播到向量寄存器，和16个 metadata放到另一个寄存器
 3. 一次比较，得到匹配槽位掩码
 
-### Go Map 1.24
+## Go Map 1.24
 
 ![](pic/GoMap1.24.png)
 
-一个Map包含了多个SwissTable，方便单个扩容。
+一个Map包含了多个SwissTable，方便单个扩容；并且Go 的 Swiss Table 是 8 槽
 
 Map里包含dirPtr、dirLen以及globalDepth，其中dirPtr指向Table数组或单Group（数量小于8个的情况）。
 

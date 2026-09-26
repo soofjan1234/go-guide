@@ -5,7 +5,7 @@ date: 2026-07-10
 draft: false
 ---
 
-## 并发安全 +999
+## Go 的 map 并发安全吗 +999
 
 ![sync.Map.基础概念](pic/sync.Map.基础概念.png)
 

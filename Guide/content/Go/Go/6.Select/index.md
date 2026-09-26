@@ -11,7 +11,7 @@ draft: false
 
 ## 随机选择 +3
 
-有多个channel时，select会随机选择一个channel进行处理。
+有多个channel就绪时，select会随机选择一个channel进行处理。
 
 ### 为什么需要 pollorder 
 
