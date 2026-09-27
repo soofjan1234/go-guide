@@ -38,18 +38,18 @@ draft: false
 重启后分两步：先把页修到能用，再裁定 prepare 事务提交还是回滚。
 
 **1. 修页：两次写**
-    - 脏页 16KB、盘常按 4KB 写，刷到一半会撕页，CRC 失败。
-    - Redo 是「某页某偏移改什么」，页结构坏了无从下手。
-    - 先从 Doublewrite 捞回完整页（或确认数据文件里的页没动过）。
+- 脏页 16KB、盘常按 4KB 写，刷到一半会撕页，CRC 失败。
+- Redo 是「某页某偏移改什么」，页结构坏了无从下手。
+- 先从 Doublewrite 捞回完整页（或确认数据文件里的页没动过）。
 
 **2. 重放：Redo 全打上去**
-    - 从 Checkpoint 往后扫 Redo，对比 Page LSN，该重做的都重做。
-    - 不管事务提交没有——已 commit、prepare、未提交，只要进了 Redo，物理修改都会回到页上。
-    - 这一步结束后：页是完整的、内容是「崩溃前 Redo 已刷盘的最新样子」，但有些不该对外生效的事务也在页上。
+- 从 Checkpoint 往后扫 Redo，对比 Page LSN，该重做的都重做。
+- 不管事务提交没有——已 commit、prepare、未提交，只要进了 Redo，物理修改都会回到页上。
+- 这一步结束后：页是完整的、内容是「崩溃前 Redo 已刷盘的最新样子」，但有些不该对外生效的事务也在页上。
 
 **3. 收尾：看事务状态，决定留下还是 Undo**
-    - Redo 里已是 commit：改动留下。
-    - 从未进入 prepare（写 Redo 到 prepare 之前就崩）：Undo 滚掉。
-        - 停在 prepare：再对 Binlog（引擎和 Server 对齐，不是另开一套「主从恢复」）
-        - 有完整 Binlog：补 commit，改动留下。
-        - 没有：Undo 滚掉。
+- Redo 里已是 commit：改动留下。
+- 从未进入 prepare（写 Redo 到 prepare 之前就崩）：Undo 滚掉。
+    - 停在 prepare：再对 Binlog（引擎和 Server 对齐，不是另开一套「主从恢复」）
+    - 有完整 Binlog：补 commit，改动留下。
+    - 没有：Undo 滚掉。

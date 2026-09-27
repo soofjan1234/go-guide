@@ -5,7 +5,7 @@ date: 2026-05-27
 draft: false
 ---
 
-## Redo Log +1
+## Redo Log 是什么？
 
 ![日志.redolog.环形日志](pic/日志.redolog.环形日志.png)
 
@@ -15,13 +15,13 @@ draft: false
 
 恢复的话是从checkpoint之后恢复，Checkpoint 之前的 Redo 对应脏页都已落盘。
 
-### 为什么用 WAL，先写日志再刷数据页？
+## 为什么用 WAL，先写日志再刷数据页？
 
 ![日志.redolog.WAL](pic/日志.redolog.WAL.png)
 
 写日志是顺序写，I/O 模式更简单，吞吐通常更好；刷数据是随机IO
 
-### LSN（Log Sequence Number，日志序列号）的作用
+## LSN（Log Sequence Number，日志序列号）的作用
 
 1. 决定崩溃恢复的起点与范围
     - 确定恢复起点：直接从最后一次成功的 Checkpoint LSN 开始往后扫描
@@ -31,9 +31,9 @@ draft: false
     - 对比 当前写入 LSN 与 Checkpoint LSN 的差值
         - 如果过大，说明脏页刷盘太慢，redo log 快要追尾了。此时会触发 Furious Flush（同步急刷盘），阻塞业务写请求，强行推进 Checkpoint LSN 释放空间
 
-## Redo Log 和 Binlog、Undolog
+# Redo Log 和 Binlog、Undolog
 
-### 区别
+## 区别
 
 1. 记录形式不同
     - Redolog是什么表什么页什么偏移做了什么修改
@@ -47,7 +47,7 @@ draft: false
     - RedoLog、UndoLog属于**InnoDB 存储引擎**内部
     - BinLog属于**Server 层**，与引擎解耦
 
-### redo log能用于主从复制吗
+## redo log能用于主从复制吗
 
 1. 空间限制：Redo Log是环形循环写入，没有历史全量记录。
     - 如果从库网络中断断开 1 小时，等网络恢复时，主库对应的 redo log 早就被覆写了，从库根本无法追平数据

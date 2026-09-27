@@ -105,7 +105,7 @@
     }
     \vspace{0.2ex}
     \begin{itemize}
-        \item 完成多格式文档解析器选型：PDF 解析总耗时降低约 86\%，典型内存由约 218 MB 降至 10+ MB；平均解析 CPU 由约 80\% 降至 33\%。
+        \item 使用多份真实文档对比不同解析方案，使用 pdftotext、antiword 等工具代替LibreOffice，平均内存、cpu降低 56 \%、47 \%。
         \item 针对内存受限环境，基于 Bleve 构建轻量级搜索能力；对超长文档采用分块索引和结果聚合，峰值 heapInuse 下降约 76\%。
         \item 使用 CJDict 词典分词，并以压缩 Trie longest-match 替代 substring + map 查词，将 Trace 总耗时降低约 48\%、进程 user CPU 降低约 63\%。
     \end{itemize}
@@ -117,7 +117,7 @@
     }
     \vspace{0.2ex}
     \begin{itemize}
-        \item 基于拉普拉斯方差实现照片模糊检测；采用 CPU 自适应 Worker Pool 并行计算、串行写入 SQLite，固定样本 A/B 测试耗时降低约 65.3\%。
+        \item 基于拉普拉斯方差实现照片模糊检测，采用 Worker 并行计算、串行批量写入 SQLite；在 1000 张照片实验中，耗时由 13.51 s 降至 4.41 s。
         \item 实现重复照片识别，结合宽高比、dHash 与 pHash 判定，并按 SHA1 缓存图像哈希；支持重复组管理、保留图切换与批量清理。
         \item 优化相册时间轴慢查询：预计算拍摄时间缺失时的排序时间，回填历史数据并建立复合索引，使分页排序能够使用索引。
     \end{itemize}
