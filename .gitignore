@@ -13,3 +13,6 @@ _uv*.txt
 uvicorn-log.json
 
 .obsidian/workspace.json
+
+# 简历的 XeLaTeX 辅助文件。
+IV-arena/resume/build/

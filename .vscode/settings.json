@@ -1,0 +1,6 @@
+{
+  // 使用简历目录里的 .latexmkrc，统一 XeLaTeX、PDF 和辅助文件位置。
+  "latex-workshop.latex.recipe.default": "latexmk (latexmkrc)",
+  "latex-workshop.latex.outDir": "%DIR%",
+  "latex-workshop.latex.auxDir": "%DIR%/build"
+}

@@ -1,10 +1,10 @@
-% !TEX TS-program = xelatex
+% !LW recipe=latexmk (latexmkrc)
 % !TEX encoding = UTF-8 Unicode
 % !Mode:: "TeX:UTF-8"
 
-\documentclass{resume}
-\usepackage{zh_CN-Adobefonts_external}
-\usepackage{linespacing_fix}
+\documentclass{styles/resume}
+\usepackage{styles/zh_CN-Adobefonts_external}
+\usepackage{styles/linespacing_fix}
 \usepackage{cite}
 \usepackage{titlesec}
 \usepackage{enumitem}
@@ -27,7 +27,7 @@
 \begin{itemize}[label=,leftmargin=*]
 \large
 \item \textbf{当前状态：}\textbf{深圳在职}
-\item \textbf{到岗时间：}\textbf{2周}
+\item \textbf{到岗时间：}\textbf{2周左右}
 \item \textbf{学历：}\textbf{本科全日制（学信网可查）}
 \item \textbf{求职偏好：}不外包 / 不驻场
 \end{itemize}
@@ -61,17 +61,19 @@
         \item 掌握 MySQL InnoDB 存储引擎的 Buffer Pool，事务，MVCC 和锁，索引，内部日志底层以及慢查询的工作原理。
         \item 掌握 Redis 数据结构与底层实现，熟悉过期删除、持久化等机制，掌握缓存三兄弟问题、双写一致性的解决方案。
         \item 具备基础 RabbitMQ 消息队列的知识，理解消息重复、丢失处理方法；了解 Kafka、RocketMQ 相关选型。
+        \item 基本了解 Go 全文检索库 Bleve 的索引结构，理解倒排索引的组织方式和查询的基本流程。
     \end{itemize}
     
-    \item \textbf{工程基础}
+    \item \textbf{Agent}
     \begin{itemize}
-        \item 熟悉 HTTP/HTTPS、TCP、DNS；结合业务做过 NAT 穿透信令，以及 gRPC + Protobuf。
-        \item 熟悉 Docker 容器化部署技术；实现前后端，转发 Docker Engine API 实现镜像、容器、网络和运行状态管理。
-        \item 对Agent开发有兴趣，了解工具调用、skill、RAG、上下文管理、LangChain/LangGraph框架等基本概念。
+        \item 具备基础的 Agent 的工具调用、状态管理与上下文组织的知识，能够使用 LangGraph 编排条件分支、检查点恢复及人工审核流程。
+        \item 基本理解 RAG 的文档处理、检索与生成流程，了解混合检索、结果融合及 Recall@K、MRR 等检索评估方法。
     \end{itemize}
 
     \item \textbf{其他}
     \begin{itemize}
+        \item 熟悉 HTTP/HTTPS、TCP、DNS；结合业务做过 NAT 穿透信令，以及 gRPC + Protobuf。
+        \item 熟悉 Docker 容器化部署技术；实现前后端，转发 Docker Engine API 实现镜像、容器、网络和运行状态管理。
         \item 热爱编程与开源，熟练使用 Codex/Cursor 等 AI 工具优化工作效率。
         \item 坚持技术分享与社区建设，发表教学视频与文章 200+，累计 1k+ 点赞收藏。
     \end{itemize}
@@ -91,7 +93,7 @@
 \paragraph*{私有云存储系统（NAS）开发}\mbox{}\\
 {\small
 \noindent NAS（Network Attached Storage，网络附加存储）是部署于局域网内的私有云存储设备，为用户提供文件存储、备份及远程访问等能力。\\
-\noindent\textcolor{gray}{\textbf{技术栈：} Go/Gin, Gorm, MySQL, Python/FastAPI, PostgreSQL, SQLite, Bleve, gRPC, RKNN, LangGraph}
+\noindent\textcolor{gray}{\textbf{技术栈：} Go/Gin, Gorm, MySQL, SQLite, Bleve, gRPC, RKNN, Python/FastAPI, PostgreSQL, LangGraph}
 }
 \vspace{1ex}
 
@@ -109,15 +111,15 @@
     \end{itemize}
     \vspace{1ex}
 
-    \item \textbf{售后邮件 Agent}：
+    \item \textbf{相册}：
     {\small
-    \noindent\textcolor{gray}{基于产品文档与历史案例的售后邮件 Agent，完成邮件分类、知识检索、回复生成与人工审核闭环}
+    \noindent\textcolor{gray}{NAS 本地照片管理服务，支持照片检测、去重与时间轴查询}
     }
     \vspace{0.2ex}
     \begin{itemize}
-        \item 构建合成基准集 + 历史真实邮件双阶段 Retrieval Benchmark，以 Recall@K、MRR、P95 延迟和内存对 4 个 Embedding 模型进行选型
-        \item 用 LangGraph + PostgreSQL Checkpointer 编排分类、检索改写、证据评估、生成校验与人工 interrupt，审核通过才出站。
-        \item 产品文档与历史案例分路检索（全文 + pgvector，RRF 融合）；依据不足、资料冲突或高风险时只补信息或转人工。
+        \item 基于拉普拉斯方差实现照片模糊检测；采用 CPU 自适应 Worker Pool 并行计算、串行写入 SQLite，固定样本 A/B 测试耗时降低约 65.3\%。
+        \item 实现重复照片识别，结合宽高比、dHash 与 pHash 判定，并按 SHA1 缓存图像哈希；支持重复组管理、保留图切换与批量清理。
+        \item 优化相册时间轴慢查询：预计算拍摄时间缺失时的排序时间，回填历史数据并建立复合索引，使分页排序能够使用索引。
     \end{itemize}
     \vspace{1ex}
 
@@ -142,10 +144,10 @@
         \item 采用应用层 AES+RSA 和传输层 TLS 的双层加密方案，保障凭证与敏感字段在复杂网络下的传输安全。
     \end{itemize}
     \vspace{1ex}
-    
+
     \item \textbf{其他}：
     \begin{itemize}
-        \item 相册：基于拉普拉斯方差实现照片模糊检测，通过 CPU 自适应 Worker Pool 并行计算，SQLite 串行写入并支持取消，吞吐提升 65.3\%。
+        \item 售后邮件 Agent：一周内完成 MVP，实现邮件分类、知识检索、回复草稿生成与人工审核流程。
         \item 文件索引同步系统：自研 BFS+Queue 架构替代 fsnotify 监听，在海量文件场景下内存开销降低 87\% 以上。
         \item 通过 rate 限流与 Ristretto 缓存库有效缓解并发流量冲击，响应时间缩短 90ms。
     \end{itemize}
