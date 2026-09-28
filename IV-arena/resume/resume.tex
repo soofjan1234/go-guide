@@ -123,17 +123,6 @@
     \end{itemize}
     \vspace{1ex}
 
-    \item \textbf{MediaAI}：
-    {\small
-    \noindent\textcolor{gray}{NAS 本地 AI 运行平台，统一管理模型、NPU 资源及 ASR、TTS、人脸分析等 AI 服务}
-    }
-    \vspace{0.2ex}
-    \begin{itemize}
-        \item 基于余弦距离实现增量式人脸聚类，基于 LFW/WIDER Face 验证模型效果，实现不同人误合并率 0\%、同人归类准确率 89\%。
-        \item 设计 NPU 租约调度机制，支持优先级、deadline 及心跳超时回收；基于 Protobuf/gRPC over Unix Domain Socket 对本机业务提供接口。
-    \end{itemize}
-    \vspace{1ex}
-
      \item \textbf{云端}：
     {\small
     \noindent\textcolor{gray}{NAS 远程访问云端信令服务，负责设备发现、穿透凭证发放与连接协商}
@@ -142,6 +131,17 @@
     \begin{itemize}
         \item 主导设计 NAT 穿透交互架构，规范客户端、服务端、云端及穿透端的通信流程，实现复杂网络下稳定高效访问。
         \item 采用应用层 AES+RSA 和传输层 TLS 的双层加密方案，保障凭证与敏感字段在复杂网络下的传输安全。
+    \end{itemize}
+    \vspace{1ex}
+
+    \item \textbf{MediaAI}：
+    {\small
+    \noindent\textcolor{gray}{NAS 本地 AI 运行平台，统一管理模型、NPU 资源及 ASR、TTS、人脸分析等 AI 服务}
+    }
+    \vspace{0.2ex}
+    \begin{itemize}
+        \item 基于余弦距离实现增量式人脸聚类，基于 LFW/WIDER Face 验证模型效果，实现不同人误合并率 0\%、同人归类准确率 89\%。
+        \item 设计 NPU 租约调度机制，支持优先级、deadline 及心跳超时回收；基于 Protobuf/gRPC over Unix Domain Socket 对本机业务提供接口。
     \end{itemize}
     \vspace{1ex}
 
