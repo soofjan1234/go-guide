@@ -148,8 +148,7 @@
     \item \textbf{其他}：
     \begin{itemize}
         \item 售后邮件 Agent：一周内完成 MVP，实现邮件分类、知识检索、回复草稿生成与人工审核流程。
-        \item 文件索引同步系统：自研 BFS+Queue 架构替代 fsnotify 监听，在海量文件场景下内存开销降低 87\% 以上。
-        \item 通过 rate 限流与 Ristretto 缓存库有效缓解并发流量冲击，响应时间缩短 90ms。
+        \item 文件索引同步系统：自研 BFS+Queue 架构替代 fsnotify 监听，海量文件场景下，Go 堆峰值约降 92\%；RSS 峰值比 fsnotify 平均低59\%。
     \end{itemize}
 
 \end{itemize}
