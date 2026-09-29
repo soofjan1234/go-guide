@@ -33,7 +33,7 @@ TLS 不用「全程非对称」，而是**握手非对称 + 传数据对称**：
 ## 证书里有什么
 
 1. 明文信息部分（TBS, To Be Signed）：
-    - 服务器的公钥（Public Key）（极其重要，用于后续握手协商对称密钥）。
+    - 服务器的公钥（Public Key）（极其重要，用来验签，证明对端拥有证书对应私钥）。
     - 绑定的域名（Subject / SAN）（如 *.google.com、example.com）。
     - 颁发者信息（Issuer）（比如 DigiCert、Let's Encrypt）。
     - 证书有效期（Validity）（生效日期与失效日期）。

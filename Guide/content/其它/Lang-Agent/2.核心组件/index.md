@@ -71,14 +71,16 @@ print(response.content)
 
 ## 2. 提示词模板：分离固定指令与动态输入
 
-`PromptTemplate` 的作用很简单：把重复使用的指令写成模板，只替换每次变化的数据。
+聊天模型优先用 `ChatPromptTemplate` 将 system 指令和 human 输入分开；`PromptTemplate` 更适合明确需要一个字符串的补全式链路。模板负责替换动态数据，不保证模型回答正确。
 
 ```python
-from langchain_core.prompts import PromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 
-prompt = PromptTemplate.from_template("从以下描述提取商品信息：{text}")
-text = prompt.format(text="无线鼠标，售价 99 元，属于数码商品。")
-response = model.invoke(text)
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "从商品描述提取信息；缺失字段不要猜测。"),
+    ("human", "{text}"),
+])
+response = model.invoke(prompt.invoke({"text": "无线鼠标，售价 99 元，属于数码商品。"}))
 ```
 
 它负责组织输入，不负责保证模型回答正确，也不会自动校验输出格式。
@@ -97,17 +99,16 @@ JSON 适合表达对象和列表，也容易与接口、数据库字段衔接。
 
 ```python
 from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 
 parser = JsonOutputParser()
-prompt = PromptTemplate(
-    template=(
+prompt = ChatPromptTemplate.from_messages([
+    ("system",
         "从商品描述提取 name、price、category 三个字段。"
         "price 用数字表示，单位为元；未提供的信息用 null，不要猜测。\n"
-        "{format_instructions}\n商品描述：{text}"
-    ),
-    input_variables=["text"],
-    partial_variables={"format_instructions": parser.get_format_instructions()},
-)
+        "{format_instructions}"),
+    ("human", "商品描述：{text}"),
+]).partial(format_instructions=parser.get_format_instructions())
 
 # | 将上一步输出传给下一步，构成 LCEL 处理链。
 chain = prompt | model | parser
@@ -138,6 +139,7 @@ print(result)
 from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 from langchain_core.output_parsers import PydanticOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 
 class ProductInfo(BaseModel):
     # 拒绝约定之外的字段。
@@ -150,14 +152,12 @@ class ProductInfo(BaseModel):
     )
 
 parser = PydanticOutputParser(pydantic_object=ProductInfo)
-prompt = PromptTemplate(
-    template=(
+prompt = ChatPromptTemplate.from_messages([
+    ("system",
         "从商品描述提取信息；未提供的字段填 null，不要猜测。\n"
-        "{format_instructions}\n商品描述：{text}"
-    ),
-    input_variables=["text"],
-    partial_variables={"format_instructions": parser.get_format_instructions()},
-)
+        "{format_instructions}"),
+    ("human", "商品描述：{text}"),
+]).partial(format_instructions=parser.get_format_instructions())
 chain = prompt | model | parser
 product = chain.invoke({"text": "无线鼠标，售价 99 元，属于数码商品。"})
 

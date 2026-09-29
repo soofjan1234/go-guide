@@ -32,9 +32,9 @@ weight: 30
 
 摘要通常在历史达到阈值后更新，并保留近期原文。若每轮都将全部历史重新送给摘要模型，摘要步骤的输入仍会不断增长，不能认为整个系统的 token 消耗已经固定。
 
-### 1.2 LangChain v1 的短期记忆
+### 1.2 LangChain v1 的会话状态保存
 
-`create_agent` 将对话消息放在 Agent 状态的 `messages` 中。配置 `checkpointer` 后，可以保存执行过程中的状态，再用同一个 `thread_id` 延续会话。
+`create_agent` 将对话消息放在 Agent 状态的 `messages` 中。`checkpointer` 按 `thread_id` 保存和恢复状态，本身不会控制传给模型的 Token 数。上下文裁剪、近期消息保留或摘要是另一层，可按 Token 预算使用 `trim_messages` 或 `SummarizationMiddleware` 等策略。
 
 ```python
 import os
@@ -142,11 +142,11 @@ print(response["messages"][-1].content)
 
 ### 2.2 bind_tools 与 create_agent 的区别
 
-`model.bind_tools([lookup_product])` 将工具定义提供给模型。一次 `invoke()` 可能返回带 `tool_calls` 的 `AIMessage`，但绑定动作不会替你运行本地函数。
+`bound = model.bind_tools([lookup_product])` 返回绑定了工具定义的新 Runnable，原 `model` 不会就地修改；后续调用应使用 `bound.invoke(...)`。一次调用可能返回带 `tool_calls` 的 `AIMessage`，但绑定动作不会替你运行本地函数。
 
 手动实现时，需要读取工具名与参数、执行函数，并构造带有对应 `tool_call_id` 的 `ToolMessage`；连同原始 `AIMessage` 再次交给模型，直到结束或达到执行限制。
 
-`create_agent` 已封装这个循环，适合直接构建工具调用助手。不能在工具执行完成后就直接等待用户下一次输入，否则本轮缺少模型根据工具结果继续处理的步骤。
+`create_agent` 已封装这个循环，适合直接构建工具调用助手。工具执行后通常还要让模型读到 `ToolMessage` 并完成本轮回答，再交回用户；需要中途审批时使用 `interrupt` 或 HITL middleware 暂停。
 
 ## 3. 综合案例：带记忆的商品查询助手
 

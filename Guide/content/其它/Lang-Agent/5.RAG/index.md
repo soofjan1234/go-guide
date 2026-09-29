@@ -49,6 +49,8 @@ LangChain 使用 `Document` 表示文本及元数据：`page_content` 是内容�
 - `length_function=len`：按字符计数，不是按 token 计数。
 - `separators`：从较大边界向较小边界尝试，末尾 `""` 允许最终退化到字符级拆分。
 
+中文文本空格少，分割时应优先保留标题、段落和句号等边界，再根据检索评测调整 `chunk_size` 与重叠；不能直接套英文按空格切分的默认效果。
+
 `split_text(text)` 通常将字符串变成字符串列表；`split_documents(documents)` 将 `Document` 列表变成更小的 `Document` 列表，并保留原元数据。标题分割器的 `split_text()` 则直接返回带标题元数据的 `Document`，不要混淆返回类型。
 
 安装 `langchain-core`、`langchain-text-splitters` 后，可直接运行下面的纯文本示例：
@@ -120,6 +122,8 @@ token_chunks = token_splitter.split_documents(documents)
 ### 2.3 向量嵌入与存储
 
 Embedding 将文本映射到向量空间，用距离或相似度检索候选。建库与查询必须使用匹配的 Embedding 模型和配置；更换模型后，通常需要重建向量索引。
+
+中文或中英混合资料应选在相应语料上效果经过验证的多语言或中文模型，例如 BGE 系列候选，再用本业务查询集比较召回。向量维度、是否归一化、文档和问题是否需要不同指令前缀，都按所选模型说明统一配置；不能只因维度相同就混用向量。
 
 #### 两个核心方法：embed_documents 与 embed_query
 

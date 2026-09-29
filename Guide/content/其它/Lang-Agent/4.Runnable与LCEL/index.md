@@ -21,6 +21,8 @@ weight: 40
 
 执行单次输入用 `invoke()`，多条输入用 `batch()`，异步调用用 `ainvoke()`，流式读取用 `stream()`。`batch()` 表示对多条输入执行，不一定对应模型供应商的离线批处理 API。
 
+LCEL 链的 `stream()` 输出最后一步能流式产生的块；若最后一步需要先攒完整输入，用户未必看到逐 Token 输出。要观察中间 Runnable 的事件，可用 `astream_events()`。模型遇到临时 429、超时可在模型步骤用 `with_retry(...)`，主模型失败后可用 `with_fallbacks([backup_model])`；不要默认重试整条含副作用的链。
+
 下面先使用不需要模型的代码理解数据流。安装依赖：
 
 ```bash

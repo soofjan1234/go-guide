@@ -29,6 +29,9 @@ draft: false
 2. 查看周期频率
     1. 定时任务
     2. 缓存失效
+    3. Go GC、流量潮汐、日志轮转或批处理
+
+先把尖刺时间与定时任务、GC、流量和缓存指标对齐，再用 CPU profile 找实际热点；周期相同只是线索，不等于根因。
 
 # 现实问题
 
@@ -48,7 +51,7 @@ draft: false
     - 交互慢：通常是静态资源（图片/视频）过大、CDN 慢、或异步接口（API）响应慢。
 2. 再看链路：利用浏览器 F12 抓包定位
     - 看 DNS Lookup 耗时：考虑更换 DNS 服务商，使用智能 DNS
-    - 看 Initial connection / SSL 耗时：开启 HTTP/2 或 HTTP/3（多路复用），优化服务器 SSL 配置
+    - 看 Initial connection / SSL 耗时：分别检查 TCP 建连、TLS 版本、证书链和会话恢复。HTTP/2 的多路复用改善连接建立后的多请求传输，不会缩短一次 TLS 握手；HTTP/3/QUIC 在适用环境下可能减少建连往返。
     - 看 TTFB（Time to First Byte，等待第一字节响应）：可以看出是前端还是后端
     - 看 Content Download（内容下载）：带宽被占满，或者单个资源（如 Banner 图、视频）体积过大
 4. 再看CDN
@@ -88,7 +91,7 @@ draft: false
 
 ## OOM怎么排查？
 
-趋势 → 谁被杀 → heap → goroutine → 代码泄漏点  → 先保现场
+先保现场：查 `dmesg` 或系统日志中的 OOM Kill 记录、容器的 `memory.events` 与内存上限；进程尚存活时立即抓 heap profile 和 goroutine dump。随后对比内存趋势与被杀进程，区分 Go heap、mmap、页缓存、goroutine 或 cgroup 限额问题，再定位增长对象和代码路径。进程已被杀时，不能假设还能补抓它的 heap。
 
 ## 已是核心功能，已知有发布，为何不直接回滚
 

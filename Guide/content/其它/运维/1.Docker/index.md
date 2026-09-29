@@ -21,10 +21,10 @@ Docker 不是虚拟机。容器共享宿主机内核，虚拟机则有完整 Gue
 
 ## Docker Image 和 Container 有什么区别？
 
-1. 状态：Image是静态的；Container是动态的，正在运行的
-2. 可读写性：Image只读；Container只写
-3. 占用空间：Image较大
-4. 关系：一个Image可以启动N个容器；一个容器基于一个镜像启动
+1. 状态：镜像是创建容器的模板；容器是镜像的实例，可以处于 created、running、exited 等状态。退出后仍可用 `docker ps -a` 查看。
+2. 可读写性：镜像层只读且可共享；容器看到的是可读可写的合并文件系统，每个容器有自己的可写层。
+3. 占用空间：多个容器可共享镜像层，运行中的写入、日志和挂载数据另占空间，不能只比较镜像与容器的大小。
+4. 关系：一个镜像可以创建多个容器；删除容器时，其默认可写层也会消失，独立 Volume 不随之删除。
 
 ### Image 为什么是只读的？
 
@@ -34,7 +34,7 @@ Docker 不是虚拟机。容器共享宿主机内核，虚拟机则有完整 Gue
 
 ![](docker/OverlayFS.png)
 
-为了满足程序运行时的写需求，并通过 OverlayFS 的 Copy-on-Write 技术，在不破坏只读镜像的前提下，为每个容器提供独立的写入沙盒
+OverlayFS 把多层只读镜像层（lowerdir）和容器的可写层（upperdir）合成一个视图。读取时先查 upperdir，再查 lowerdir；修改镜像中的文件时会先复制到 upperdir，删除则用 whiteout 遮住原文件，不会写穿镜像层。
 
 ![](docker/COW.png)
 
@@ -45,7 +45,7 @@ Docker 不是虚拟机。容器共享宿主机内核，虚拟机则有完整 Gue
 
 ### alpine 为什么只有几 MB？
 
-1. 用 musl libc 代替 glibc，体积更小，速度极快、更加安全。
+1. 使用 musl libc 而非 glibc，配合 BusyBox 缩小基础镜像；代价是依赖 glibc 的软件和部分 CGO 程序可能不兼容，不能由体积推断运行速度或安全性。
 2. 用 BusyBox 代替标准 GNU 工具集。把几十个最常用的 Unix 工具全部打包合并到了一个极小的可执行文件中（只有 1MB 多）
 
 > 在 Linux 世界中，libc（C 标准库）是所有程序的基石。程序只要运行在 Linux 上，最终都需要通过 libc 来调用 Linux 内核的功能
@@ -73,10 +73,12 @@ scratch 是一个虚拟的、完全空白的镜像。
 
 用新的进程替换当前进程，但保留原来的 PID
 
+Dockerfile 的 JSON exec 形式（如 `ENTRYPOINT ["./app"]`）直接启动应用；shell 形式（如 `CMD ./app`）会经过 `/bin/sh -c`。若用启动脚本，末尾写 `exec ./app` 可让应用接替脚本成为 PID 1，接收 `docker stop` 发给 PID 1 的 SIGTERM。
+
 ### 为什么需要 tini？
 
 1. 信号转发：当 docker stop 发送 SIGTERM 给 tini（PID 1）时，tini 会非常敬业地立刻转发给你的应用（PID 2）。
-2. 收割僵尸：当有孤儿进程产生并被托管给 PID 1 时，tini 会自动调用系统调用，把这些僵尸进程全部干净利落地收割掉，防止内存泄漏。
+2. 收割僵尸：子进程退出后需要父进程调用 `wait` 回收，否则僵尸会占用进程表中的 PID 项；tini 可以代 PID 1 回收被托管的子进程。这不是业务内存泄漏。
 
 > docker run --init -d my-node-app
 
@@ -89,14 +91,33 @@ scratch 是一个虚拟的、完全空白的镜像。
 2. 提高安全性（减少攻击面）
 3. 更快的传输和部署
 
+Go 服务的最小示例：
+
+```dockerfile
+FROM golang:1.24 AS build
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -o /app ./cmd/server
+
+FROM scratch
+COPY --from=build /app /app
+ENTRYPOINT ["/app"]
+```
+
+第一阶段有编译器，最终镜像只带程序；示例中的 Go 版本应与项目及支持周期匹配。实际使用时还要根据项目入口、证书和时区需求调整，并用 `.dockerignore` 排除无关文件。
+
 ## 为什么 COPY go.mod 再 go mod download？
 
-利用缓存
+先复制依赖清单并下载依赖，使源码变化时尽量复用依赖层；源码最后再复制。
 
 ## ENTRYPOINT 和 CMD 有什么区别？
 
 - ENTRYPOINT：容器启动时必定执行的命令（主程序）。	
 - CMD：传递给 ENTRYPOINT 的默认参数，或默认命令。
+
+仅设置 `CMD` 时，`docker run 镜像 新命令` 会替换整个默认命令；同时设置 `ENTRYPOINT` 和 `CMD` 时，运行参数通常替换 `CMD`，保留 `ENTRYPOINT`。
 
 ---
 
@@ -131,7 +152,7 @@ docker-compose 帮你在后台创建了自定义网络，并利用了 Docker 原
 ## Bind Mount 和 Volume 区别？
 
 1. 管理：Volume是由Docker统一管理；Bind Mount直接映射宿主机的绝对路径
-2. 影响：如果容器内挂载点本来就有文件，这些文件会自动复制到 Volume 中；Bind Mount的话，会被宿主机的文件夹直接覆盖（隐藏）
+2. 影响：空的 Volume 首次挂到镜像中已有内容的目录时，Docker 默认会把该目录内容复制进去；已有数据的 Volume 不会反复复制。Bind Mount 不复制，只会遮住容器原目录中的内容。
 3. 使用场景：数据库持久化用Volume；热更新用Bind Mount
 4. 命令：Volume无需指定地址；Bind Mount显式指定 type=bind，并指定地址
 
@@ -142,11 +163,11 @@ docker run --mount type=bind,source=/data/mysql,target=/var/lib/mysql nginx
 
 ## 为什么 OOM Killer 会杀容器？
 
-Linux 内核有一个保护机制叫 OOM Killer。当系统物理内存耗尽，为了防止整个操作系统崩溃（Kernel Panic），内核必须充当“杀手”，挑选一个或多个进程强制杀死，以释放内存。
+容器达到 `--memory` 等 cgroup 内存上限时，即使宿主机还有空闲内存，也可能发生容器内 OOM，内核会选择进程终止。未设置容器上限时，整机内存耗尽也可能触发宿主机级 OOM；排查时先区分这两类。
 
 ---
 
-# 第六层：实际部署
+# 第五层：实际部署
 
 ## docker-compose.yml 主要写哪些内容？
 
@@ -237,10 +258,10 @@ logging:
 ## 线上升级镜像怎么做？
 
 1. 修改配置文件，比如v1.3.0
-2. 拉取新镜像
-3. 滚动启动新版本：docker compose up -d --no-deps --build web-app
+2. 对示例中的 `image:` 服务执行 `docker compose pull web-app` 拉取新 tag。
+3. 执行 `docker compose up -d --no-deps web-app` 重建服务。单实例 Compose 更新会有中断，不等同于 Kubernetes 多副本滚动更新；只有使用本地 `build:` 构建时才加 `--build`。
 
-# 第七层：底层
+# 第六层：底层
 
 Docker 容器并不是真正的“虚拟机”，它本质上只是宿主机上的一个普通进程。之所以能起到虚拟机的效果，全靠 Linux 内核的两个机制：Namespace（命名空间）和Cgroups（Control Groups，控制组）
 
@@ -256,6 +277,8 @@ Docker 容器并不是真正的“虚拟机”，它本质上只是宿主机上�
 1. 限制CPU数量
 2. 绑定对应CPU核心
 3. 限制CPU权重
+
+内存可以用 `--memory` 设 cgroup 上限；CPU 配额和内存上限是运行时约束，不等同于 Kubernetes 调度时使用的 request。
 
 ## Containerd（容器运行时）
 

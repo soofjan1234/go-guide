@@ -99,6 +99,8 @@ Reducer 是某个字段的更新规则，决定“旧值”和“新返回值”
 
 例如已有 `records = ["清洗完成"]`，节点只需返回 `{"records": ["摘要完成"]}`，合并后就得到两条记录。不要返回旧列表再加新记录，否则旧内容会被重复拼接。
 
+`operator.add` 适合普通追加列表。聊天消息应使用 `langgraph.graph.message.add_messages` 或预定义的 `MessagesState`：它按消息 ID 追加或更新，不能把消息状态当成普通列表一直相加。
+
 同一轮多个节点同时写一个字段时，默认覆盖规则不能用来决定谁胜出，通常会触发并发更新错误。需要让它们写不同字段，或者为共享字段定义合适的 Reducer。**Reducer 负责合并数据，不负责安排节点先后顺序。**
 
 ### 1.2 Node：执行一个处理步骤
@@ -367,6 +369,56 @@ for update in parallel_graph.stream(initial_state, stream_mode="updates"):
 
 输出依次包含清洗更新、两条并行分支的更新、汇总更新；并行分支的事件先后顺序不应作为程序判断依据。这里看到的是各节点的局部更新，不是每次都输出完整 State。
 
+流模式需要分清：`values` 输出每一步合并后的完整状态，`updates` 输出节点提交的增量，`messages` 输出模型消息片段及元数据，更适合接逐 Token 展示。
+
 图没有待执行节点、也没有待传递的消息后结束。`END` 标记一条路线走到了出口；如果还有其他并行分支在执行，不能把一条边连到 `END` 理解成强制取消所有任务。
 
 到这里可以把整个机制串起来：**节点读取状态并返回更新，Reducer 合并字段，边确定后续路线，运行时按超步骤推进，直到没有后续任务。**
+
+## 4. 手写最小工具调用图
+
+前面的文本处理例子没有工具循环。手写 Agent 图时，可用 `MessagesState` 保存消息（内部使用 `add_messages`），模型节点产生工具调用，`tools_condition` 决定是否转到 `ToolNode`，工具结果再回到模型节点：
+
+```text
+START → model ──无工具调用──→ END
+           └──有工具调用──→ tools ──→ model
+```
+
+```python
+import os
+from langchain_core.tools import tool
+from langchain_openai import ChatOpenAI
+from langgraph.graph import MessagesState, StateGraph, START
+from langgraph.prebuilt import ToolNode, tools_condition
+
+
+@tool
+def lookup_price(sku: str) -> str:
+    """按 SKU 查询演示价格。"""
+    # 演示固定结果；实际项目应校验权限并调用真实数据源。
+    return "99 元" if sku == "M1" else "未找到"
+
+
+# 模型只提出工具调用；ToolNode 才负责执行函数。
+tools = [lookup_price]
+model = ChatOpenAI(model=os.environ["OPENAI_MODEL"]).bind_tools(tools)
+
+
+def call_model(state: MessagesState) -> dict:
+    """让模型读取现有消息并返回一条新消息。"""
+    return {"messages": [model.invoke(state["messages"])]}
+
+
+builder = StateGraph(MessagesState)
+builder.add_node("model", call_model)
+builder.add_node("tools", ToolNode(tools))
+builder.add_edge(START, "model")
+builder.add_conditional_edges("model", tools_condition)
+builder.add_edge("tools", "model")
+agent = builder.compile()
+
+result = agent.invoke({"messages": [{"role": "user", "content": "M1 多少钱？"}]})
+print(result["messages"][-1].content)
+```
+
+这就是 `create_agent` 封装的基本循环。若要跨请求延续会话或人工暂停，还需配置 checkpointer 与线程标识；这个最小例子只演示单次调用。

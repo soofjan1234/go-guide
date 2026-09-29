@@ -75,7 +75,9 @@ config = {"configurable": {"thread_id": "reply-review-001"}}
 
 ## 3. interrupt：暂停并等待审核意见
 
-`interrupt(payload)` 把需要展示的内容交给调用方，并暂停当前执行。本例使用普通 `invoke()` 接口，暂停信息出现在返回值的 `__interrupt__` 中；调用会返回，不会一直占着一个函数调用等待人回复。
+`interrupt(payload)` 要能跨调用恢复，图必须配置 checkpointer，并在调用时使用稳定的 `thread_id`。它把需要展示的内容交给调用方，暂停当前执行；本例使用普通 `invoke()` 接口，暂停信息出现在返回值的 `__interrupt__` 中，调用会返回，不会一直占着一个函数调用等待人回复。
+
+这里的 `interrupt()` 是节点内部的动态中断。`compile(interrupt_before=[...])` / `compile(interrupt_after=[...])` 是在指定节点前后设置静态断点，常用于调试或由外部控制执行；恢复时通常沿用相同线程配置并继续执行，不能把静态断点和 `Command(resume=...)` 提供动态审核结果混为一谈。
 
 恢复时再次调用图，传入 `Command(resume=审核意见)`。这个审核意见会成为节点内 `interrupt()` 的返回值。
 

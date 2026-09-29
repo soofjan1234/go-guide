@@ -15,6 +15,7 @@ weight: 80
 2. Skill：告诉 Agent 应该怎样做事
 3. MCP：让 Agent 接入外部能力
 4. Tool Calling、Skill 与 MCP 的区别
+5. A2A：Agent 之间的任务通信
 
 ## 1. Tool Calling：让 Agent 调用工具
 
@@ -123,7 +124,7 @@ Agent 不必一开始就把所有 Skill 的完整内容放进上下文。常见�
 
 ### MCP 是什么
 
-MCP（Model Context Protocol）是一套让外部能力以统一方式接入 Agent 的开放协议。
+MCP（Model Context Protocol）是一套让外部能力以统一方式接入应用的开放协议。**Host** 是运行 Agent 的应用，Host 内的 **Client** 与一个 **Server** 建立连接，Server 提供 Tools、Resources 和 Prompts。Host 负责权限与用户确认，Client 通过 JSON-RPC 通信；常见传输是本地 stdio 和远程 Streamable HTTP。
 
 没有统一协议时，不同 Agent 想接 GitHub、数据库或本地文件，往往都要分别编写一套适配代码。MCP 把这些能力包装成标准接口：支持 MCP 的 Agent 可以连接支持 MCP 的服务端，并发现和使用它提供的能力。
 
@@ -151,4 +152,8 @@ MCP（Model Context Protocol）是一套让外部能力以统一方式接入 Age
 | Skill | 面对一类任务时应该怎样做 | 操作说明书，例如代码审查步骤 |
 | MCP | 外部能力如何被标准化地提供给 Agent | 工具插座标准，例如接入 GitHub |
 
-一句话记忆：**Tool Calling 是一次调用动作，Skill 是做事方法，MCP 是接入外部能力的统一协议。**
+一句话记忆：**Tool Calling 是模型提出的一次调用请求，Skill 是做事方法，MCP 是接入外部能力的统一协议。**
+
+## 5. A2A：Agent 之间的任务通信
+
+A2A 面向 Agent 之间的发现、委派与任务协作；MCP 面向 Host 接入工具、资源与提示词。一个 Agent 可以通过 MCP 使用外部能力，也可以通过 A2A 把任务交给另一个 Agent，两者解决的层次不同。

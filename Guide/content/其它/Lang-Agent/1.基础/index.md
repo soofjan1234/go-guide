@@ -24,11 +24,13 @@ LangChain 最初的目标是降低 LLM 应用开发门槛，把 `Model`、`Promp
 
 ![](pic/第二阶段.png)
 
+图中若出现高层 Agent API，应按第四阶段的 v1 接口理解；本阶段主要说明核心协议与集成包拆分。
+
 其中 `langchain-core` 尽量保持轻量，负责 `Runnable`、Message、Tool 等基础协议；`langchain-openai`、`langchain-anthropic` 等负责具体模型厂商的适配；`langchain` 则提供更高层的开发接口。
 
 LCEL 在这个阶段非常重要。它让实现 `Runnable` 接口的组件可以通过 `|` 进行组合：`Prompt → Model → Parser`
 
-甚至可以构建包含并行、分支等逻辑的 Workflow。
+还可组合并行分支，但 LCEL 适合无环的数据处理；需要循环、持久化和人工介入的 Workflow 应交给 LangGraph。
 
 因此这一阶段主要解决的是**框架工程化问题**：通过拆包降低核心框架与第三方 Integration 之间的耦合，让不同组件可以独立演进。
 
@@ -38,7 +40,9 @@ LCEL 在这个阶段非常重要。它让实现 `Runnable` 接口的组件可以
 
 普通 Chain 通常是：`Prompt → Model → Parser`；RAG 也通常可以描述成：`Question → Retriever → Prompt → Model → Answer`
 
-这些流程的执行路径基本是开发者提前确定的。但真正的 Agent 不一样。它可能执行：
+旧版 `LLMChain` 的路径通常固定；`AgentExecutor` 后来能运行工具调用循环，但状态、暂停和恢复需要额外安排。LangGraph 把循环、状态与检查点放进运行时，`create_agent` 是其上的高层入口。
+
+这些固定链路的执行路径基本由开发者提前确定。真正的 Agent 可能执行：
 
 ```text
 User → LLM → 是否调用工具？
@@ -100,8 +104,8 @@ LangChain Python v1 将 `langchain` 主包聚焦于 Agent 开发，以 `create_a
 
 `create_agent` 同样支持 Checkpoint、状态恢复和人工审批，例如通过 `HumanInTheLoopMiddleware` 对工具调用进行审批。这些需求本身并不意味着必须直接使用 LangGraph。
 
+`HumanInTheLoopMiddleware` 的审批依赖底层 Graph 的中断与恢复机制；需要自定义审核节点时，再手写 `interrupt()` 流程。
+
 当标准 Agent 循环及其 middleware 能满足需求时，可以优先使用 `create_agent`；当业务需要精确控制节点、分支、循环和状态流转，例如自定义 `Planner → Executor → Reviewer` 的执行与回退规则时，再直接使用 LangGraph 的 `StateGraph`。
-
-
 
 
