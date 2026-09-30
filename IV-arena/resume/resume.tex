@@ -16,8 +16,17 @@
 \setlist[itemize,2]{itemsep=0.4ex, parsep=0.1ex, topsep=0.2ex}
 \renewcommand{\CJKglue}{\hskip 0.06em}
 
+% 保持正文区域高度不变，让上下页边距对称。
+\geometry{top=0.625in,bottom=0.625in}
+
 \begin{document}
 \pagenumbering{gobble}
+% 消除页首基线留白，避免整页内容额外向下偏移。
+\setlength{\topskip}{0pt}
+
+% 每页内容作为整体，前后使用等量弹性留白实现上下居中。
+\vspace*{\fill}
+\noindent\begin{minipage}{\textwidth}
 
 \name{侯汶政｜后端/全栈/Agent工程师}
 
@@ -86,7 +95,11 @@
 \item 全国大学生算法设计与编程挑战赛（银奖）
 \end{itemize}
 
+\end{minipage}\par
+\vspace*{\fill}
 \newpage
+\vspace*{\fill}
+\noindent\begin{minipage}{\textwidth}
 \section{\faSuitcase\ 工作经历}
 \datedsubsection{\textbf{软件工程师 @ 慧为智能科技有限公司}}{2023.05 - 至今}
 
@@ -113,13 +126,13 @@
 
     \item \textbf{相册}：
     {\small
-    \noindent\textcolor{gray}{NAS 本地照片管理服务，支持照片检测、去重与时间轴查询}
+    \noindent\textcolor{gray}{NAS 本地照片管理服务，支持照片检测、回忆、相册集与查询}
     }
     \vspace{0.2ex}
     \begin{itemize}
-        \item 基于拉普拉斯方差实现照片模糊检测，采用 Worker 并行计算、串行批量写入 SQLite；在 1000 张照片实验中，耗时由 13.51 s 降至 4.41 s。
-        \item 实现重复照片识别，结合宽高比、dHash 与 pHash 判定，并按 SHA1 缓存图像哈希；支持重复组管理、保留图切换与批量清理。
-        \item 优化相册时间轴慢查询：预计算拍摄时间缺失时的排序时间，回填历史数据并建立复合索引，使分页排序能够使用索引。
+        \item 基于拉普拉斯方差实现照片模糊检测，采用 Worker 并行计算、协调线程串行落库，分离图像计算与 SQLite 写入流程。
+        \item 结合宽高比、dHash 与 pHash 实现重复照片识别，并按 SHA1 缓存图像哈希；通过结果批量事务写入、进度更新节流及单次解码复用，将 3000 张图片的板端全量扫描耗时由约 14 分钟缩短至 4.5 分钟。
+        \item 优化时间轴分页查询，将动态 CASE 排序改为预计算 sort\_time，并建立用户、排序时间及 ID 的复合索引；在 5 万条媒体元数据对照实验中，查询 p95 平均由 302.85 ms 降至 10.43 ms。
     \end{itemize}
     \vspace{1ex}
 
@@ -153,4 +166,6 @@
 
 \end{itemize}
 
+\end{minipage}\par
+\vspace*{\fill}
 \end{document}
