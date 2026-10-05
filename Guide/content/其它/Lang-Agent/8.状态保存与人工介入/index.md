@@ -1,5 +1,5 @@
 ---
-title: LangGraph 状态保存与人工介入
+title: LangGraph 状态
 weight: 80
 ---
 

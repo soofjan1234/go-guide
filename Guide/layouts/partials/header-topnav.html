@@ -13,6 +13,8 @@
 {{ $network := site.GetPage "section" "其它/网络" }}
 {{ $operations := site.GetPage "section" "其它/运维" }}
 {{ $agent := site.GetPage "section" "其它/Agent" }}
+{{/* 获取 Lang-Agent 栏目，供顶部“其它”菜单使用。 */}}
+{{ $langAgent := site.GetPage "section" "其它/Lang-Agent" }}
 {{ $projects := site.GetPage "section" "项目" }}
 
 <nav class="top-index" aria-label="技术索引">
@@ -41,6 +43,7 @@
       {{ with $network }}<a href="{{ .RelPermalink }}">网络</a>{{ end }}
       {{ with $operations }}<a href="{{ .RelPermalink }}">运维</a>{{ end }}
       {{ with $agent }}<a href="{{ .RelPermalink }}">Agent</a>{{ end }}
+      {{ with $langAgent }}<a href="{{ .RelPermalink }}">Lang-Agent</a>{{ end }}
     </div>
   </div>
 

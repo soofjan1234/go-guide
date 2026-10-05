@@ -118,7 +118,7 @@
     }
     \vspace{0.2ex}
     \begin{itemize}
-        \item 使用多份真实文档对比不同解析方案，使用 pdftotext、antiword 等工具代替LibreOffice，平均内存、cpu降低 56 \%、47 \%。
+        \item 使用多份真实文档对比不同解析方案，使用 pdftotext、antiword 等工具代替 LibreOffice，平均内存、cpu降低 56 \%、47 \%。
         \item 针对内存受限环境，基于 Bleve 构建轻量级搜索能力；对超长文档采用分块索引和结果聚合，峰值 heapInuse 下降约 76\%。
         \item 使用 CJDict 词典分词，并以压缩 Trie longest-match 替代 substring + map 查词，将 Trace 总耗时降低约 48\%、进程 user CPU 降低约 63\%。
     \end{itemize}

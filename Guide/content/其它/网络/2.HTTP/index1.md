@@ -20,7 +20,7 @@ draft: false
 4. HTTP/1.1 强制要求 `Host`。
 5. HTTP/1.1 默认使用持久连接（Keep-Alive）。
 
-## HTTP 1.1
+## HTTP 1.1的缺点
 
 ![](pic/HTTP1.1.png)
 
@@ -59,9 +59,9 @@ HTTP/1.1 的请求和响应头部（Header）是纯文本的，且每次请求�
 需要理解这三个概念的关系：
 
 - 连接 (Connection)： 一个 TCP 连接，里面可以承载任意数量的双向数据流。
-流 (Stream)： 连接中的一个虚拟信道，可以双向传输。每个流都有一个唯一的整数标识符。
+- 流 (Stream)： 连接中的一个虚拟信道，可以双向传输。每个流都有一个唯一的整数标识符。
 - 消息 (Message)： 对应 HTTP/1.1 中的一个完整请求或响应，由一个或多个帧组成。
-帧 (Frame)： HTTP/2 传输的最小单位。
+- 帧 (Frame)： HTTP/2 传输的最小单位。
 - 关系： 一个 Connection 包含多个 Stream → 一个 Stream 传输一个 Message → 一个 Message 被拆分为多个 Frame。
 
 二进制分帧 + 多路复用，多个 Stream 可交错传输；但底层仍是一条 TCP 字节流，某个 TCP 报文丢失后，后续字节需等待补齐，其他 Stream 也可能被拖慢，属于 **TCP 层队头阻塞**。

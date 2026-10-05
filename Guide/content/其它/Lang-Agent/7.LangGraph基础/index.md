@@ -1,5 +1,5 @@
 ---
-title: LangGraph 基础：状态、节点、边与执行机制
+title: LangGraph 基础
 weight: 70
 ---
 
