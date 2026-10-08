@@ -106,8 +106,6 @@ COPY --from=build /app /app
 ENTRYPOINT ["/app"]
 ```
 
-第一阶段有编译器，最终镜像只带程序；示例中的 Go 版本应与项目及支持周期匹配。实际使用时还要根据项目入口、证书和时区需求调整，并用 `.dockerignore` 排除无关文件。
-
 ## 为什么 COPY go.mod 再 go mod download？
 
 先复制依赖清单并下载依赖，使源码变化时尽量复用依赖层；源码最后再复制。

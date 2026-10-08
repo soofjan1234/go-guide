@@ -3,15 +3,7 @@ title: 语言模型
 weight: 20
 ---
 
-# 目录
-
-1. LLM 是什么：下一词预测
-2. N-gram：用统计做文字接龙
-3. RNN/LSTM：给模型加入连续记忆
-4. Transformer：训练时并行处理序列
-5. Decoder-Only：GPT 的生成方式
-
-# LLM 是什么？
+## LLM 是什么？
 
 LLM 是 Large Language Model 的英文缩写，中文通常翻译为**大语言模型**。
 
@@ -36,7 +28,7 @@ flowchart LR
     p1 --> output["选择下一个 Token<br/>输出：好"]
 ```
 
-# 1. N-gram：用统计做文字接龙
+## 1. N-gram：用统计做文字接龙
 
 N-gram 是最早期、也最直观的语言模型之一。它的核心思想是：把一句话切成连续包含 N 个词的滑动窗口，然后根据历史统计预测下一个词。这个假设也被称为**马尔可夫假设**：下一个词主要取决于它前面的少量词。
 
@@ -65,7 +57,7 @@ N-gram 的优点是简单、可解释、容易实现。但它也有三个明显�
 - **上下文太短**：实际应用中，N 通常只能设到 3 或 5。也就是说，模型最多只记得前面几个词。
 - **缺乏语义理解**：N-gram 本质上是在“数数”，不理解词义。在它眼里，“猫”和“咪”可能是两个完全无关的符号。如果语料里只有“猫吃鱼”，它未必能从“咪吃____”联想到“鱼”。
 
-# 2. RNN/LSTM：给模型加入连续记忆
+## 2. RNN/LSTM：给模型加入连续记忆
 
 RNN（Recurrent Neural Network，循环神经网络）的核心思想是：
 
@@ -123,7 +115,7 @@ LSTM 是一种特殊的 RNN。它的核心创新，是引入**细胞状态（Cel
 
 LSTM 显著缓解了 RNN 的长期依赖问题，但它仍然保留了“按顺序读”的结构，因此并行效率依然有限。
 
-# 3. Transformer：把全文摊开来看
+## 3. Transformer：把全文摊开来看
 
 RNN/LSTM 的主要问题在于：必须读完前一个词，才能处理后一个词。Transformer 的想法更大胆：
 
@@ -133,7 +125,7 @@ RNN/LSTM 的主要问题在于：必须读完前一个词，才能处理后一�
 
 但这也带来一个新问题：如果所有词同时进入模型，模型怎么知道词的顺序？“猫吃鱼”和“鱼吃猫”包含同样的词，但意思完全不同。为了解决这个问题，Transformer 引入了**位置编码（Positional Encoding）**。
 
-## 位置编码（Positional Encoding）
+### 位置编码（Positional Encoding）
 
 Transformer 的核心组件自注意力机制（Self-Attention）是排列无关的。
 
@@ -141,7 +133,7 @@ Transformer 的核心组件自注意力机制（Self-Attention）是排列无关
 
 如果不加位置编码，句子 "Cat eats fish"（猫吃鱼）与 "Fish eats cat"（鱼吃猫）在 Transformer 看来生成的特征加权结果完全一致。因此，必须显式注入位置编码，让模型识别词语在序列中的先后次序与结构关系
 
-## 自注意力机制（Self-Attention）
+### 自注意力机制（Self-Attention）
 
 ![](pic/Transformer.png)
 
@@ -167,7 +159,7 @@ Transformer 的核心组件自注意力机制（Self-Attention）是排列无关
 
 计算后，“它”和“苹果”之间的注意力权重最高。于是，“它”的最终含义中就融入了大量“苹果”的信息，模型从而精准理解了“它 = 苹果”，而不是小明或小红。
 
-## 多头注意力（Multi-Head Attention）
+### 多头注意力（Multi-Head Attention）
 
 如果只做一次这种匹配，视角可能过于单一（比如只关注了指代关系）。
 
@@ -175,9 +167,9 @@ Transformer 将 Q/K/V 投影到多个子空间，各头独立计算注意力，�
 
 最后，模型把多个头看到的信息拼接起来，得到更丰富的文本表示。
 
-# 4. Transformer 的三种常见架构
+## 4. Transformer 的三种常见架构
 
-## Encoder-Only：更擅长理解
+### Encoder-Only：更擅长理解
 
 Encoder-Only 模型只保留 Encoder，代表是 BERT。它可以同时看到输入文本的左右两侧上下文
 
@@ -188,7 +180,7 @@ Encoder-Only 模型只保留 Encoder，代表是 BERT。它可以同时看到输
 
 但它通常不是按从左到右的方式生成文本，所以不适合作为聊天机器人持续续写回答。
 
-## Encoder-Decoder：输入到输出的转换
+### Encoder-Decoder：输入到输出的转换
 
 Encoder-Decoder 模型同时使用 Encoder 和 Decoder。Encoder 负责理解输入，Decoder 负责生成输出，代表包括原始 Transformer、T5 和早期很多机器翻译模型。
 
@@ -198,7 +190,7 @@ Encoder-Decoder 模型同时使用 Encoder 和 Decoder。Encoder 负责理解输
 - Encoder：理解英文含义
 - Decoder：生成对应中文
 
-## Decoder-Only：GPT 的生成方式
+### Decoder-Only：GPT 的生成方式
 
 GPT（Generative Pre-trained Transformer）采用的是 **Decoder-Only** 架构。它的基本思想非常统一：
 
@@ -216,7 +208,7 @@ GPT（Generative Pre-trained Transformer）采用的是 **Decoder-Only** 架构�
 
 推理可分为 **prefill** 和 **decode**：prefill 处理已有提示词，通常影响首 Token 延迟；decode 每步生成一个新 Token，并复用历史 Token 的 KV cache，避免反复计算旧位置的 K/V。上下文变长会增加 prefill 计算量和 KV cache 的显存占用。
 
-### 掩码自注意力（Masked Self-Attention）
+#### 掩码自注意力（Masked Self-Attention）
 
 训练时，模型通常会一次性拿到完整文本。但如果它能看到未来词，就无法真正学习“预测下一个词”。因此，Decoder-Only 模型使用**掩码自注意力**来防止偷看答案。
 
@@ -234,7 +226,7 @@ GPT（Generative Pre-trained Transformer）采用的是 **Decoder-Only** 架构�
 
 也就是说，“吃”可以看见“我、喜欢、吃”，但不能提前看到“苹果”。
 
-### Decoder-Only 为什么成为主流
+#### Decoder-Only 为什么成为主流
 
 Decoder-Only 架构之所以重要，主要有三个原因。
 

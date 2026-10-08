@@ -1,6 +1,6 @@
 ---
 title: 基础
-weight: 10
+weight: 1
 date: 2026-08-09
 draft: false
 ---
@@ -14,7 +14,7 @@ draft: false
   - 全链路批量处理；
   - 零拷贝的技术
 - RocketMQ 吞吐量也很高，且在高并发下更平稳：
-  - ommitLog 集中式顺序写
+  - commitLog 集中式顺序写
   - 利用 mmap 进行内存映射
   - 完美的业务兼顾
 - RabbitMQ 吞吐量比较低：
@@ -140,5 +140,3 @@ flowchart LR
 - `x-match=any`：任意一个 Header 匹配即可。
 
 Headers Exchange 表达能力强，但使用和维护成本更高。大多数业务使用 Direct 或 Topic Exchange 就足够了。
-
----
