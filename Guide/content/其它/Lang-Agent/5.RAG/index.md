@@ -145,26 +145,6 @@ print(len(query_vector))      # 向量维度，取决于模型及配置。
 
 向量不是文本的可逆编码，也不是唯一标识。维度相同不代表来自不同模型的向量可以混用。对商品编号等精确字符串，仅靠语义向量不一定够，混合检索放在下一篇讨论。
 
-#### 本地方案：HuggingFaceEmbeddings
-
-安装 `langchain-huggingface` 和 `sentence-transformers`，并将 `HF_EMBEDDING_PATH` 指向已下载且兼容 Sentence Transformers 的嵌入模型目录：
-
-```python
-from langchain_huggingface import HuggingFaceEmbeddings
-
-local_embeddings = HuggingFaceEmbeddings(
-    model_name=os.environ["HF_EMBEDDING_PATH"],
-    model_kwargs={"device": "cpu"},
-    encode_kwargs={"normalize_embeddings": True},
-)
-local_vectors = local_embeddings.embed_documents(["M1 无线鼠标保修一年。"])
-local_query = local_embeddings.embed_query("保修多久？")
-```
-
-本地推理由自己的设备承担计算开销；如果传入远程模型 ID，则首次加载可能下载权重。还应遵循模型卡规定的 query/document 前缀或 prompt 配置，不能只更换名称就假定效果相同。
-
-`normalize_embeddings=True` 将向量归一化为单位长度，使余弦、点积与欧氏距离的排序关系更容易对齐；它不是通用的“提升准确率”开关，要与模型建议及索引度量匹配。
-
 #### 向量存储负责什么？
 
 Embedding 模型负责计算向量，向量库负责保存向量、原文、元数据及 ID，并建立检索索引。常用接口包括：
@@ -190,8 +170,6 @@ print(ids)
 for hit in hits:
     print(hit.metadata, hit.page_content)
 ```
-
-若切换本地模型，将 `embedding=embeddings` 改为 `embedding=local_embeddings` 并重建索引即可。通常不需要先手动调用 `embed_documents` 再 `add_documents`，否则会重复计算。
 
 #### FAISS：保存与重新加载本地索引
 

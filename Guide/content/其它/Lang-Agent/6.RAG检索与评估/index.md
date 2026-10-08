@@ -135,30 +135,6 @@ result = {**data, "answer": answer_chain.invoke(data)}
 
 Recall@K 是“找到的相关项 / 全部标注相关项”，Precision@K 是“相关返回项 / 实际返回项”；MRR 中若首个相关结果排第 `r` 位，该问题得 `1/r`，再对问题集求平均。必须明确评测单位是文档还是分块，切分方案变化时不能直接混用旧分块标签。
 
-### 3.1 一个最小检索评测
-
-以下按来源 ID 计算召回，复用前面的 `retriever`；两个样本只用于演示计算过程，不能代表完整质量评估。
-
-```python
-eval_cases = [
-    {"question": "M1 鼠标保修多久？", "sources": {"mouse-m1-manual"}},
-    {"question": "K1 键盘怎么连接？", "sources": {"keyboard-k1-manual"}},
-]
-recalls = []
-for case in eval_cases:
-    docs = retriever.invoke(case["question"])
-    found = {doc.metadata["source"] for doc in docs}
-    recall = len(found & case["sources"]) / len(case["sources"])
-    recalls.append(recall)
-print("按来源计算的平均 Recall@2：", sum(recalls) / len(recalls))
-```
-
-这里总共只有两份文档且 K=2，即使排序很差也可能召回全部，因此不能据此证明检索优秀。正式评测应加入足够的干扰资料，并同时检查精度和排序。
-
-回答正确性与忠实性需要另行评估：答案可能碰巧正确，却没有资料支持；也可能忠实复述了过期文档，却不符合当前事实。可以人工标注或使用 LLM 评审，但自动评分应抽样复核。
-
-常见 RAG 评测还会使用 `faithfulness`（答案是否受检索上下文支持）、`answer relevancy`（是否回答了问题）、`context recall` 和 `context precision`（证据是否找全、有效片段是否排前）。这些自动指标需要结合人工样本复核，不能把忠实度当成事实正确性。
-
 ## 4. 调优：根据失败原因调整
 
 | 观察到的问题 | 优先检查或调整 |

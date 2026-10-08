@@ -1,5 +1,6 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{resume}[2015/05/25 An elegant Résumé class]
+% 声明名称与文档使用的 styles/resume 加载路径一致。
+\ProvidesClass{styles/resume}[2015/05/25 An elegant Résumé class]
 \LoadClass[11pt]{article}
 
 % disable indent globally
@@ -12,12 +13,17 @@
 \RequirePackage{progressbar}
 % use hyperlink for email and url
 \RequirePackage{hyperref}
+% 书签中的排版间距使用普通空格，正文的间距保持原样。
+\pdfstringdefDisableCommands{\def\quad{ }}
 \RequirePackage{url}
 \urlstyle{tt}
 % 图标字体从项目目录加载，避免依赖系统字体安装。
 \RequirePackage{fontspec}
 \defaultfontfeatures[FontAwesome]{Path=fonts/fontawesome/opentype/,Extension=.otf}
 \RequirePackage{fontawesome}
+% 图标字体只使用正常字形，避免继承标题的小型大写样式。
+\let\resumeOriginalFA\FA
+\renewcommand{\FA}{\upshape\resumeOriginalFA}
 % use xcolor for customizing color
 %\RequirePackage[usenames,dvipsnames]{xcolor}
 % loading fonts

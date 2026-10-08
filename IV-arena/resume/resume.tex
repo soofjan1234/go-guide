@@ -20,7 +20,8 @@
 \geometry{top=0.625in,bottom=0.625in}
 
 \begin{document}
-\pagenumbering{gobble}
+% 隐藏可见页码，保留内部页码以生成各页唯一的链接锚点。
+\pagestyle{empty}
 % 消除页首基线留白，避免整页内容额外向下偏移。
 \setlength{\topskip}{0pt}
 
@@ -30,7 +31,7 @@
 
 \name{侯汶政｜后端/全栈/Agent工程师}
 
-\section{\faInfoCircle\ 基本信息}
+\section[基本信息]{\faInfoCircle\ 基本信息}
 \vspace{0.5ex}
 \begin{minipage}[t]{0.48\textwidth}
 \begin{itemize}[label=,leftmargin=*]
@@ -55,7 +56,7 @@
 % {\setlength{\fboxsep}{0pt}\fbox{\includegraphics[height=5cm,keepaspectratio]{photo.jpg}}}
 % \end{minipage}
 
-\section{\faCogs\ 综合技术能力}
+\section[综合技术能力]{\faCogs\ 综合技术能力}
 \begin{itemize}
     \item \textbf{编程语言}
     \begin{itemize}
@@ -88,7 +89,7 @@
     \end{itemize}
 \end{itemize}
 
-\section{\faGraduationCap\ 教育背景}
+\section[教育背景]{\faGraduationCap\ 教育背景}
 \datedsubsection{\textbf{广州大学} \quad 学士，计算机科学与技术}{2019.09 -- 2023.06}
 \begin{itemize}
 \item CET-4 英语四级（610分），CET-6 英语六级（602分）
@@ -100,7 +101,7 @@
 \newpage
 \vspace*{\fill}
 \noindent\begin{minipage}{\textwidth}
-\section{\faSuitcase\ 工作经历}
+\section[工作经历]{\faSuitcase\ 工作经历}
 \datedsubsection{\textbf{软件工程师 @ 慧为智能科技有限公司}}{2023.05 - 至今}
 
 \paragraph*{私有云存储系统（NAS）开发}\mbox{}\\
