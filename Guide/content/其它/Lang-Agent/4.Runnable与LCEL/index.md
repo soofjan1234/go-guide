@@ -21,8 +21,6 @@ weight: 40
 
 执行单次输入用 `invoke()`，多条输入用 `batch()`，异步调用用 `ainvoke()`，流式读取用 `stream()`。`batch()` 表示对多条输入执行，不一定对应模型供应商的离线批处理 API。
 
-LCEL 链的 `stream()` 输出最后一步能流式产生的块；若最后一步需要先攒完整输入，用户未必看到逐 Token 输出。要观察中间 Runnable 的事件，可用 `astream_events()`。模型遇到临时 429、超时可在模型步骤用 `with_retry(...)`，主模型失败后可用 `with_fallbacks([backup_model])`；不要默认重试整条含副作用的链。
-
 下面先使用不需要模型的代码理解数据流。安装依赖：
 
 ```bash
@@ -148,42 +146,3 @@ print(route.invoke({"stock": 0}))   # 缺货
 
 分支由开发者定义的条件决定。若需要模型判断问题类型，可以先得到分类结果，再路由；这与 Agent 自主选择工具是不同的执行方式。
 
-## 7. 加入模型：保留原输入，生成商品文案
-
-安装 `langchain-openai`，配置 `OPENAI_API_KEY` 与可用的 `OPENAI_MODEL`，再运行下面示例。代码复用前文导入的 Runnable 类。
-
-```python
-import os
-from langchain_openai import ChatOpenAI
-from langchain_core.prompts import PromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-
-model = ChatOpenAI(model=os.environ["OPENAI_MODEL"])
-extract_prompt = PromptTemplate.from_template(
-    "从以下商品说明提取两个卖点，不要补充未提供的事实：{description}"
-)
-write_prompt = PromptTemplate.from_template(
-    "面向{audience}，根据卖点写一段简短介绍，不要夸大：{selling_points}"
-)
-
-# assign 保留 description、audience，并补充第一步生成的卖点。
-marketing_chain = (
-    RunnablePassthrough.assign(
-        selling_points=extract_prompt | model | StrOutputParser()
-    )
-    | write_prompt
-    | model
-    | StrOutputParser()
-)
-answer = marketing_chain.invoke({
-    "description": "无线鼠标，支持蓝牙连接，重量 60 克。",
-    "audience": "经常出差的用户",
-})
-print(answer)
-```
-
-这条链调用模型两次：先提取卖点，再生成文案。拆成多步便于观察和替换某一步，但也增加调用成本；简单任务不必为了使用链而拆分。
-
-## 8. 与 LangGraph 的边界
-
-LCEL 适合表达顺序、并行、分支以及数据转换。需要显式循环、可恢复状态、人工暂停等流程控制时，可以使用 LangGraph。它们可以配合：一个 LangGraph 节点内部也可以执行 LCEL 链。

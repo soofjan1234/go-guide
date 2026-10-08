@@ -24,8 +24,6 @@ LangChain 最初的目标是降低 LLM 应用开发门槛，把 `Model`、`Promp
 
 ![](pic/第二阶段.png)
 
-图中若出现高层 Agent API，应按第四阶段的 v1 接口理解；本阶段主要说明核心协议与集成包拆分。
-
 其中 `langchain-core` 尽量保持轻量，负责 `Runnable`、Message、Tool 等基础协议；`langchain-openai`、`langchain-anthropic` 等负责具体模型厂商的适配；`langchain` 则提供更高层的开发接口。
 
 LCEL 在这个阶段非常重要。它让实现 `Runnable` 接口的组件可以通过 `|` 进行组合：`Prompt → Model → Parser`
@@ -70,8 +68,6 @@ LangChain Python v1 将 `langchain` 主包聚焦于 Agent 开发，以 `create_a
 
 这使前面的演变衔接起来：早期 LangChain 以 Chain 和组件封装为主；LangGraph 提供有状态的编排与运行能力；LangChain v1 则在 LangGraph 之上提供高层 Agent API。阅读旧教程时，需要区分旧版 API 与 v1 的使用方式。
 
-参考：[LangChain v1 官方说明](https://docs.langchain.com/oss/python/releases/langchain-v1)。
-
 ## LangChain Python v1 和 LangGraph 是什么关系？
 
 它们不是竞争关系，而是互补的——一个帮你快速搭基础，一个帮你管控复杂流程。
@@ -104,8 +100,5 @@ LangChain Python v1 将 `langchain` 主包聚焦于 Agent 开发，以 `create_a
 
 `create_agent` 同样支持 Checkpoint、状态恢复和人工审批，例如通过 `HumanInTheLoopMiddleware` 对工具调用进行审批。这些需求本身并不意味着必须直接使用 LangGraph。
 
-`HumanInTheLoopMiddleware` 的审批依赖底层 Graph 的中断与恢复机制；需要自定义审核节点时，再手写 `interrupt()` 流程。
-
-当标准 Agent 循环及其 middleware 能满足需求时，可以优先使用 `create_agent`；当业务需要精确控制节点、分支、循环和状态流转，例如自定义 `Planner → Executor → Reviewer` 的执行与回退规则时，再直接使用 LangGraph 的 `StateGraph`。
 
 
