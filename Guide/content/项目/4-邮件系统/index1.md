@@ -84,7 +84,7 @@ PostgreSQL 同时承载：
 
 补充：
 - Recall@K（召回率@K）：检索出的前 K 个结果中，有没有包含标准答案（Ground Truth）
-- MRR（Mean Reciprocal Rank，平均倒数排名）：把所有 Query 中正确答案第一次出现的排名的倒数求平均
+- MRR（Mean Reciprocal Rank，平均倒数排名）：结果排好后，看第一个相关答案排在第几名。第 1 名得 1 分，第 2 名得 ½ 分，再对所有问题取平均。
 
 ## 合成集有什么？
 
