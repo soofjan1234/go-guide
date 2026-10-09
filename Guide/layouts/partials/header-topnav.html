@@ -2,6 +2,7 @@
 {{ $goActive := in (slice "Go" "go") $section }}
 {{ $middlewareActive := eq $section "中间件" }}
 {{ $otherActive := eq $section "其它" }}
+{{ $aiActive := in (slice "AI" "ai") $section }}
 {{ $projectActive := eq $section "项目" }}
 {{ $go := site.GetPage "section" "Go/Go" }}
 {{ $goPractice := site.GetPage "section" "Go/Go实战" }}
@@ -12,9 +13,11 @@
 {{ $other := site.GetPage "section" "其它/其它" }}
 {{ $network := site.GetPage "section" "其它/网络" }}
 {{ $operations := site.GetPage "section" "其它/运维" }}
-{{ $agent := site.GetPage "section" "其它/Agent" }}
-{{/* 获取 Lang-Agent 栏目，供顶部“其它”菜单使用。 */}}
-{{ $langAgent := site.GetPage "section" "其它/Lang-Agent" }}
+{{/* AI 栏目统一使用新目录，栏目内页面共享顶部高亮状态。 */}}
+{{ $ai := site.GetPage "section" "AI" }}
+{{ $agent := site.GetPage "section" "AI/Agent" }}
+{{ $claudeCode := site.GetPage "section" "AI/Claude Code" }}
+{{ $deepseekHarness := site.GetPage "section" "AI/Deepseek Harness" }}
 {{ $projects := site.GetPage "section" "项目" }}
 
 <nav class="top-index" aria-label="技术索引">
@@ -37,13 +40,20 @@
   </div>
 
   <div class="top-index-group">
+    {{ with $ai }}<a href="{{ .RelPermalink }}" class="top-index-link{{ if $aiActive }} is-active{{ end }}">AI</a>{{ end }}
+    <div class="top-index-dropdown">
+      {{ with $agent }}<a href="{{ .RelPermalink }}">Agent</a>{{ end }}
+      {{ with $claudeCode }}<a href="{{ .RelPermalink }}">Claude Code</a>{{ end }}
+      {{ with $deepseekHarness }}<a href="{{ .RelPermalink }}">Deepseek Harness</a>{{ end }}
+    </div>
+  </div>
+
+  <div class="top-index-group">
     {{ with $other }}<a href="{{ .RelPermalink }}" class="top-index-link{{ if $otherActive }} is-active{{ end }}">其它</a>{{ end }}
     <div class="top-index-dropdown">
       {{ with $other }}<a href="{{ .RelPermalink }}">其它</a>{{ end }}
       {{ with $network }}<a href="{{ .RelPermalink }}">网络</a>{{ end }}
       {{ with $operations }}<a href="{{ .RelPermalink }}">运维</a>{{ end }}
-      {{ with $agent }}<a href="{{ .RelPermalink }}">Agent</a>{{ end }}
-      {{ with $langAgent }}<a href="{{ .RelPermalink }}">Lang-Agent</a>{{ end }}
     </div>
   </div>
 

@@ -1,0 +1,15 @@
+{{- /* 按栏目配置选择目录内容；扁平栏目按主题权重收集全部文章，正文和侧栏共用此顺序。 */ -}}
+{{- $pages := .Pages.ByWeight -}}
+{{- if .Params.flat_articles -}}
+  {{- $pages = slice -}}
+  {{- /* 先按主题排序，再按主题内文章排序，避免各目录的 index1 混排。 */ -}}
+  {{- range .Sections.ByWeight -}}
+    {{- range .RegularPagesRecursive.ByWeight -}}
+      {{- $pages = $pages | append . -}}
+    {{- end -}}
+  {{- end -}}
+  {{- range .RegularPages.ByWeight -}}
+    {{- $pages = $pages | append . -}}
+  {{- end -}}
+{{- end -}}
+{{- return $pages -}}

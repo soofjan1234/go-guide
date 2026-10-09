@@ -1,5 +1,6 @@
 {{ $current := . }}
-{{ $sections := slice "Go" "go" "中间件" "其它" "项目" }}
+{{/* 顶级栏目的识别同时接受目录名和 Hugo 规范化后的 Section。 */}}
+{{ $sections := slice "Go" "go" "中间件" "其它" "AI" "ai" "项目" }}
 <nav class="nav-sidebar" aria-label="站点目录">
   <h2 class="side-title">目录</h2>
   <ul class="side-list">
@@ -7,6 +8,9 @@
       {{ $sectionPath := $current.Section }}
       {{ if eq $sectionPath "go" }}
         {{ $sectionPath = "Go" }}
+      {{ end }}
+      {{ if eq $sectionPath "ai" }}
+        {{ $sectionPath = "AI" }}
       {{ end }}
       {{ with site.GetPage "section" $sectionPath }}
         {{ $group := . }}
@@ -16,7 +20,7 @@
             {{ $navSection = . }}
           {{ end }}
         {{ end }}
-        {{ range $navSection.Pages.ByWeight }}
+        {{ range partial "section-pages.html" $navSection }}
         <li>
           <a href="{{ .RelPermalink }}" class="side-link{{ if or ($current.Eq .) (hasPrefix $current.RelPermalink .RelPermalink) }} is-active{{ end }}">{{ .Title }}</a>
         </li>
