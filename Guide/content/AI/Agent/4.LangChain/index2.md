@@ -1,6 +1,6 @@
 ---
 title: Runnable 与 LCEL
-weight: 20
+weight: 41
 aliases:
   - "/其它/agent/4.langchain/index2/"
   - "/其它/lang-agent/index2/"

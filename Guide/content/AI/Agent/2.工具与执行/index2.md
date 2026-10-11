@@ -1,6 +1,6 @@
 ---
 title: 执行方式
-weight: 20
+weight: 21
 aliases:
   - "/其它/agent/2.工具与执行/index2/"
   - "/其它/agent/index4/"

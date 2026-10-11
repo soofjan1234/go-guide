@@ -1,7 +1,8 @@
 ---
 title: 工具调用与能力接入
-weight: 10
+weight: 20
 aliases:
+  - "/其它/agent/2.工具与执行/"
   - "/其它/agent/2.工具与执行/index1/"
   - "/其它/agent/index3/"
 ---

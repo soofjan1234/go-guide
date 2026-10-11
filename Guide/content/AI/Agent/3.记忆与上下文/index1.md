@@ -1,7 +1,8 @@
 ---
 title: 记忆与上下文
-weight: 10
+weight: 30
 aliases:
+  - "/其它/agent/3.记忆与上下文/"
   - "/其它/agent/3.记忆与上下文/index1/"
   - "/其它/agent/index5/"
 ---
@@ -84,4 +85,4 @@ aliases:
 
 缓存不能替代长期记忆。写操作不能靠工具缓存跳过，副作用要靠幂等与结果核验控制。
 
-线程状态和跨线程资料的具体保存方式放在 [LangGraph 状态保存]({{< relref "AI/Agent/5.LangGraph/index2.md" >}})。
+线程状态和跨线程资料的具体保存方式放在 [LangGraph 状态保存]({{< relref "AI/Agent/5.LangGraph/index1.md" >}})。
