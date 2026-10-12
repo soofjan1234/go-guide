@@ -132,7 +132,7 @@
     \vspace{0.2ex}
     \begin{itemize}
         \item 基于拉普拉斯方差实现照片模糊检测，采用 Worker 并行计算、协调线程串行落库，分离图像计算与 SQLite 写入流程。
-        \item 结合宽高比、dHash 与 pHash 实现重复照片识别，并按 SHA1 缓存图像哈希；通过结果批量事务写入、进度更新节流及单次解码复用，将 3000 张图片的板端全量扫描耗时由约 14 分钟缩短至 4.5 分钟。
+        \item 结合宽高比、DINOv2＋SIFT＋RANSAC 实现重复照片识别，并按 SHA1 缓存图像哈希；通过结果批量事务写入、进度更新节流及单次解码复用，将 3000 张图片的板端全量扫描耗时由约 14 分钟缩短至 4.5 分钟。
         \item 优化时间轴分页查询，将动态 CASE 排序改为预计算 sort\_time，并建立用户、排序时间及 ID 的复合索引；在 5 万条媒体元数据对照实验中，查询 p95 平均由 302.85 ms 降至 10.43 ms。
     \end{itemize}
     \vspace{1ex}
@@ -154,7 +154,7 @@
     }
     \vspace{0.2ex}
     \begin{itemize}
-        \item 基于余弦距离实现增量式人脸聚类，基于 LFW/WIDER Face 验证模型效果，实现不同人误合并率 0\%、同人归类准确率 89\%。
+        \item 基于余弦距离实现增量式人脸聚类，基于 LFW 验证模型效果，实现不同人误合并率 0\%、同人归类准确率 89\%。
         \item 设计 NPU 租约调度机制，支持优先级、deadline 及心跳超时回收；基于 Protobuf/gRPC over Unix Domain Socket 对本机业务提供接口。
     \end{itemize}
     \vspace{1ex}

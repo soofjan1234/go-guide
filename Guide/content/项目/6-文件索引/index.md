@@ -1,5 +1,5 @@
 ---
-title: 其他
+title: 文件索引
 weight: 60
 date: 2026-06-12
 draft: false
@@ -51,10 +51,6 @@ Pending 表示任务已提交但还没处理；worker 开始处理前把它改�
 
 # 其他
 
-## NAS产品定价
-
-200-500美元，各型号不同
-
 ## NAS是什么
 
 可以理解为放在用户家里的个人私有云。
@@ -63,17 +59,25 @@ Pending 表示任务已提交但还没处理；worker 开始处理前把它改�
 
 我们既提供 NAS 硬件，也提供 LincOS 和配套客户端，所以它是一个软硬件一体化产品
 
-## 规格
+## NAS 产品规格
 
-基于瑞芯微芯片（如RK3568、RK3588）的 ARM 架构 NAS
+| 规格 | RK3568 测试机 | RK3576 测试机 |
+| --- | --- | --- |
+| 设备标识 | LincStation E1 / TVD8322R | TVD3570R 开发板 |
+| 采集方式 | ADB：`192.168.31.90:5555` | SSH：`192.168.31.37` |
+| CPU 架构 | ARM64 | ARM64 |
+| CPU | 4 核 Cortex-A55，最高约 2.0 GHz | 4 核 Cortex-A53 + 4 核 Cortex-A72，最高分别约 2.0 / 2.2 GHz |
+| 内存 | 约 4 GB | 约 4 GB |
+| NPU 标称算力 | 1 TOPS | 6 TOPS（INT8） |
+| 操作系统 | Android 12 + Debian 12 子系统 | Debian 12 |
+| Linux 内核 | 4.19.232 | 6.1.141 |
+| 系统存储 | 约 32 GB eMMC | 约 32 GB eMMC |
+| 文件系统 | SATA、NVMe 数据盘使用 Btrfs；系统与 `/data` 使用 ext4；Debian 子系统根目录使用 Overlay | 数据盘使用 Btrfs；`/userdata`、`/oem` 使用 ext4；根目录使用 Overlay |
+| 物理网口个数 | 1 个（E1 官方产品资料） | 待核实；系统当前识别到 1 个有线接口 |
+| 当前装入的数据盘 | 500 GB SATA 硬盘、128 GB NVMe SSD，另接 USB 闪存盘 | 128 GB KINGBANK KP320 数据盘 |
+| 数据盘位 | E1 标称为 2 个 SATA 盘位 + 2 个 M.2 NVMe 插槽 | 待核实 |
 
-相比于 Intel 的 x86 芯片，价格更便宜、功耗极低
-
-RK3576 的标称 NPU 算力为 6 TOPS。
-
-## 硬盘
-
-裸机，数据硬盘由用户自己购买。机器会自带用于系统运行的 eMMC 存储。有的系列可以装四个 M.2 NVMe、两个 SATA 数据盘
+数据硬盘由用户自行购买，机器自带用于系统运行的 eMMC。E1 官方当前标称 64 GB eMMC，本次测试机读到约 32 GB，记录时需区分产品版本与测试机配置。
 
 ## 优点
 

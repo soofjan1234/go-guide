@@ -1,6 +1,6 @@
 ---
 title: Agent
-weight: 0
+weight: 10
 flat_articles: true
 aliases:
   - "/其它/agent/"

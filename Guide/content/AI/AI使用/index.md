@@ -1,6 +1,6 @@
 ---
-title: AI
-weight: 20
+title: AI使用
+weight: 30
 date: 2026-05-27
 draft: false
 ---

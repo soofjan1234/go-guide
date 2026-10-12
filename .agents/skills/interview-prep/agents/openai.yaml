@@ -1,0 +1,4 @@
+interface:
+  display_name: "面试准备"
+  short_description: "联网调研目标公司并结合个人简历生成三条精炼面试回答"
+  default_prompt: "使用 $interview-prep 根据公司和岗位准备三条简洁面试回答。"

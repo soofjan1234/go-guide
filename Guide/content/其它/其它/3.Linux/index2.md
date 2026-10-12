@@ -1,40 +1,9 @@
 ---
-title: Linux
-weight: 30
+title: Linux 资源与性能排查
+weight: 20
 date: 2026-05-27
 draft: false
 ---
-
-## 进程、协程、线程对比 +3
-
-1. 进程资源分配的最小单位；线程是CPU调度的最小单位；协程是轻量级线程
-2. 协程是用户态的，切换开销最小，适合 I/O 密集高并发；其他两个需要系统调用，切换开销较大
-3. 进程资源隔离；线程共享进程地址空间等资源；协程共享进程内存，由 runtime 映射到 OS 线程（M:N）
-
-## 进程通信 +1
-
-1. 匿名管道（`pipe`，常用于有亲缘关系的进程）与命名管道（FIFO，可供无亲缘关系的进程通信）。
-2. 信号是异步通知，如 SIGTERM；信号量是计数同步原语，用于协调资源访问，两者不是同一种机制。
-3. 共享内存
-4. 消息队列
-5. 套接字
-
-子进程退出后，父进程若未调用 `wait` 回收退出状态，会留下占用 PID 表项的僵尸进程；父进程先退出时，孤儿进程会被 init 或其他 subreaper 接管。Go 使用 `os/exec` 启动子进程后也要调用 `Wait`。
-
-## 权限模型 (rwx / 755) +1
-
-- **权限位**：`r` (读/4), `w` (写/2), `x` (执行/1)。
-- **三组身份**：所有者 (Owner) / 所属组 (Group) / 其他人 (Others)。
-- **常见权限**：
-  - `755` (`rwxr-xr-x`)：所有者全权，其他人可读可执行。
-  - `644` (`rw-r--r--`)：普通文件标准权限。
-  - `600` (`rw-------`)：私钥文件常用权限。
-
-## 脚本第一行（Shebang）作用 +1
-
-告诉系统用哪个解释器执行脚本。
-- `#!/bin/bash`：路径固定，如果 bash 不在 `/bin` 下会报错。
-- `#!/usr/bin/env bash`：更便携，会从当前用户的 `PATH` 中查找 bash。
 
 ## top
 
@@ -46,7 +15,7 @@ Tasks: 301 total,   1 running, 300 sleeping,   0 stopped,   0 zombie
  Swap:  4086656K total,     1024K used,  4085632K free,  2319180K cached
 400%cpu  48%user   0%nice  22%sys 323%idle   0%iow   5%irq   2%sirq   0%host
 
-  PID USER         PR  NI VIRT  RES  SHR S[%CPU] %MEM     TIME+ ARGS      
+  PID USER         PR  NI VIRT  RES  SHR S[%CPU] %MEM     TIME+ ARGS
  1569 root         20   0 1.2G  27M  14M S  3.0   0.6  12:07.98 LincStorageMGMT
 30608 root         20   0  10G 5.5M 4.3M R  2.0   0.1   0:00.18 top
 ```
