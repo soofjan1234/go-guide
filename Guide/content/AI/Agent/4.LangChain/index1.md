@@ -1,7 +1,8 @@
 ---
 title: LangChain 与核心组件
-weight: 10
+weight: 40
 aliases:
+  - "/其它/agent/4.langchain/"
   - "/其它/agent/4.langchain/index1/"
   - "/其它/lang-agent/index1/"
   - "/其它/lang-agent/index3/"
@@ -145,4 +146,4 @@ LangChain Python v1 的 `create_agent` 基于 LangGraph 构建，已经封装常
 
 消息和执行日志用于检查公开的调用过程，不等于模型完整的内部思考。提示词要求“必须查工具”，也不能替代业务侧的执行核验。
 
-消息裁剪策略见 [记忆与上下文]({{< relref "AI/Agent/3.记忆与上下文/index1.md" >}})；检查点与线程管理见 [状态保存与人工介入]({{< relref "AI/Agent/5.LangGraph/index2.md" >}})。
+消息裁剪策略见 [记忆与上下文]({{< relref "AI/Agent/3.记忆与上下文/index1.md" >}})；检查点与线程管理见 [状态保存与人工介入]({{< relref "AI/Agent/5.LangGraph/index1.md" >}})。
