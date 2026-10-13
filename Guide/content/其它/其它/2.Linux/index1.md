@@ -1,6 +1,6 @@
 ---
 title: Linux 基础与常用命令
-weight: 10
+weight: 20
 date: 2026-05-27
 draft: false
 ---

@@ -43,6 +43,8 @@ fmt.Println(e2 == nil) // false：动态类型已是 *MyError，只是 data 为 
 
 ![同步原语.WaitGroup](pic/同步原语.WaitGroup.png)
 
+等待一组并发任务（Goroutine）全部执行完毕，然后再继续向下执行后续代码。
+
 sync.WaitGroup 只有三个方法：
 
 1. Add(delta int)：把计数器加上 delta。通常用来设定要等待的协程数量。
