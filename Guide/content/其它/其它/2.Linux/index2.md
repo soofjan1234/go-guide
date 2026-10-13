@@ -5,6 +5,7 @@ date: 2026-05-27
 draft: false
 ---
 
+# cpu
 ## top
 
 上半部分是系统整体状态，下半部分是进程列表。
@@ -43,7 +44,7 @@ procs ------------memory------------ ----swap--- -----io---- ---system-- ----cpu
 2. vmstat是像打日志一样，top的交互式，占用终端
 3. vmstat可以看出 CPU 占用或 I/O 是在上升还是下降。
 
-## 内存
+# 内存
 
 通过 free -h 命令查看
 
@@ -52,6 +53,8 @@ procs ------------memory------------ ----swap--- -----io---- ---system-- ----cpu
 Mem:           15Gi       8.0Gi       1.5Gi       500Mi       5.5Gi       6.5Gi
 Swap:         2.0Gi       1.0Gi       1.0Gi
 ```
+
+## mem
 
 1. total：总内存
 2. free：完全空闲内存。
@@ -63,7 +66,7 @@ Swap:         2.0Gi       1.0Gi       1.0Gi
   - 计算公式大致为： available ≈ free + 大部分的 buff/cache
 5. used：已用内存
 
-### swap
+## swap
 
 swap（虚拟内存）是硬盘上的一块区域。当物理内存（RAM）实在不够用时，操作系统会把内存里暂时不常用的数据“丢”到硬盘的 Swap 空间里，把珍贵的物理内存腾出来给急需运行的程序
 1. used（已用大小）：
