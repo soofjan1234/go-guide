@@ -5,7 +5,7 @@ date: 2026-05-27
 draft: false
 ---
 
-# 什么是RPC
+## 什么是RPC
 
 RPC（Remote Procedure Call，远程过程调用）是一种远程调用方式，不是某一种固定的传输协议。它让调用方以类似本地函数的形式调用远端服务，但网络超时、重试和远端故障仍需显式处理。
 
@@ -16,22 +16,6 @@ gRPC 是 Google 开源的 RPC 框架，默认 HTTP/2 + Protobuf。一份 `.proto
 ## 四种 gRPC 调用模型
 
 gRPC 不只有“请求一次、返回一次”，服务方法在 `.proto` 中可定义为四种模型：
-
-```proto
-service PhotoService {
-    // 1. 一元 RPC：一次请求，对应一次响应。
-    rpc GetPhoto(PhotoRequest) returns (PhotoResponse);
-
-    // 2. 服务端流：客户端请求一次，服务端连续返回多条消息。
-    rpc WatchProgress(TaskRequest) returns (stream Progress);
-
-    // 3. 客户端流：客户端连续上传多条消息，最后得到一次响应。
-    rpc UploadPhoto(stream PhotoChunk) returns (UploadResult);
-
-    // 4. 双向流：两端都可连续发送消息，读写相互独立。
-    rpc Chat(stream ChatMessage) returns (stream ChatMessage);
-}
-```
 
 1. **一元 RPC（Unary）**：最常用，适合查询照片、创建任务等普通请求/响应场景。
 2. **服务端流（Server streaming）**：适合订阅任务进度、日志或持续推送结果；客户端发完一个请求后持续读取服务端消息。
@@ -52,34 +36,16 @@ Metadata 是附着在**一次 RPC 调用**上的键值对，类似 HTTP Header�
 
 ![](pic/RPCvsHTTP.png)
 
-1. 接口风格：REST 风格 API 常以资源和 HTTP 方法组织接口；RPC 常以服务方法表达操作。HTTP API 也可以设计成动作接口。
-2. 传输协议：REST 风格 API 可使用 HTTP/1.1、HTTP/2 或 HTTP/3；gRPC 常基于 HTTP/2，其他 RPC 框架也可能使用自定义 TCP 协议。
-3. 数据序列化：前者常用 JSON，后者常用 Protobuf；编码格式并不由 HTTP 或 RPC 这个名称强制决定。
-4. 契约约束：`.proto` / IDL 可以生成强类型代码；HTTP API 也可以使用 OpenAPI 等契约并生成代码，约束强弱取决于团队如何维护和验证。
-5. 性能/吞吐：二进制编码、连接复用等机制可能降低部分开销，但实际延迟和吞吐受消息大小、实现与负载影响，应在相同条件下测量。
+| 维度 | gRPC + Protobuf（RPC 阵营） | HTTP + JSON / REST（通用网络阵营） |
+| :--- | :--- | :--- |
+| **设计哲学** | **面向过程 / 动作**（像调用本地函数一样调远程方法） | **面向资源 / 统一接口**（也可灵活设计成动作/RPC 风格） |
+| **传输协议** | **HTTP/2（或 TCP / IPC）**：原生支持多路复用、双向流式通信，支持 UDS 本机进程通信 | **HTTP/1.1、HTTP/2 或 HTTP/3**：以请求-响应为主，流式通常依赖 SSE/WebSocket 或分块传输 |
+| **数据序列化** | **Protobuf（二进制）**：编码体积更小、编解码更快、更节省带宽和 CPU | **JSON（文本格式）**：人类直观可读，但体积较大、解析性能相对较弱 |
+| **契约约束** | **硬契约（强类型代码生成）**：以 `.proto` 为单一数据源，自动生成多语言客户端/服务端代码，编译期暴露不兼容问题 | **软/半强契约（依赖规范与文档）**：契约约束强弱依赖团队规范（如 OpenAPI/Swagger 生成代码），容错高但易出现运行时隐患 |
+| **功能特性** | **内建原生支持**：开箱即用的 Deadline/超时控制、请求取消（Cancellation）、标准状态码与流式调用 | **依赖应用层实现**：需自行在请求头或中间件中约定超时、追踪等元数据协议 |
+| **开发与排障** | **依赖工具链**：对机器友好。需提前编译生成 Stub 代码，抓包与手工调试依赖专用工具（如 grpcurl） | **极度灵活直观**：对人友好。浏览器、curl、Postman、脚本随手可调，抓包与排障门槛极低 |
+| **适用场景** | **内部服务与高性能基建（东西向）**：微服务内网 RPC、高吞吐/低延迟服务、同机 IPC、跨团队强契约协作 | **开放生态与终端交互（南北向）**：Web 浏览器端、对外开放 API、调用方技术栈杂乱、数据结构频繁变化的场景 |
 
-## 如何选择 gRPC + Protobuf 或 HTTP API + JSON
-
-![](Protobuf对比Json.png)
-
-```proto
-message User {
-    int32 user_id = 1;  // 唯一代号/编号 Tag
-    string name   = 2;  // 这个字段的代号是 2
-}
-```
-
-.proto + gRPC 往往更合适：
-- 字段和类型固定，改接口时更容易发现双方不兼容。
-- 自动生成 Go/C++ 等客户端代码，少手写请求和响应解析。
-- 二进制编码通常更小、更快。
-- 原生支持 deadline、取消、流式调用和标准状态码。
-- 很适合 Unix Domain Socket 的本机进程通信。
-
-但 HTTP + JSON 也有明显优势：
-- 浏览器、脚本、curl 都能直接调用和调试。
-- 对外开放 API 更通用，文档和排障门槛低。
-- 数据结构经常变化、调用方语言杂时更灵活。
 
 ## RPC 的核心工作流程
 
