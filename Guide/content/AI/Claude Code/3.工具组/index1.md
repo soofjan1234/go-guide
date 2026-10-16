@@ -1,6 +1,6 @@
 ---
 title: AgentTool 子 Agent
-weight: 10
+weight: 110
 ---
 
 AgentTool 的作用是**把一个相对独立的任务委派给另一个 Agent 执行**。主 Agent 不必在同一条上下文里完成所有搜索、分析和验证，而是可以把部分工作交给子 Agent，最后接收结果。

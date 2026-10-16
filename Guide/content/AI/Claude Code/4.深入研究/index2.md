@@ -1,6 +1,6 @@
 ---
 title: MCP 与 LSP 集成
-weight: 20
+weight: 220
 ---
 
 Claude Code 的工具系统不必只依赖内置的 Read、Edit 和 Bash。**MCP 负责把外部能力接入 Agent，LSP 则帮助 Agent 更准确地理解代码符号与引用关系。** 二者用途不同，但都能提升 Agent 获取信息和完成任务的能力。

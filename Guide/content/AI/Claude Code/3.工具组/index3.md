@@ -1,6 +1,6 @@
 ---
 title: AskUserQuestionTool 用户交互
-weight: 30
+weight: 130
 ---
 
 Agent 并不总能仅凭现有信息完成任务。当关键需求存在多种合理选择，而且不同选择会明显改变实现时，**AskUserQuestionTool 允许 Agent 把决策交还给用户，再根据回答继续执行**。这属于 Human-in-the-loop（人在回路中）的常见形式。
