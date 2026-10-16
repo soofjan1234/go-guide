@@ -1,6 +1,6 @@
 ---
 title: SkillTool 技能加载
-weight: 20
+weight: 120
 ---
 
 SkillTool 的价值是**让 Agent 按需获取一套可复用的任务指导**，而不是把所有领域知识、流程和规则都塞进长期生效的 System Prompt。

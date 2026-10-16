@@ -3,131 +3,117 @@ title: 核心引擎
 weight: 20
 ---
 
-QueryEngine 是 Claude Code 的会话级任务编排器。它不只调用一次模型，还负责管理消息、协调工具执行，并处理权限、预算、中断等运行约束。
+QueryEngine 负责把一次用户请求，推进成“模型分析 → 工具执行 → 根据结果继续分析”的完整任务。它还要保存消息、处理中断，并限制执行轮次和费用。
 
-# QueryEngine 与会话
+下面以“检查 `main.ts` 有没有问题”为例，理解它的执行过程。
 
-源码注释将其描述为 `One QueryEngine per conversation.`。需要区分三个层次：
+# 会话、任务与模型请求
 
-| 概念 | 含义 |
+源码注释是 `One QueryEngine per conversation.`，即一个会话对应一个 QueryEngine。这里需要区分三个层次：
+
+| 概念 | 对应这个例子 |
 | --- | --- |
-| Conversation | 持续的会话，持有 QueryEngine 和必要的会话状态 |
-| Agent Run | 一次用户输入触发的任务执行 |
-| Model Request | Agent Run 中的一次模型 API 请求 |
+| Conversation：会话 | 用户与 Claude Code 持续交流的整个聊天 |
+| Agent Run：任务执行 | 这次“检查 main.ts”的请求触发的执行过程 |
+| Model Request：模型请求 | 执行任务过程中，向模型发起的一次调用 |
 
-一次 Agent Run 可能包含多次 Model Request；同一个 Conversation 也可以先后执行多次 Agent Run。会话级对象并不意味着所有状态都永久保留，部分状态会在每轮提交任务时重置。
+它们的关系是：
 
-## 核心状态
-
-| 字段 | 作用 |
-| --- | --- |
-| `mutableMessages` | 维护会话消息历史 |
-| `abortController` | 控制执行中断 |
-| `permissionDenials` | 记录权限拒绝 |
-| `totalUsage` | 统计模型使用量 |
-| `readFileState` | 维护文件读取状态缓存 |
-| `discoveredSkillNames` | 记录发现的 Skill 名称 |
-| `loadedNestedMemoryPaths` | 记录已加载的嵌套 Memory 路径 |
-
-
-# submitMessage：一次任务的入口
-
-`submitMessage()` 接收用户输入，准备本次任务的运行环境，并通过异步生成器持续向上层输出消息。文章节选：
-
-```typescript
-async *submitMessage(
-  prompt: string | ContentBlockParam[],
-  options?: { uuid?: string; isMeta?: boolean },
-): AsyncGenerator<SDKMessage, void, unknown> {
-  const {
-    cwd,
-    commands,
-    tools,
-    mcpClients,
-    verbose = false,
-    thinkingConfig,
-    maxTurns,
-    maxBudgetUsd,
-  } = this.config
-
-  this.discoveredSkillNames.clear()
-  setCwd(cwd)
-  const persistSession = !isSessionPersistenceDisabled()
-}
+```text
+一个会话
+  ├─ 第一次任务：检查 main.ts
+  │    ├─ 请求模型：决定读取文件
+  │    ├─ 请求模型：读完后决定搜索相关调用
+  │    └─ 请求模型：综合结果回答
+  └─ 第二次任务：根据发现修改代码
+       └─ 继续发起若干次模型请求
 ```
 
-以上是用于说明入口职责的源码节选，并非 `submitMessage()` 的完整实现。
+**用户发一条消息，不代表后台只调用一次模型。** 一次任务可能包含多次模型请求，同一个会话也可以先后执行多次任务。
 
-## 为什么使用异步生成器？
+# submitMessage：每次任务的入口
 
-`async *` 表示异步生成器，调用者可使用 `for await...of` 逐步接收消息，无需等整项任务完成后一次性返回：
+用户输入交给 `submitMessage()` 后，引擎要准备本次任务的执行条件：
+
+| 配置 | 需要确定的事情 |
+| --- | --- |
+| `cwd` | 在哪个工作目录执行 |
+| `commands` | 有哪些可用命令 |
+| `tools` | 可以调用哪些工具 |
+| `mcpClients` | 有哪些 MCP 客户端连接 |
+| `thinkingConfig` | 使用什么模型思考配置 |
+| `maxTurns` | 最多执行多少轮 |
+| `maxBudgetUsd` | 最多使用多少美元预算 |
+
+引擎还会重置部分本轮状态。例如，原笔记中的 `discoveredSkillNames.clear()` 会清空已发现的 Skill 名称记录。
+
+**会话继续保留，不等于所有状态都一直累积。** 聊天历史可以延续，本轮临时状态则可能重置。
+
+# Agent Loop：模型与工具配合完成任务
+
+用户输入“检查 main.ts”后，可能经历下面的过程：
+
+```text
+用户：检查 main.ts
+        ↓
+模型请求 1：提出 Read(main.ts) 工具调用
+        ↓
+Harness 检查权限并执行 Read
+        ↓
+把文件内容交回模型
+        ↓
+模型请求 2：提出 Grep(...)，搜索相关调用
+        ↓
+Harness 检查权限、执行 Grep，把结果交回模型
+        ↓
+模型请求 3：信息足够，给出分析结果
+        ↓
+本次任务结束，保留必要的会话状态
+```
+
+这里的 Harness 指模型外围的运行程序，负责组织模型调用、执行工具和管理运行过程。
+
+- **模型决定下一步想做什么**：例如读取文件、搜索代码，或者直接回答。
+- **Harness 判断能不能做、实际执行，再返回结果**：包括权限检查、工具执行、错误处理和结果回填。
+
+工具调用中的两个关键名称：
+
+| 名称 | 含义 |
+| --- | --- |
+| `tool_use` | 模型提出的工具调用请求，例如读取 main.ts |
+| `tool_result` | 程序执行工具后返回的结果，例如文件内容或执行错误 |
+
+模型提出“读取文件”，仍需要程序真正读取；随后模型才能根据工具结果继续判断下一步。
+
+这个循环也可能因用户中断、达到轮次或预算限制而停止，并非每次都能完成目标。
+
+# 为什么要维护运行状态
+
+任务会跨多步执行，引擎需要记住已经做了什么，以及当前受到哪些约束：
+
+| 字段 | 可以这样理解 |
+| --- | --- |
+| `mutableMessages` | 保存聊天历史、工具调用及其返回结果 |
+| `abortController` | 用户停止任务时，用来发出中断信号 |
+| `permissionDenials` | 记录哪些操作被拒绝过 |
+| `totalUsage` | 统计已经消耗的模型用量 |
+| `readFileState` | 保存文件读取相关状态缓存 |
+| `discoveredSkillNames` | 记录发现过哪些 Skill |
+| `loadedNestedMemoryPaths` | 记录加载过哪些嵌套 Memory 文件路径 |
+
+这些状态让多次模型请求能够连成一次连续任务，而不是每次调用都从头开始。
+
+# async *：边执行，边返回消息
+
+`async *` 表示异步生成器，允许函数在执行过程中逐条产出消息。调用者使用 `for await...of` 接收：
 
 ```typescript
 for await (const message of engine.submitMessage(prompt)) {
+  // 每收到一条消息，就及时交给界面或其他上层调用方处理。
   console.log(message)
 }
 ```
 
-它适合逐步输出模型消息、工具执行相关事件和最终结果。**流式输出是上层消费方式，不等于每条消息都会触发一次新的模型请求。**
+这样，上层可以陆续展示消息、工具执行进展和最终结果，无需等整个任务结束。
 
-## 本轮任务的配置
-
-| 配置 | 用途 |
-| --- | --- |
-| `cwd` | 当前工作目录 |
-| `commands` | 可用命令 |
-| `tools` | 可用工具集合 |
-| `mcpClients` | MCP 客户端连接 |
-| `thinkingConfig` | 模型思考配置 |
-| `maxTurns` | 执行轮次限制 |
-| `maxBudgetUsd` | 预算限制 |
-
-这些配置决定任务在哪里运行、能使用哪些能力、受到哪些约束。示例中的 `discoveredSkillNames.clear()` 也说明部分状态会在提交新任务时重置。
-
-# Agent Loop：模型与工具的闭环
-
-核心流程如下：
-
-```text
-用户输入
-   ↓
-QueryEngine 组织上下文并调用模型
-   ↓
-模型输出内容或提出 tool_use
-   ↓
-如果需要工具：权限检查 → 执行工具
-   ↓
-将 tool_result 交回模型
-   ↓
-模型根据新结果继续决策
-   ├─ 再次调用工具 → 循环
-   └─ 给出最终回答 → 结束本轮任务
-```
-
-**模型负责提出工具调用，Harness 负责权限判断、实际执行、错误处理和结果回填。** 模型本身不会直接读取文件或运行命令。
-
-例如用户请求“检查 `main.ts` 的潜在问题”，模型可能先请求 Read，看到文件内容后再请求 Grep 查找相关调用，最后综合工具结果回答。一次用户输入因此可以产生多次模型调用。
-
-# 完整运行示例
-
-用户输入“检查 `main.ts` 是否存在问题”，简化执行过程：
-
-```text
-Conversation：QueryEngine 已创建
-   ↓
-Agent Run：submitMessage("检查 main.ts 是否存在问题")
-   ↓
-Model Request 1：返回 Read(main.ts) 的 tool_use
-   ↓
-Harness 检查权限并执行 Read
-   ↓
-tool_result：文件内容
-   ↓
-Model Request 2：返回 Grep(...) 的 tool_use
-   ↓
-Harness 执行 Grep 并回填结果
-   ↓
-Model Request 3：给出分析结果，不再请求工具
-   ↓
-本次 Agent Run 结束，保留必要的会话状态
-```
+**返回多条消息，不意味着发起同样次数的模型请求。** 一次模型请求也可能产生多个输出事件。
