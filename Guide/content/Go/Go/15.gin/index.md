@@ -151,13 +151,21 @@ InitValidator()
 
 ## gin.Context 和 context.Context 的区别
 
-1. 本质与定位：HTTP 业务上下文，处理 Request/Response；请求链路传递信号与元数据
-2. 核心职责：获取路由参数、Body 解析、设置 Header、响应 JSON/HTML、控制中间件执行流（Next()/Abort()；
-3. 生命周期：短生命周期，随单个 HTTP 请求建立而创建，请求结束立即销毁/回收；可跨协程/跨层级，由开发者显式创建和控制撤销
-4. 对象池复用：是（Gin 底层基于 sync.Pool 复用 gin.Context 实例）；否（按需创建，不可复用）
-5. 并发安全性：非线程安全，严禁直接跨协程共享；线程安全，支持多个 Goroutine 并发读取
+1. 本质：gin.Context是具体的结构体；context.Context是个接口
+2. 核心职责：
+    - gin.Context 承载 HTTP 请求/响应生命周期、参数解析、中间件调度； 
+    - context.Context 协程取消控制、超时截止时间、跨 API 传值
+3. 生命周期：  
+    - gin.Context 短生命周期，随单个 HTTP 请求建立而创建，请求结束立即销毁/回收；
+    - context.Context 可跨协程/跨层级，由开发者显式创建和控制撤销
+4. 对象池复用：
+    - gin.Context 是（Gin 底层基于 sync.Pool 复用 gin.Context 实例）；
+    - context.Context 否（按需创建，不可复用）
+5. 并发安全性：
+    - gin.Context 非线程安全，严禁直接跨协程共享；
+    - context.Context 线程安全，支持多个 Goroutine 并发读取
 
-gin.Context 实现了 context.Context，可以往下传，但请求结束后不能再用。
+gin.Context 自己管理 HTTP 请求处理需要的东西；标准库的 context.Context 则可以通过 c.Request.Context() 取得
 
 ## API 版本化 +1
 

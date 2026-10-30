@@ -29,7 +29,7 @@
 \vspace*{\fill}
 \noindent\begin{minipage}{\textwidth}
 
-\name{侯汶政｜后端/全栈/Agent工程师}
+\name{侯汶政｜后端/全栈工程师}
 
 \section[基本信息]{\faInfoCircle\ 基本信息}
 \vspace{0.5ex}
@@ -63,31 +63,51 @@
         \item 深入理解 Go runtime GMP 模型，掌握调度循环、工作窃取、阻塞处理及 goroutine 抢占。
         \item 掌握 Go 并发编程与源码机制，熟悉 channel、slice、map 等组件的实现原理，理解 select、锁及 context 等核心特性。
         \item 深入理解 Go 内存管理与性能排查方法，掌握逃逸和泄漏分析、内存分配器与 GC 原理。
+        \item 使用 Gin/GORM 开发 Go 服务，理解路由、中间件、参数校验以及事务处理机制。
         \item 拥有 Vue/React/Android 实战经验，具备多端适应能力。
     \end{itemize}
 
-    \item \textbf{数据库与中间件}
+    \item \textbf{数据库}
     \begin{itemize}
         \item 掌握 MySQL InnoDB 存储引擎的 Buffer Pool，事务，MVCC 和锁，索引，内部日志底层以及慢查询的工作原理。
         \item 掌握 Redis 数据结构与底层实现，熟悉过期删除、持久化等机制，掌握缓存三兄弟问题、双写一致性的解决方案。
-        \item 具备基础 RabbitMQ 消息队列的知识，理解消息重复、丢失处理方法；了解 Kafka、RocketMQ 相关选型。
-        \item 基本了解 Go 全文检索库 Bleve 的索引结构，理解倒排索引的组织方式和查询的基本流程。
+        \item 具备 SQLite 开发与优化经验，理解 WAL 和单 Writer 写入约束，能够通过执行计划、复合索引及批量事务优化查询与写入。
     \end{itemize}
     
-    \item \textbf{Agent}
+    \item \textbf{中间件与工程化}
     \begin{itemize}
-        \item 具备基础的 Agent 的工具调用、状态管理与上下文组织的知识，能够使用 LangGraph 编排条件分支、检查点恢复及人工审核流程。
-        \item 基本理解 RAG 的文档处理、检索与生成流程，了解混合检索、结果融合及 Recall@K、MRR 等检索评估方法。
+        \item 具备基础 RabbitMQ 消息队列的知识，理解消息重复、丢失处理方法；了解 Kafka、RocketMQ 相关选型。
+        \item 基本了解 Go 全文检索库 Bleve 的索引结构，理解倒排索引的组织方式和查询的基本流程。
+        \item 熟悉 HTTP/HTTPS、TCP、DNS；结合业务做过 NAT 穿透信令，以及 gRPC + Protobuf。
+        \item 熟悉 Docker 容器化部署技术；实现前后端，转发 Docker Engine API 实现镜像、容器、网络和运行状态管理。
     \end{itemize}
 
     \item \textbf{其他}
     \begin{itemize}
-        \item 熟悉 HTTP/HTTPS、TCP、DNS；结合业务做过 NAT 穿透信令，以及 gRPC + Protobuf。
-        \item 熟悉 Docker 容器化部署技术；实现前后端，转发 Docker Engine API 实现镜像、容器、网络和运行状态管理。
         \item 热爱编程与开源，熟练使用 Codex/Cursor 等 AI 工具优化工作效率。
         \item 坚持技术分享与社区建设，发表教学视频与文章 200+，累计 1k+ 点赞收藏。
     \end{itemize}
 \end{itemize}
+
+\section[个人项目]{\faCode\ 个人项目}
+\paragraph*{视频 Feed 流系统}\mbox{}\\
+{\small
+\noindent 基于 Go 开发的分布式 Feed 流服务，实现用户动态发布、关注关系、时间线查询等功能，采用缓存、异步消息和 Feed 分发策略提升系统吞吐能力。\\
+\noindent\textcolor{gray}{\textbf{技术栈：} Go, React, Redis, RabbitMQ, MySQL}
+}
+\vspace{0.3ex}
+
+\begin{itemize}
+    \item \textbf{Feed 性能优化}：实现时间线、关注流、推荐流、热榜流，使用游标分页、缓存和批量查询提升 Feed 读取速度。
+    \item \textbf{推拉结合视频分发}：普通作者发布走粉丝推送，大 V 作者发布走拉取合并，解决大 V 发布带来的海量 fanout 压力。
+    \item \textbf{异步化}：引入 RabbitMQ 消息队列解耦动态发布和 Feed 扩散流程，提升写入接口响应速度，并通过消费者幂等机制避免重复消费。
+\end{itemize}
+
+\end{minipage}\par
+\vspace*{\fill}
+\newpage
+\vspace*{\fill}
+\noindent\begin{minipage}{\textwidth}
 
 \section[教育背景]{\faGraduationCap\ 教育背景}
 \datedsubsection{\textbf{广州大学} \quad 学士，计算机科学与技术}{2019.09 -- 2023.06}
@@ -96,18 +116,13 @@
 \item 全国大学生算法设计与编程挑战赛（银奖）
 \end{itemize}
 
-\end{minipage}\par
-\vspace*{\fill}
-\newpage
-\vspace*{\fill}
-\noindent\begin{minipage}{\textwidth}
 \section[工作经历]{\faSuitcase\ 工作经历}
 \datedsubsection{\textbf{软件工程师 @ 慧为智能科技有限公司}}{2023.05 - 至今}
 
 \paragraph*{私有云存储系统（NAS）开发}\mbox{}\\
 {\small
 \noindent NAS（Network Attached Storage，网络附加存储）是部署于局域网内的私有云存储设备，为用户提供文件存储、备份及远程访问等能力。\\
-\noindent\textcolor{gray}{\textbf{技术栈：} Go/Gin, Gorm, MySQL, SQLite, Bleve, gRPC, RKNN, Python/FastAPI, PostgreSQL, LangGraph}
+\noindent\textcolor{gray}{\textbf{技术栈：} Go/Gin, Gorm, MySQL, SQLite, Bleve, gRPC, RKNN}
 }
 \vspace{1ex}
 
@@ -159,10 +174,9 @@
     \end{itemize}
     \vspace{1ex}
 
-    \item \textbf{其他}：
+    \item \textbf{文件索引同步系统}：
     \begin{itemize}
-        \item 售后邮件 Agent：一周内完成 MVP，实现邮件分类、知识检索、回复草稿生成与人工审核流程。
-        \item 文件索引同步系统：自研 BFS+Queue 架构替代 fsnotify 监听，海量文件场景下，Go 堆峰值约降 92\%；RSS 峰值比 fsnotify 平均低59\%。
+        \item 自研 BFS+Queue 架构替代 fsnotify 监听，海量文件场景下，Go 堆峰值约降 92\%；RSS 峰值比 fsnotify 平均低59\%。
     \end{itemize}
 
 \end{itemize}
