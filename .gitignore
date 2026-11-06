@@ -16,3 +16,8 @@ uvicorn-log.json
 
 # 简历的 XeLaTeX 辅助文件。
 IV-arena/resume/build/
+
+# 本地 Codex 配置、缓存与手机投递证据不进入版本库。
+.codex*
+.gocache/
+tools/boss_apply_data/
