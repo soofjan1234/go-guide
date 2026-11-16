@@ -1,4 +1,6 @@
 {{ $section := .Section }}
+{{ $personalProjects := site.GetPage "section" "个人项目" }}
+{{ $personalProjectActive := eq $section "个人项目" }}
 {{ $goActive := in (slice "Go" "go") $section }}
 {{ $middlewareActive := eq $section "中间件" }}
 {{ $otherActive := eq $section "其它" }}
@@ -58,4 +60,5 @@
   </div>
 
   {{ with $projects }}<a href="{{ .RelPermalink }}" class="top-index-link{{ if $projectActive }} is-active{{ end }}">项目</a>{{ end }}
+  {{ with $personalProjects }}<a href="{{ .RelPermalink }}" class="top-index-link{{ if $personalProjectActive }} is-active{{ end }}">{{ .Title }}</a>{{ end }}
 </nav>
