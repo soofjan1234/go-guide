@@ -3,6 +3,8 @@ title: 邮件系统1
 weight: 40
 date: 2026-06-12
 draft: false
+build:
+  list: never
 ---
 
 # 项目背景

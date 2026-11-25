@@ -39,7 +39,7 @@ draft: false
 | **ext4** | 成熟、通用的 Linux 磁盘文件系统 | `/userdata`、`/oem` 等，存应用数据和配置 |
 | **OverlayFS** | 把多个目录叠加成一个目录视图 | 根目录 `/`，组合系统基础文件和可写内容 |
 
-用户的硬盘插进来是用btrfs 然后我们的应用是用ext4 接着系统的根目录是overlayFS
+用户的硬盘插进来是用btrfs，然后我们的应用是用ext4，接着系统的根目录是overlayFS
 
 ## 优点
 

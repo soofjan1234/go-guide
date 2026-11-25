@@ -3,6 +3,8 @@ title: 邮件系统2
 weight: 41
 date: 2026-06-12
 draft: false
+build:
+  list: never
 ---
 
 # 图里有哪些节点？
